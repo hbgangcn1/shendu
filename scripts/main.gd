@@ -52,7 +52,7 @@ func _test_card_pool() -> void:
 	var pool_size: int = CardPool.get_pool_size()
 	assert(pool_size == 9, "MVP 卡池应为 9 张，实际为 %d" % pool_size)
 
-	var fire_bolt: CardData = CardPool.get_card("fire_bolt")
+	var fire_bolt = CardPool.get_card("fire_bolt")
 	assert(fire_bolt != null, "fire_bolt 应存在")
 	assert(fire_bolt.damage == 10, "fire_bolt 伤害应为 10")
 	assert(fire_bolt.element == WuXing.Element.FIRE, "fire_bolt 应为火属性")

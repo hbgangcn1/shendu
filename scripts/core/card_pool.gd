@@ -1,10 +1,9 @@
 ## 卡池加载器 — 管理所有卡牌数据
 ## 作为 Autoload 单例使用
 
-class_name CardPool
 extends Node
 
-# 加载后的卡牌数据字典 {id: CardData}
+# 加载后的卡牌数据字典 {id: card_data_resource}
 var _cards: Dictionary = {}
 
 # MVP 卡池 ID 列表
@@ -30,42 +29,34 @@ func _load_cards(path: String) -> void:
 
 	var data: Array = json.data
 	for card_dict in data:
-		var card := _dict_to_card(card_dict)
+		var dict := card_dict as Dictionary
+		var card = load("res://scripts/core/card_data.gd").new()
+		card.id = dict.get("id", "")
+		card.card_name = dict.get("card_name", "")
+		card.description = dict.get("description", "")
+		card.cost = dict.get("cost", 0)
+		card.element = dict.get("element", 0)
+		card.card_type = dict.get("card_type", 0)
+		card.rarity = dict.get("rarity", 0)
+		card.damage = dict.get("damage", 0)
+		card.block = dict.get("block", 0)
+		card.draw_cards = dict.get("draw_cards", 0)
+		card.heal = dict.get("heal", 0)
 		_cards[card.id] = card
 		_mvp_pool.append(card.id)
 
 	print("CardPool: 加载了 %d 张卡牌" % _cards.size())
 
-## 将字典转换为 CardData 资源
-func _dict_to_card(dict: Dictionary) -> CardData:
-	var card := CardData.new()
-	card.id = dict.get("id", "")
-	card.card_name = dict.get("card_name", "")
-	card.description = dict.get("description", "")
-	card.cost = dict.get("cost", 0)
-	card.element = dict.get("element", 0)
-	card.card_type = dict.get("card_type", 0)
-	card.rarity = dict.get("rarity", 0)
-	card.damage = dict.get("damage", 0)
-	card.block = dict.get("block", 0)
-	card.draw_cards = dict.get("draw_cards", 0)
-	card.heal = dict.get("heal", 0)
-	return card
-
 ## 根据 ID 获取卡牌
-func get_card(id: String) -> CardData:
+func get_card(id: String):
 	return _cards.get(id, null)
 
 ## 获取 MVP 卡池中所有卡牌
-func get_mvp_pool() -> Array[CardData]:
-	var result: Array[CardData] = []
+func get_mvp_pool() -> Array:
+	var result: Array = []
 	for id in _mvp_pool:
 		result.append(_cards[id])
 	return result
-
-## 获取 MVP 卡池的 ID 列表
-func get_mvp_pool_ids() -> Array[String]:
-	return _mvp_pool.duplicate()
 
 ## 获取卡池大小
 func get_pool_size() -> int:
