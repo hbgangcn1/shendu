@@ -1,0 +1,26 @@
+# Godot 4 specific ignores
+.godot/
+
+# Godot-specific ignores
+*.translation
+export_presets.cfg
+
+# Imported resources
+.import/
+
+# Builds
+build/
+export/
+
+# OS specific
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+*.code-workspace
+
+# Large binary assets (use Git LFS if needed)
+# *.png
+# *.wav
+# *.ogg
