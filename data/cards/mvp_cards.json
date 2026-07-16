@@ -1,119 +1,439 @@
 [
 	{
-		"id": "metal_slash",
-		"card_name": "金刚斩",
+		"id": "MC-ME-001",
+		"name": "金刚斩",
+		"name_prefix": "金",
+		"name_core": "刚",
+		"name_suffix": "斩",
+		"cost": 2,
+		"type": "attack",
+		"element": "metal",
+		"rarity": "common",
+		"effects": [
+			{
+				"trigger": "on_attack",
+				"action": {"type": "Damage", "target": "enemy", "value": 8, "element": "metal"},
+				"description": "对敌方造成 8 点金属性伤害"
+			}
+		],
 		"description": "锋利如金，斩断一切。",
-		"cost": 2,
-		"element": 0,
-		"card_type": 0,
-		"rarity": 0,
-		"damage": 8,
-		"block": 0,
-		"draw_cards": 0,
-		"heal": 0
+		"upgrade_id": "MC-ME-001U",
+		"character_lock": null,
+		"engraving_slot_count": 2,
+		"erosion_tolerance": 3,
+		"art_path": "res://assets/images/cards/card_char_metal_001.png",
+		"tags": []
 	},
 	{
-		"id": "metal_defend",
-		"card_name": "铁壁",
+		"id": "MC-ME-002",
+		"name": "铁壁",
+		"name_prefix": "铁",
+		"name_core": "壁",
+		"name_suffix": null,
+		"cost": 1,
+		"type": "defense",
+		"element": "metal",
+		"rarity": "common",
+		"effects": [
+			{
+				"trigger": "on_play",
+				"action": {"type": "Block", "target": "self", "value": 6},
+				"description": "获得 6 点格挡"
+			}
+		],
 		"description": "以金气凝结护盾。",
-		"cost": 1,
-		"element": 0,
-		"card_type": 1,
-		"rarity": 0,
-		"damage": 0,
-		"block": 6,
-		"draw_cards": 0,
-		"heal": 0
+		"upgrade_id": "MC-ME-002U",
+		"character_lock": null,
+		"engraving_slot_count": 2,
+		"erosion_tolerance": 3,
+		"art_path": "res://assets/images/cards/card_char_metal_002.png",
+		"tags": []
 	},
 	{
-		"id": "wood_strike",
-		"card_name": "藤鞭",
+		"id": "MC-WO-001",
+		"name": "藤鞭",
+		"name_prefix": "藤",
+		"name_core": "鞭",
+		"name_suffix": null,
+		"cost": 1,
+		"type": "attack",
+		"element": "wood",
+		"rarity": "common",
+		"effects": [
+			{
+				"trigger": "on_attack",
+				"action": {"type": "Damage", "target": "enemy", "value": 6, "element": "wood"},
+				"description": "对敌方造成 6 点木属性伤害"
+			}
+		],
 		"description": "灵藤抽击，生生不息。",
-		"cost": 1,
-		"element": 1,
-		"card_type": 0,
-		"rarity": 0,
-		"damage": 6,
-		"block": 0,
-		"draw_cards": 0,
-		"heal": 0
+		"upgrade_id": "MC-WO-001U",
+		"character_lock": null,
+		"engraving_slot_count": 2,
+		"erosion_tolerance": 3,
+		"art_path": "res://assets/images/cards/card_char_wood_001.png",
+		"tags": []
 	},
 	{
-		"id": "wood_heal",
-		"card_name": "回春术",
+		"id": "MC-WO-002",
+		"name": "回春术",
+		"name_prefix": "回",
+		"name_core": "春",
+		"name_suffix": "术",
+		"cost": 1,
+		"type": "support",
+		"element": "wood",
+		"rarity": "common",
+		"effects": [
+			{
+				"trigger": "on_play",
+				"action": {"type": "Heal", "target": "self", "value": 5},
+				"description": "回复 5 点生命"
+			}
+		],
 		"description": "木气滋养，回复生命。",
-		"cost": 1,
-		"element": 1,
-		"card_type": 3,
-		"rarity": 0,
-		"damage": 0,
-		"block": 0,
-		"draw_cards": 0,
-		"heal": 5
+		"upgrade_id": "MC-WO-002U",
+		"character_lock": null,
+		"engraving_slot_count": 2,
+		"erosion_tolerance": 3,
+		"art_path": "res://assets/images/cards/card_char_wood_002.png",
+		"tags": []
 	},
 	{
-		"id": "water_splash",
-		"card_name": "水弹",
+		"id": "MC-WA-001",
+		"name": "水弹",
+		"name_prefix": "水",
+		"name_core": "弹",
+		"name_suffix": null,
+		"cost": 1,
+		"type": "attack",
+		"element": "water",
+		"rarity": "common",
+		"effects": [
+			{
+				"trigger": "on_attack",
+				"action": {"type": "Damage", "target": "enemy", "value": 5, "element": "water"},
+				"description": "对敌方造成 5 点水属性伤害"
+			},
+			{
+				"trigger": "on_play",
+				"action": {"type": "Draw", "target": "self", "value": 1},
+				"description": "抽 1 张牌"
+			}
+		],
 		"description": "水流如刀，灵活渗透。",
-		"cost": 1,
-		"element": 4,
-		"card_type": 0,
-		"rarity": 0,
-		"damage": 5,
-		"block": 0,
-		"draw_cards": 1,
-		"heal": 0
+		"upgrade_id": "MC-WA-001U",
+		"character_lock": null,
+		"engraving_slot_count": 2,
+		"erosion_tolerance": 3,
+		"art_path": "res://assets/images/cards/card_char_water_001.png",
+		"tags": []
 	},
 	{
-		"id": "water_defend",
-		"card_name": "水幕",
+		"id": "MC-WA-002",
+		"name": "水幕",
+		"name_prefix": "水",
+		"name_core": "幕",
+		"name_suffix": null,
+		"cost": 1,
+		"type": "defense",
+		"element": "water",
+		"rarity": "common",
+		"effects": [
+			{
+				"trigger": "on_play",
+				"action": {"type": "Block", "target": "self", "value": 5},
+				"description": "获得 5 点格挡"
+			}
+		],
 		"description": "水流护盾，柔中带刚。",
-		"cost": 1,
-		"element": 4,
-		"card_type": 1,
-		"rarity": 0,
-		"damage": 0,
-		"block": 5,
-		"draw_cards": 0,
-		"heal": 0
+		"upgrade_id": "MC-WA-002U",
+		"character_lock": null,
+		"engraving_slot_count": 2,
+		"erosion_tolerance": 3,
+		"art_path": "res://assets/images/cards/card_char_water_002.png",
+		"tags": []
 	},
 	{
-		"id": "fire_bolt",
-		"card_name": "烈焰弹",
-		"description": "以火焚尽一切阻碍。",
+		"id": "MC-FI-001",
+		"name": "烈焰弹",
+		"name_prefix": "烈",
+		"name_core": "焰",
+		"name_suffix": "弹",
 		"cost": 3,
-		"element": 3,
-		"card_type": 0,
-		"rarity": 0,
-		"damage": 10,
-		"block": 0,
-		"draw_cards": 0,
-		"heal": 0
+		"type": "attack",
+		"element": "fire",
+		"rarity": "common",
+		"effects": [
+			{
+				"trigger": "on_attack",
+				"action": {"type": "Damage", "target": "enemy", "value": 10, "element": "fire"},
+				"description": "对敌方造成 10 点火属性伤害"
+			}
+		],
+		"description": "以火焚尽一切阻碍。",
+		"upgrade_id": "MC-FI-001U",
+		"character_lock": null,
+		"engraving_slot_count": 2,
+		"erosion_tolerance": 3,
+		"art_path": "res://assets/images/cards/card_char_fire_001.png",
+		"tags": []
 	},
 	{
-		"id": "fire_burst",
-		"card_name": "爆燃",
+		"id": "MC-FI-002",
+		"name": "爆燃",
+		"name_prefix": "爆",
+		"name_core": "燃",
+		"name_suffix": null,
+		"cost": 2,
+		"type": "attack",
+		"element": "fire",
+		"rarity": "rare",
+		"effects": [
+			{
+				"trigger": "on_attack",
+				"action": {"type": "Damage", "target": "enemy", "value": 14, "element": "fire"},
+				"description": "对敌方造成 14 点火属性伤害"
+			}
+		],
 		"description": "火焰爆发，灼烧敌人。",
-		"cost": 2,
-		"element": 3,
-		"card_type": 0,
-		"rarity": 1,
-		"damage": 14,
-		"block": 0,
-		"draw_cards": 0,
-		"heal": 0
+		"upgrade_id": "MC-FI-002U",
+		"character_lock": null,
+		"engraving_slot_count": 3,
+		"erosion_tolerance": 4,
+		"art_path": "res://assets/images/cards/card_char_fire_002.png",
+		"tags": []
 	},
 	{
-		"id": "earth_shield",
-		"card_name": "岩盾",
-		"description": "大地之力，稳如磐石。",
+		"id": "MC-EA-001",
+		"name": "岩盾",
+		"name_prefix": "岩",
+		"name_core": "盾",
+		"name_suffix": null,
 		"cost": 2,
-		"element": 2,
-		"card_type": 1,
-		"rarity": 0,
-		"damage": 0,
-		"block": 8,
-		"draw_cards": 0,
-		"heal": 0
+		"type": "defense",
+		"element": "earth",
+		"rarity": "common",
+		"effects": [
+			{
+				"trigger": "on_play",
+				"action": {"type": "Block", "target": "self", "value": 8},
+				"description": "获得 8 点格挡"
+			}
+		],
+		"description": "大地之力，稳如磐石。",
+		"upgrade_id": "MC-EA-001U",
+		"character_lock": null,
+		"engraving_slot_count": 2,
+		"erosion_tolerance": 3,
+		"art_path": "res://assets/images/cards/card_char_earth_001.png",
+		"tags": []
+	}
+
+,
+	{
+		"id": "MC-ME-003",
+		"name": "金精聚",
+		"name_prefix": "金精",
+		"name_core": "聚",
+		"name_suffix": null,
+		"cost": 0,
+		"type": "support",
+		"element": "metal",
+		"rarity": "common",
+		"effects": [
+			{
+				"trigger": "on_play",
+				"action": {"type": "Draw", "target": "self", "value": 2},
+				"description": "抽 2 张牌"
+			}
+		],
+		"description": "金精凝聚，思绪如剑。",
+		"upgrade_id": "MC-ME-003U",
+		"character_lock": null,
+		"engraving_slot_count": 2,
+		"erosion_tolerance": 3,
+		"art_path": "res://assets/images/cards/card_char_metal_003.png",
+		"tags": []
+	},
+	{
+		"id": "MC-WO-003",
+		"name": "木生术",
+		"name_prefix": "木生",
+		"name_core": "术",
+		"name_suffix": null,
+		"cost": 1,
+		"type": "support",
+		"element": "wood",
+		"rarity": "common",
+		"effects": [
+			{
+				"trigger": "on_play",
+				"action": {"type": "Heal", "target": "self", "value": 4},
+				"description": "回复 4 点生命"
+			}
+		],
+		"description": "木之生气，润养身心。",
+		"upgrade_id": "MC-WO-003U",
+		"character_lock": null,
+		"engraving_slot_count": 2,
+		"erosion_tolerance": 3,
+		"art_path": "res://assets/images/cards/card_char_wood_003.png",
+		"tags": []
+	},
+	{
+		"id": "MC-WA-003",
+		"name": "润泽诀",
+		"name_prefix": "润泽",
+		"name_core": "诀",
+		"name_suffix": null,
+		"cost": 1,
+		"type": "support",
+		"element": "water",
+		"rarity": "common",
+		"effects": [
+			{
+				"trigger": "on_play",
+				"action": {"type": "Draw", "target": "self", "value": 2},
+				"description": "抽 2 张牌"
+			}
+		],
+		"description": "水之润泽，思绪泉涌。",
+		"upgrade_id": "MC-WA-003U",
+		"character_lock": null,
+		"engraving_slot_count": 2,
+		"erosion_tolerance": 3,
+		"art_path": "res://assets/images/cards/card_char_water_003.png",
+		"tags": []
+	},
+	{
+		"id": "MC-FI-003",
+		"name": "余烬",
+		"name_prefix": "余",
+		"name_core": "烬",
+		"name_suffix": null,
+		"cost": 1,
+		"type": "support",
+		"element": "fire",
+		"rarity": "common",
+		"effects": [
+			{
+				"trigger": "on_play",
+				"action": {"type": "Damage", "target": "enemy", "value": 4, "element": "fire"},
+				"description": "对敌方造成 4 点火属性伤害"
+			}
+		],
+		"description": "火烬未熄，余温伤人。",
+		"upgrade_id": "MC-FI-003U",
+		"character_lock": null,
+		"engraving_slot_count": 2,
+		"erosion_tolerance": 3,
+		"art_path": "res://assets/images/cards/card_char_fire_003.png",
+		"tags": []
+	},
+	{
+		"id": "MC-EA-003",
+		"name": "厚土润",
+		"name_prefix": "厚土",
+		"name_core": "润",
+		"name_suffix": null,
+		"cost": 1,
+		"type": "support",
+		"element": "earth",
+		"rarity": "common",
+		"effects": [
+			{
+				"trigger": "on_play",
+				"action": {"type": "Heal", "target": "self", "value": 3},
+				"description": "回复 3 点生命"
+			}
+		],
+		"description": "厚土滋养，缓缓回血。",
+		"upgrade_id": "MC-EA-003U",
+		"character_lock": null,
+		"engraving_slot_count": 2,
+		"erosion_tolerance": 3,
+		"art_path": "res://assets/images/cards/card_char_earth_003.png",
+		"tags": []
+	},
+	{
+		"id": "MC-EA-004",
+		"name": "厚土归元",
+		"name_prefix": "厚土",
+		"name_core": "归元",
+		"name_suffix": null,
+		"cost": 2,
+		"type": "support",
+		"element": "earth",
+		"rarity": "common",
+		"effects": [
+			{
+				"trigger": "on_play",
+				"action": {"type": "Heal", "target": "self", "value": 5},
+				"description": "回复 5 点生命"
+			},
+			{
+				"trigger": "on_play",
+				"action": {"type": "Block", "target": "self", "value": 3},
+				"description": "获得 3 点格挡"
+			}
+		],
+		"description": "土气归元，养身护体。",
+		"upgrade_id": "MC-EA-004U",
+		"character_lock": null,
+		"engraving_slot_count": 2,
+		"erosion_tolerance": 3,
+		"art_path": "res://assets/images/cards/card_char_earth_004.png",
+		"tags": []
+	},
+	{
+		"id": "MC-WO-004",
+		"name": "藤蔓护",
+		"name_prefix": "藤蔓",
+		"name_core": "护",
+		"name_suffix": null,
+		"cost": 2,
+		"type": "defense",
+		"element": "wood",
+		"rarity": "common",
+		"effects": [
+			{
+				"trigger": "on_play",
+				"action": {"type": "Block", "target": "self", "value": 7},
+				"description": "获得 7 点格挡"
+			}
+		],
+		"description": "灵藤缠绕，护身成壁。",
+		"upgrade_id": "MC-WO-004U",
+		"character_lock": null,
+		"engraving_slot_count": 2,
+		"erosion_tolerance": 3,
+		"art_path": "res://assets/images/cards/card_char_wood_004.png",
+		"tags": []
+	},
+	{
+		"id": "MC-WA-004",
+		"name": "潮汐壁垒",
+		"name_prefix": "潮汐",
+		"name_core": "壁垒",
+		"name_suffix": null,
+		"cost": 2,
+		"type": "defense",
+		"element": "water",
+		"rarity": "common",
+		"effects": [
+			{
+				"trigger": "on_play",
+				"action": {"type": "Block", "target": "self", "value": 9},
+				"description": "获得 9 点格挡"
+			}
+		],
+		"description": "潮汐之力，坚不可摧。",
+		"upgrade_id": "MC-WA-004U",
+		"character_lock": null,
+		"engraving_slot_count": 2,
+		"erosion_tolerance": 3,
+		"art_path": "res://assets/images/cards/card_char_water_004.png",
+		"tags": []
 	}
 ]

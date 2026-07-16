@@ -2,7 +2,12 @@
 ## 作为 Autoload 单例使用
 ## 所有模块通过 EventBus 发射/监听信号，不直接引用彼此
 
+# implements: design/00-MASTER.md
+# implements_philosophy: rule_3_three_layer_loops, rule_8_cosmetics_over_p2w
+# avoids_red_line: red_10_three_layer_break
+
 extends Node
+@warning_ignore("unused_signal")
 
 # ==================== 战斗流程信号 ====================
 

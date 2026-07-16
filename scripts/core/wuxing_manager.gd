@@ -1,3 +1,7 @@
+# implements: design/00-MASTER.md
+# implements_philosophy: rule_3_three_layer_loops, rule_8_cosmetics_over_p2w
+# avoids_red_line: red_10_three_layer_break
+
 extends Node
 
 # ==================== 五行枚举 ====================
@@ -28,6 +32,24 @@ const ELEMENT_COLORS := {
 	Element.EARTH: Color(0.85, 0.65, 0.2),    # 琥珀
 }
 
+# 元素图标路径（无文字版，遵循 NO_TEXT_DESIGN_PRINCIPLE.md）
+const ELEMENT_ICONS := {
+	Element.METAL: "res://assets/images/ui/ui_icon_metal_001.png",
+	Element.WOOD:  "res://assets/images/ui/ui_icon_wood_001.png",
+	Element.WATER: "res://assets/images/ui/ui_icon_water_001.png",
+	Element.FIRE:  "res://assets/images/ui/ui_icon_fire_001.png",
+	Element.EARTH: "res://assets/images/ui/ui_icon_earth_001.png",
+}
+
+# 元素英文名（用于图标文件名与调试）
+const ELEMENT_ENGLISH_NAMES := {
+	Element.METAL: "metal",
+	Element.WOOD:  "wood",
+	Element.WATER: "water",
+	Element.FIRE:  "fire",
+	Element.EARTH: "earth",
+}
+
 # ==================== 相生相克表 ====================
 
 # 相生表：GENERATE[from] = to
@@ -56,6 +78,15 @@ const GENERATION_BONUS := 1.5      # 相生加成 +50%
 const COUNTER_MULTIPLIER := 2.0    # 克制伤害 ×2
 const COUNTERED_MULTIPLIER := 0.5  # 被克伤害 ×0.5
 
+## 相生链奖励类型
+enum GenerationBonusType {
+	DAMAGE_PERCENT,  # 伤害加成百分比
+	FLAT_BLOCK,      # 固定格挡
+	DRAW_CARDS,      # 抽牌
+	HEAL,            # 回复生命
+	COST_REDUCE,     # 减费
+}
+
 # ==================== 查询方法 ====================
 
 ## 获取元素中文名
@@ -82,16 +113,59 @@ func is_counter(attacker: Element, defender: Element) -> bool:
 func is_countered_by(attacker: Element, defender: Element) -> bool:
 	return COUNTER[defender] == attacker
 
+## 获取相生加成信息（用于蓄势爆发 + 相生链奖励）
+## 根据「被生者」元素决定奖励类型
+func get_generation_bonus(element: Element) -> Dictionary:
+	var target: Element = GENERATE[element]
+	var bonus_type: GenerationBonusType
+	var value: int
+	
+	# 木生火→伤害加成 | 火生土→格挡 | 土生金→抽牌 | 金生水→回复 | 水生木→减费
+	match target:
+		Element.FIRE:
+			bonus_type = GenerationBonusType.DAMAGE_PERCENT
+			value = 50
+		Element.EARTH:
+			bonus_type = GenerationBonusType.FLAT_BLOCK
+			value = 8
+		Element.METAL:
+			bonus_type = GenerationBonusType.DRAW_CARDS
+			value = 1
+		Element.WATER:
+			bonus_type = GenerationBonusType.HEAL
+			value = 6
+		Element.WOOD:
+			bonus_type = GenerationBonusType.COST_REDUCE
+			value = 1
+		_:
+			bonus_type = GenerationBonusType.DAMAGE_PERCENT
+			value = 30
+	
+	return {
+		"from": element,
+		"to": target,
+		"bonus": GENERATION_BONUS,
+		"name": "%s生%s" % [ELEMENT_NAMES[element], ELEMENT_NAMES[target]],
+		"description": "%s生%s" % [ELEMENT_NAMES[element], ELEMENT_NAMES[target]],
+		"type": bonus_type,
+		"value": value,
+	}
+
 ## 计算五行伤害倍率
 func calculate_damage_multiplier(
 	attack_element: Element,
 	defender_element: Element,
-	is_generation_chain: bool = false
+	is_generation_chain: bool = false,
+	charge_stacks: int = 0
 ) -> float:
 	var multiplier := 1.0
 
 	if is_generation_chain:
 		multiplier *= GENERATION_BONUS
+
+	# 蓄势加成：每层 +25%，上限 1.75（按 spec 07-combat-system-spec.md:174）
+	if charge_stacks > 0:
+		multiplier *= min(1.0 + charge_stacks * 0.25, 1.75)
 
 	if is_counter(attack_element, defender_element):
 		multiplier *= COUNTER_MULTIPLIER

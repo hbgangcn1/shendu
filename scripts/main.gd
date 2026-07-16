@@ -1,6 +1,10 @@
 ## 主场景入口脚本
 ## 启动时打印五行系统自测，确认核心模块正常
 
+# implements: design/01-player-experience.md
+# implements_philosophy: rule_1_core_loop_first
+# avoids_red_line: red_8_tutorial_hell
+
 extends Node2D
 
 func _ready() -> void:
@@ -12,6 +16,8 @@ func _ready() -> void:
 	print("========================================")
 	print("  所有自测通过 ✓")
 	print("========================================")
+	# 自测完成后进入主菜单
+	get_tree().change_scene_to_file.call_deferred("res://scenes/main_menu.tscn")
 
 ## 五行系统自测
 func _test_wuxing() -> void:
@@ -46,15 +52,27 @@ func _test_wuxing() -> void:
 
 	print("  ✓ 伤害计算正确")
 
-## 卡池自测
+## 卡池自测（card_pool.gd 现加载 mvp+zhuji+jindan 三池共 45 张）
+## 注：EA 范围 45 张（5属性×9张），详见 design/00-MASTER.md §十
+## 补卡记录 2026-06-29：mvp 9→17（+8 common），zhuji 9→15（+4 common+2 rare），jindan 7→13（+2 common+1 rare+2 epic+1 legend）
 func _test_card_pool() -> void:
 	print("\n--- 卡池自测 ---")
 	var pool_size: int = CardPool.get_pool_size()
-	assert(pool_size == 9, "MVP 卡池应为 9 张，实际为 %d" % pool_size)
+	assert(pool_size == 45, "总卡池应为 45 张（EA 范围），实际为 %d" % pool_size)
 
-	var fire_bolt = CardPool.get_card("fire_bolt")
-	assert(fire_bolt != null, "fire_bolt 应存在")
-	assert(fire_bolt.damage == 10, "fire_bolt 伤害应为 10")
-	assert(fire_bolt.element == WuXing.Element.FIRE, "fire_bolt 应为火属性")
+	var fire_bolt = CardPool.get_card("MC-FI-001")
+	assert(fire_bolt != null, "MC-FI-001 烈焰弹应存在")
+	assert(fire_bolt.damage == 10, "烈焰弹伤害应为 10")
+	assert(fire_bolt.element == WuXing.Element.FIRE, "烈焰弹应为火属性")
+
+	# 验证补的 0 费卡
+	var jin_jing = CardPool.get_card("MC-ME-003")
+	assert(jin_jing != null, "MC-ME-003 金精聚应存在（0 费 support）")
+	assert(jin_jing.cost == 0, "金精聚费用应为 0")
+
+	# 验证补的传说卡（card_pool.gd 已做 rarity 偏移 -1，jindan 4 → spec 3）
+	var ye_huo = CardPool.get_card("MC-FI-006")
+	assert(ye_huo != null, "MC-FI-006 业火焚天应存在（legend）")
+	assert(ye_huo.rarity == 3, "业火焚天应为传说（spec rarity=3）")
 
 	print("  ✓ 卡池加载正确（%d 张卡牌）" % pool_size)
