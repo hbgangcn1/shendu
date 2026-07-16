@@ -127,7 +127,12 @@ func _write_battle_state(state: Dictionary, current_scene: Node) -> void:
 		state["generation_chain"] = []
 		for elem in chain:
 			state["generation_chain"].append(int(elem))
-	state["chain_trigger_count"] = bm._chain_trigger_count if bm.has("_chain_trigger_count") else 0
+	# 2026-07-16 fix: 原 bm.has("_chain_trigger_count") 错用 .has() on Node → SCRIPT ERROR
+	# Node 无 .has() 方法。改成 has_method() 检查 + get() 取值
+	if bm.has_method("get") and "_chain_trigger_count" in bm:
+		state["chain_trigger_count"] = int(bm.get("_chain_trigger_count"))
+	else:
+		state["chain_trigger_count"] = 0
 	state["battle_state"] = bm.get_state_name()
 
 func _get_scene_name() -> String:
