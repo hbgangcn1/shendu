@@ -79,8 +79,9 @@ func _ready() -> void:
 			RunGoals.add_goal("max_runtime_seconds", 120, "normal")
 			RunGoals.add_goal("survive_n_battles", 3, "high")
 			RunGoals.add_goal("collect_n_cards", 15, "normal")
-	# 2026-07-13：检测 --ai-player-mode=model flag
+	# 2026-07-13：检测 --ai-player-mode=model flag (2026-07-17 增强：支持空格分隔形式)
 	_ai_player_mode = _parse_ai_player_mode()
+	print("AIPlayer: 解析后的 mode = %s" % _ai_player_mode)
 	if _ai_player_mode == MODE_MODEL:
 		print("AIPlayer: model mode 启用（外部 LLM agent 驱动决策，run_id=%s）" % _run_id)
 		print("AIPlayer: 命令行启动方式: ai_player_client.py --mode=request")
@@ -105,14 +106,30 @@ func _is_qa_mode() -> bool:
 	return OS.get_cmdline_user_args().has("--qa-auto-run")
 
 # 2026-07-13 新增：解析 --ai-player-mode=<mode> 参数
+# 2026-07-17 修复：支持两种形式（Godot 4.7 在 Windows 上对 `--key=value` 形式解析有 bug）
+#   形式 1: --ai-player-mode=model  （= 直接连接）
+#   形式 2: --ai-player-mode model  （空格分隔，POSIX 标准）
 func _parse_ai_player_mode() -> String:
-	for arg in OS.get_cmdline_user_args():
+	var args: Array = OS.get_cmdline_user_args()
+	print("AIPlayer[debug]: cmdline_user_args = %s" % str(args))
+	var i: int = 0
+	while i < args.size():
+		var arg: String = args[i]
+		# 形式 1: --ai-player-mode=model
 		if arg.begins_with("--ai-player-mode="):
 			var mode := arg.substr("--ai-player-mode=".length())
 			if mode == MODE_MODEL or mode == MODE_SCRIPT:
 				return mode
 			push_warning("AIPlayer: 未知 mode '%s'，fallback 到 script mode" % mode)
 			return MODE_SCRIPT
+		# 形式 2: --ai-player-mode model
+		if arg == "--ai-player-mode" and i + 1 < args.size():
+			var mode: String = args[i + 1]
+			if mode == MODE_MODEL or mode == MODE_SCRIPT:
+				return mode
+			push_warning("AIPlayer: 未知 mode '%s'，fallback 到 script mode" % mode)
+			return MODE_SCRIPT
+		i += 1
 	return MODE_SCRIPT
 
 # model 模式的观察循环：只检测状态 + 报告 stats + 监听时间，不做决策
