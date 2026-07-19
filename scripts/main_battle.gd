@@ -78,6 +78,11 @@ func _start_battle() -> void:
 	print("战斗：初始化完成，敌人数量=%d" % enemies.size())
 	print(battle_manager.get_battle_summary())
 
+	# 首战新手引导
+	if not GameState.first_battle_done:
+		battle_ui.start_tutorial()
+		print("战斗：首战，启动新手引导")
+
 func _generate_enemies() -> Array:
 	var enemies: Array = []
 	var node_id: String = GameState.current_node_id
@@ -158,6 +163,12 @@ func _connect_signals() -> void:
 	battle_ui.card_selected.connect(_on_card_selected)
 	battle_ui.enemy_selected.connect(_on_enemy_selected)
 	battle_ui.end_turn_pressed.connect(_on_end_turn_pressed)
+
+	# 新手引导信号连接
+	battle_ui.card_selected.connect(_on_tutorial_card_selected)
+	battle_ui.enemy_selected.connect(_on_tutorial_enemy_selected)
+	battle_ui.end_turn_pressed.connect(_on_tutorial_end_turn_pressed)
+	battle_manager.turn_started.connect(_on_tutorial_turn_started)
 
 # ==================== 事件处理 ====================
 
@@ -306,6 +317,20 @@ func _on_enemy_selected(enemy_index: int) -> void:
 func _on_end_turn_pressed() -> void:
 	battle_manager.player_end_turn()
 	_update_ui()
+
+# ==================== 新手引导回调 ====================
+
+func _on_tutorial_card_selected(card_index: int) -> void:
+	battle_ui.on_card_clicked_during_tutorial()
+
+func _on_tutorial_enemy_selected(enemy_index: int) -> void:
+	battle_ui.on_enemy_selected_during_tutorial()
+
+func _on_tutorial_end_turn_pressed() -> void:
+	battle_ui.on_end_turn_pressed_during_tutorial()
+
+func _on_tutorial_turn_started(turn: int) -> void:
+	battle_ui.on_turn_started_during_tutorial(turn)
 
 # ==================== 存档 ====================
 

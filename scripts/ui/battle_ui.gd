@@ -40,6 +40,27 @@ var _log_visible: bool = true
 # 在 update_hand_display 末尾同步设置，与 UI 实际渲染手牌一致
 var hand_count: int = 0
 
+# ==================== 新手引导（onboarding） ====================
+
+# 引导步骤枚举
+enum TutorialStep {
+	NONE = -1,      # 无引导/已完成
+	WELCOME = 0,    # 欢迎：点击卡牌
+	SELECT_ENEMY = 1, # 选择敌人
+	PLAY_CARD = 2,  # 打出卡牌
+	END_TURN = 3,   # 结束回合
+	ENERGY = 4,     # 灵力说明
+	WUXING = 5,     # 五行相生
+	COMPLETE = 6    # 完成
+}
+
+var _tutorial_step: TutorialStep = TutorialStep.NONE
+var _tutorial_overlay: Control = null
+var _tutorial_label: RichTextLabel = null
+var _tutorial_arrow: TextureRect = null
+var _tutorial_highlight: PanelContainer = null
+var _tutorial_dismissed: bool = false
+
 # ==================== 卡牌场景 ====================
 
 const CARD_SCENE := preload("res://scenes/card.tscn")
@@ -350,6 +371,238 @@ func _create_enemy_ui(enemy: Actor) -> Control:
 	vbox.add_child(intent_label)
 
 	return panel
+
+## 设置 UI 可见性
+func set_ui_visible(p_visible: bool) -> void:
+	visible = p_visible
+
+# ==================== 新手引导（onboarding）实现 ====================
+
+## 开始新手引导（在首战时调用）
+func start_tutorial() -> void:
+	if GameState.first_battle_done:
+		return
+	_tutorial_step = TutorialStep.WELCOME
+	_tutorial_dismissed = false
+	_create_tutorial_overlay()
+	_show_tutorial_step()
+
+## 创建引导覆盖层
+func _create_tutorial_overlay() -> void:
+	# 半透明遮罩
+	_tutorial_overlay = Control.new()
+	_tutorial_overlay.layout_mode = 3  # FULL_RECT
+	_tutorial_overlay.anchors_preset = 15  # FULL_RECT
+	_tutorial_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(_tutorial_overlay)
+	
+	# 高亮面板（用于框住目标 UI）
+	_tutorial_highlight = PanelContainer.new()
+	_tutorial_highlight.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var highlight_style := StyleBoxFlat.new()
+	highlight_style.bg_color = Color(0, 0, 0, 0)
+	highlight_style.border_color = UITheme.GOLD
+	highlight_style.border_width_left = 3
+	highlight_style.border_width_top = 3
+	highlight_style.border_width_right = 3
+	highlight_style.border_width_bottom = 3
+	highlight_style.corner_radius_top_left = 8
+	highlight_style.corner_radius_top_right = 8
+	highlight_style.corner_radius_bottom_left = 8
+	highlight_style.corner_radius_bottom_right = 8
+	highlight_style.shadow_size = 16
+	highlight_style.shadow_color = Color(UITheme.GOLD.r, UITheme.GOLD.g, UITheme.GOLD.b, 0.5)
+	_tutorial_highlight.add_theme_stylebox_override("panel", highlight_style)
+	_tutorial_highlight.visible = false
+	_tutorial_overlay.add_child(_tutorial_highlight)
+	
+	# 文本标签
+	_tutorial_label = RichTextLabel.new()
+	_tutorial_label.layout_mode = 2  # ANCHORED
+	_tutorial_label.anchors_preset = 0  # TOP_LEFT
+	_tutorial_label.custom_minimum_size = Vector2(300, 120)
+	_tutorial_label.bbcode_enabled = true
+	_tutorial_label.scroll_active = false
+	_tutorial_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var label_style := StyleBoxFlat.new()
+	label_style.bg_color = Color(0.05, 0.05, 0.1, 0.95)
+	label_style.border_color = UITheme.CYAN_NEON
+	label_style.border_width_left = 2
+	label_style.border_width_top = 2
+	label_style.border_width_right = 2
+	label_style.border_width_bottom = 2
+	label_style.corner_radius_top_left = 8
+	label_style.corner_radius_top_right = 8
+	label_style.corner_radius_bottom_left = 8
+	label_style.corner_radius_bottom_right = 8
+	label_style.content_margin_left = 16
+	label_style.content_margin_right = 16
+	label_style.content_margin_top = 12
+	label_style.content_margin_bottom = 12
+	_tutorial_label.add_theme_stylebox_override("normal", label_style)
+	_tutorial_label.add_theme_font_size_override("normal_font_size", 22)
+	_tutorial_label.add_theme_color_override("default_color", Color(0.9, 0.95, 1.0, 1.0))
+	_tutorial_overlay.add_child(_tutorial_label)
+	
+	# 箭头指示器
+	_tutorial_arrow = TextureRect.new()
+	_tutorial_arrow.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_tutorial_arrow.visible = false
+	# 创建一个简单的三角形箭头
+	var arrow_img := Image.new()
+	arrow_img.create(32, 32, false, Image.FORMAT_RGBA8)
+	arrow_img.lock()
+	for x in range(32):
+		for y in range(32):
+			var cx = 16.0
+			var cy = 16.0
+			var dx = x - cx
+			var dy = y - cy
+			# 向下的三角形
+			if abs(dx) * 2 < (16 - dy) and dy < 16:
+				arrow_img.set_pixel(x, y, UITheme.GOLD)
+	arrow_img.unlock()
+	var arrow_tex := ImageTexture.create_from_image(arrow_img)
+	_tutorial_arrow.texture = arrow_tex
+	_tutorial_arrow.custom_minimum_size = Vector2(32, 32)
+	_tutorial_overlay.add_child(_tutorial_arrow)
+
+## 显示当前引导步骤
+func _show_tutorial_step() -> void:
+	if _tutorial_step == TutorialStep.NONE or _tutorial_step == TutorialStep.COMPLETE:
+		_end_tutorial()
+		return
+	
+	var step_data: Dictionary = _get_tutorial_step_data(_tutorial_step)
+	if step_data.is_empty():
+		_next_tutorial_step()
+		return
+	
+	# 更新文本
+	_tutorial_label.text = step_data.get("text", "")
+	
+	# 定位标签和高亮
+	var target_node: Control = step_data.get("target_node", null)
+	var label_pos: Vector2 = step_data.get("label_pos", Vector2(50, 50))
+	var highlight_rect: Rect2 = step_data.get("highlight_rect", Rect2())
+	var arrow_pos: Vector2 = step_data.get("arrow_pos", Vector2())
+	var arrow_rotation: float = step_data.get("arrow_rotation", 0.0)
+	
+	_tutorial_label.global_position = label_pos
+	
+	if highlight_rect != Rect2():
+		_tutorial_highlight.global_position = highlight_rect.position
+		_tutorial_highlight.custom_minimum_size = highlight_rect.size
+		_tutorial_highlight.visible = true
+	else:
+		_tutorial_highlight.visible = false
+	
+	if arrow_pos != Vector2():
+		_tutorial_arrow.global_position = arrow_pos
+		_tutorial_arrow.rotation = arrow_rotation
+		_tutorial_arrow.visible = true
+	else:
+		_tutorial_arrow.visible = false
+
+## 获取引导步骤数据
+func _get_tutorial_step_data(step: TutorialStep) -> Dictionary:
+	match step:
+		TutorialStep.WELCOME:
+			var hand_node = get_node_or_null("MainHBox/GameArea/BottomPanel/BottomVBox/HandContainer")
+			return {
+				"text": "[color=#FFD700]欢迎来到蜃都战斗！[/color]\n\n点击手牌中的 [color=#4CAF50]卡牌[/color] 来选择它。",
+				"target_node": hand_node,
+				"label_pos": Vector2(50, 50),
+				"highlight_rect": Rect2(hand_node.global_position - Vector2(10, 10), hand_node.size + Vector2(20, 20)) if hand_node else Rect2(),
+				"arrow_pos": Vector2(hand_node.global_position.x + hand_node.size.x / 2, hand_node.global_position.y - 40) if hand_node else Vector2(),
+				"arrow_rotation": -PI / 2,
+			}
+		TutorialStep.SELECT_ENEMY:
+			var enemy_node = get_node_or_null("MainHBox/GameArea/EnemyArea/EnemyContainer")
+			return {
+				"text": "很好！现在点击敌人 [color=#EF5350]选择目标[/color]。\n敌人头上会显示 [color=#FFAA44]意图[/color]（攻击/防御/治疗等）。",
+				"target_node": enemy_node,
+				"label_pos": Vector2(50, 50),
+				"highlight_rect": Rect2(enemy_node.global_position - Vector2(10, 10), enemy_node.size + Vector2(20, 20)) if enemy_node else Rect2(),
+				"arrow_pos": Vector2(enemy_node.global_position.x + enemy_node.size.x / 2, enemy_node.global_position.y - 40) if enemy_node else Vector2(),
+				"arrow_rotation": -PI / 2,
+			}
+		TutorialStep.PLAY_CARD:
+			return {
+				"text": "目标选中后，再次点击 [color=#4CAF50]卡牌[/color] 即可 [color=#FFD700]打出[/color]。\n消耗的 [color=#42A5F5]灵力[/color] 显示在左下角。",
+				"target_node": get_node_or_null("MainHBox/GameArea/BottomPanel/BottomVBox/HandContainer"),
+				"label_pos": Vector2(50, 50),
+				"arrow_pos": Vector2(),
+			}
+		TutorialStep.END_TURN:
+			var btn = get_node_or_null("MainHBox/GameArea/BottomPanel/BottomVBox/EndTurnButton")
+			return {
+				"text": "打完牌后，点击 [color=#FFD700]结束回合[/color] 按钮。\n敌人将按 [color=#FFAA44]意图[/color] 行动。\n\n下回合灵力会 [color=#42A5F5]回满[/color] 并 [color=#4CAF50]抽新牌[/color]。",
+				"target_node": btn,
+				"label_pos": Vector2(btn.global_position.x - 350, btn.global_position.y - 140) if btn else Vector2(50, 50),
+				"highlight_rect": Rect2(btn.global_position - Vector2(10, 10), btn.size + Vector2(20, 20)) if btn else Rect2(),
+				"arrow_pos": Vector2(btn.global_position.x + btn.size.x / 2, btn.global_position.y - 40) if btn else Vector2(),
+				"arrow_rotation": -PI / 2,
+			}
+		TutorialStep.ENERGY:
+			var energy_label = get_node_or_null("MainHBox/GameArea/BottomPanel/BottomVBox/PlayerInfoRow/PlayerEnergyLabel")
+			return {
+				"text": "[color=#42A5F5]灵力[/color] 每回合恢复到上限（默认 10）。\n出牌消耗灵力，规划好每回合的花费。\n\n[color=#D4A04C]过载[/color]：单回合花费 > 8 会增加 [color=#CC88FF]魔念[/color]。",
+				"target_node": energy_label,
+				"label_pos": Vector2(50, 50),
+				"highlight_rect": Rect2(energy_label.global_position - Vector2(10, 10), energy_label.size + Vector2(20, 20)) if energy_label else Rect2(),
+			}
+		TutorialStep.WUXING:
+			return {
+				"text": "[color=#D4A04C]五行相生[/color] 机制：\n金生水、水生木、木生火、火生土、土生金。\n\n连续打出相生元素的卡牌会触发 [color=#FFD700]相生链[/color]，获得额外增益（伤害加成/抽牌/减费等）。\n\n链长越长，增益越强（但有衰减）。",
+				"target_node": get_node_or_null("MainHBox/GameArea/BottomPanel/BottomVBox/StatusRow/MoNianLabel"),
+				"label_pos": Vector2(50, 50),
+			}
+		TutorialStep.COMPLETE:
+			return {
+				"text": "[color=#4CAF50]基础教程完成！[/color]\n\n记住：\n• 点卡牌 → 选敌人 → 再点卡牌 → 结束回合\n• 关注敌人意图，针对性防御\n• 善用五行相生链\n• 管理魔念与侵蚀\n\n祝道友修行顺遂！",
+				"label_pos": Vector2(50, 50),
+			}
+		default:
+			return {}
+
+## 进入下一引导步骤
+func _next_tutorial_step() -> void:
+	_tutorial_step = TutorialStep(int(_tutorial_step) + 1)
+	_show_tutorial_step()
+
+## 结束引导
+func _end_tutorial() -> void:
+	if _tutorial_overlay:
+		_tutorial_overlay.queue_free()
+		_tutorial_overlay = null
+	_tutorial_step = TutorialStep.NONE
+	GameState.first_battle_done = true
+	print("BattleUI: 新手引导完成，标记 first_battle_done = true")
+
+## 外部调用：卡牌被点击时推进引导
+func on_card_clicked_during_tutorial() -> void:
+	if _tutorial_step == TutorialStep.WELCOME:
+		_next_tutorial_step()
+	elif _tutorial_step == TutorialStep.PLAY_CARD:
+		_next_tutorial_step()
+
+## 外部调用：敌人被点击时推进引导
+func on_enemy_selected_during_tutorial() -> void:
+	if _tutorial_step == TutorialStep.SELECT_ENEMY:
+		_next_tutorial_step()
+
+## 外部调用：结束回合按钮被点击时推进引导
+func on_end_turn_pressed_during_tutorial() -> void:
+	if _tutorial_step == TutorialStep.END_TURN:
+		_next_tutorial_step()
+
+## 外部调用：回合开始时推进引导（显示灵力/五行说明）
+func on_turn_started_during_tutorial(turn: int) -> void:
+	if turn == 1 and _tutorial_step == TutorialStep.ENERGY:
+		_next_tutorial_step()
+	elif turn == 2 and _tutorial_step == TutorialStep.WUXING:
+		_next_tutorial_step()
 
 ## 设置 UI 可见性
 func set_ui_visible(p_visible: bool) -> void:

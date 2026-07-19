@@ -28,6 +28,7 @@ var deck_removal_count: int = 0      # 已永久删除次数
 
 # --- 跨局状态（存档）---
 var total_dao_xing: int = 0          # 累计道行
+var first_battle_done: bool = false  # 首战完成标记（用于onboarding）
 
 signal state_changed()
 
@@ -43,6 +44,7 @@ func reset_run() -> void:
 	visited_node_ids.clear()
 	game_map = null
 	is_boss_defeated.clear()
+	# 注意：first_battle_done 是跨局存档状态，不在此处重置
 	state_changed.emit()
 
 # ==================== 角色数据 ====================
