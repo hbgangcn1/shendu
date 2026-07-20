@@ -87,12 +87,39 @@ func _ready() -> void:
 	end_btn_style.shadow_offset = Vector2(0, 0)
 	end_turn_button.add_theme_stylebox_override("normal", end_btn_style)
 	end_turn_button.pressed.connect(_on_end_turn_pressed)
+	end_turn_button.tooltip_text = "结束当前回合，敌人将按显示的意图行动。下回合灵力回满并抽新牌。"
 	# 日志折叠按钮
 	var log_toggle: Button = get_node_or_null("MainHBox/LogToggle")
 	if log_toggle:
 		UITheme.apply_button(log_toggle)
 		log_toggle.pressed.connect(_on_log_toggle)
 		log_toggle.tooltip_text = "展开/折叠战斗日志"
+	# 手牌容器提示
+	if hand_container:
+		hand_container.tooltip_text = "当前手牌。点击卡牌选择，选中目标后再次点击打出。"
+	# 敌人容器提示
+	if enemy_container:
+		enemy_container.tooltip_text = "敌人列表。点击选择目标。敌人头上显示意图（攻击/防御/治疗等）。"
+	# 灵力标签提示
+	if player_energy_label:
+		player_energy_label.tooltip_text = "当前灵力 / 最大灵力。每回合恢复到上限。出牌消耗灵力。单回合花费>8会增加魔念。"
+	# 牌库/弃牌堆提示
+	if draw_pile_label:
+		draw_pile_label.tooltip_text = "牌库剩余卡牌数。用完后弃牌堆洗牌重置为新牌库。"
+	if discard_pile_label:
+		discard_pile_label.tooltip_text = "弃牌堆卡牌数。使用过的卡牌进入弃牌堆。"
+	# 魔念/侵蚀/过载提示
+	if mo_nian_label:
+		mo_nian_label.tooltip_text = "魔念值。每点减少1点手牌上限。魔念≥3：心魔低语，跳过下次抽牌。"
+	if erosion_label:
+		erosion_label.tooltip_text = "侵蚀值。使用带侵蚀标签的卡牌后增加。侵蚀≥5：受到伤害+20%。侵蚀≥8：受到伤害+50%。侵蚀=10：立即死亡。"
+	if overload_bar:
+		overload_bar.tooltip_text = "过载条。显示本回合已花费灵力/10。超过8进入过载区，会增加魔念。"
+	if hand_size_label:
+		hand_size_label.tooltip_text = "当前手牌数 / 手牌上限（受魔念影响）"
+	# 回合标签提示
+	if turn_label:
+		turn_label.tooltip_text = "当前回合数和战斗状态"
 
 # ==================== 更新显示 ====================
 
@@ -603,7 +630,3 @@ func on_turn_started_during_tutorial(turn: int) -> void:
 		_next_tutorial_step()
 	elif turn == 2 and _tutorial_step == TutorialStep.WUXING:
 		_next_tutorial_step()
-
-## 设置 UI 可见性
-func set_ui_visible(p_visible: bool) -> void:
-	visible = p_visible
