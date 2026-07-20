@@ -128,7 +128,7 @@ var hand: Array = []           # 手牌
 var discard_pile: Array = []   # 弃牌堆
 var exhaust_pile: Array = []   # 消耗堆（永久移除的卡）
 
-var hand_size: int = 5         # 每回合抽牌数
+var hand_size: int = 4         # 每回合抽牌数 (减少初始手牌 1 张)
 
 # ==================== 初始化 ====================
 
