@@ -24,3 +24,15 @@ Thumbs.db
 # *.png
 # *.wav
 # *.ogg
+
+# AI Player runtime files (2026-07-22 添加)
+# 防止 .agent_state.json / .agent_input.json 等污染 git status
+.agent_state.json
+.agent_input.json
+.output.txt
+.output*.txt
+.omo/
+.opencode/
+.verify_markers/
+.gdlint.cfg
+.vlm_responses/
