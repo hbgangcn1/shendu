@@ -33,6 +33,8 @@ func _ready() -> void:
 	_save_system = SaveSystem.new()
 	add_child(_save_system)
 
+	# 2026-07-22：恢复 AgentSocket input（防上一战暂停遗留）
+	_enable_battle_input()
 	_start_battle()
 
 # ==================== 战斗流程 ====================
@@ -204,6 +206,8 @@ func _on_battle_ended(result: int) -> void:
 				# 原实现：硬等 1.5s 无任何视觉反馈，玩家感觉卡死
 				# 新实现：log 提示 + 0.5s 短延迟（让玩家感知胜利）+ 0.4s 渐隐
 				battle_ui.add_log("✨ 战斗胜利！境界通关！")
+				# 修复 AI Player stuck 100s bug 2026-07-22：fade 期间禁用 BattleUI 输入 + BattleManager 处理
+				_disable_battle_input()
 				if is_inside_tree():
 					await get_tree().create_timer(0.5).timeout
 					if not is_inside_tree():
@@ -232,6 +236,8 @@ func _on_battle_ended(result: int) -> void:
 
 		# 视觉反馈：胜利提示 + 短延迟 + 渐隐过渡（修复 AI Player 反馈的卡顿 bug）
 		battle_ui.add_log("✨ 战斗胜利！")
+		# 修复 AI Player stuck 100s bug 2026-07-22：fade 期间禁用 BattleUI 输入 + BattleManager 处理
+		_disable_battle_input()
 		if is_inside_tree():
 			await get_tree().create_timer(0.5).timeout
 			if not is_inside_tree():
@@ -248,6 +254,8 @@ func _on_battle_ended(result: int) -> void:
 		print("战斗：失败！")
 		# 视觉反馈：失败提示 + 短延迟 + 渐隐过渡（同胜利流程）
 		battle_ui.add_log("💀 战斗失败...")
+		# 修复 AI Player stuck 100s bug 2026-07-22：fade 期间禁用 BattleUI 输入 + BattleManager 处理
+		_disable_battle_input()
 		if is_inside_tree():
 			await get_tree().create_timer(0.5).timeout
 			if not is_inside_tree():
@@ -378,6 +386,28 @@ func _update_ui() -> void:
 	battle_ui.update_turn_display(battle_manager.turn_number, _get_location_name())
 	battle_ui.update_pile_display(player.get_draw_pile_count(), player.get_discard_pile_count())
 	battle_ui.update_status_display(player)
+
+## 禁用战斗输入（战斗结束时调用，避免 LLM 在渐隐期发 click 触发已无效的信号链路）
+## 修复 AI Player stuck 100s bug 2026-07-22
+func _disable_battle_input() -> void:
+	# 1. BattleUI 设为不可交互 + 不处理（fade 期间 AI Player 的 click 直接被 Godot 吞掉）
+	if battle_ui:
+		battle_ui.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		battle_ui.process_mode = Node.PROCESS_MODE_DISABLED
+	# 2. BattleManager 停止处理（不响应 end_turn / play_card 等）
+	if battle_manager:
+		battle_manager.process_mode = Node.PROCESS_MODE_DISABLED
+	# 3. AgentSocket 暂时不接受 click/key 命令（避免 LLM 抢在 change_scene 之前发）
+	var socket := get_node_or_null("/root/AgentSocket")
+	if socket and socket.has_method("set_input_paused"):
+		socket.set_input_paused(true)
+
+## 恢复战斗输入（新 battle 开始时调用）
+func _enable_battle_input() -> void:
+	# AgentSocket 恢复接受 click/key
+	var socket := get_node_or_null("/root/AgentSocket")
+	if socket and socket.has_method("set_input_paused"):
+		socket.set_input_paused(false)
 
 ## 读取当前战斗节点的场景名
 func _get_location_name() -> String:

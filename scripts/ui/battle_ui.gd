@@ -476,9 +476,9 @@ func _create_tutorial_overlay() -> void:
 	_tutorial_arrow.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_tutorial_arrow.visible = false
 	# 创建一个简单的三角形箭头
-	var arrow_img := Image.new()
-	arrow_img.create(32, 32, false, Image.FORMAT_RGBA8)
-	arrow_img.lock()
+	# 修复 2026-07-22：Godot 4 Image.create() 有时返回错误，改用 create_empty
+	# 避免 width=0 触发 set_pixel out of bounds
+	var arrow_img := Image.create_empty(32, 32, false, Image.FORMAT_RGBA8)
 	for x in range(32):
 		for y in range(32):
 			var cx = 16.0
@@ -488,7 +488,6 @@ func _create_tutorial_overlay() -> void:
 			# 向下的三角形
 			if abs(dx) * 2 < (16 - dy) and dy < 16:
 				arrow_img.set_pixel(x, y, UITheme.GOLD)
-	arrow_img.unlock()
 	var arrow_tex := ImageTexture.create_from_image(arrow_img)
 	_tutorial_arrow.texture = arrow_tex
 	_tutorial_arrow.custom_minimum_size = Vector2(32, 32)
