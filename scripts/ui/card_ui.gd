@@ -97,10 +97,11 @@ func _update_display() -> void:
 		tooltip_parts.append("治疗: %d" % card_data.heal)
 	if card_data.draw_cards > 0:
 		tooltip_parts.append("抽牌: %d" % card_data.draw_cards)
-	if card_data.exhaust:
+	# 修复 2026-07-22: card_data.gd 没有 exhaust/erode 字段，统一通过 tags 数组判断
+	if card_data.tags.has("exhaust"):
 		tooltip_parts.append("【消耗】使用后移出战斗")
-	if card_data.erode > 0:
-		tooltip_parts.append("【侵蚀】使用后侵蚀 +%d" % card_data.erode)
+	if card_data.tags.has("erode"):
+		tooltip_parts.append("【侵蚀】使用后侵蚀 +1")
 	if card_data.tags.size() > 0:
 		tooltip_parts.append("标签: %s" % ", ".join(card_data.tags))
 	description_label.tooltip_text = "\n".join(tooltip_parts)

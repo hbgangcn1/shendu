@@ -590,12 +590,18 @@ func _get_tutorial_step_data(step: TutorialStep) -> Dictionary:
 				"text": "[color=#4CAF50]基础教程完成！[/color]\n\n记住：\n• 点卡牌 → 选敌人 → 再点卡牌 → 结束回合\n• 关注敌人意图，针对性防御\n• 善用五行相生链\n• 管理魔念与侵蚀\n\n祝道友修行顺遂！",
 				"label_pos": Vector2(50, 50),
 			}
-		default:
+		_:
 			return {}
 
 ## 进入下一引导步骤
 func _next_tutorial_step() -> void:
-	_tutorial_step = TutorialStep(int(_tutorial_step) + 1)
+	# 修复 2026-07-22: Godot 4 不支持 TutorialStep(int_value) 构造语法
+	# 用 (int_value) as TutorialStep 显式转换回 enum
+	var next_value: int = int(_tutorial_step) + 1
+	if next_value > int(TutorialStep.COMPLETE):
+		_end_tutorial()
+		return
+	_tutorial_step = next_value as TutorialStep
 	_show_tutorial_step()
 
 ## 结束引导
