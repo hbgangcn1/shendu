@@ -557,7 +557,7 @@ func _on_mo_nian_whisper() -> void:
 		turn_started.connect(_on_whisper_recover, CONNECT_ONE_SHOT)
 
 func _on_whisper_recover(_turn: int) -> void:
-	player.hand_size = 5
+	player.hand_size = 4
 	print("BattleManager: 心魔低语效果结束，手牌上限恢复")
 
 func _on_enemy_died(enemy: Actor) -> void:
