@@ -700,19 +700,33 @@ func _handle_victory() -> void:
 
 # ==================== 卡点检测 ====================
 
+var _last_battle_turn: int = -1  # 记录上一次的战斗回合数
+
 func _check_stuck() -> void:
-	if _state == _last_state:
-		_stuck_counter += 1
-	else:
-		_stuck_counter = 0
-		_last_state = _state
-		_last_state_time_ms = Time.get_ticks_msec()
+	# 战斗内按回合重置卡点计数器：每个新回合是新的上下文
+	var battle_turn_changed: bool = false
+	if _state == State.BATTLE:
+		# 如果 _turns_in_battle 增加了，说明进入新回合，重置计数器
+		if _last_battle_turn != _turns_in_battle:
+			_stuck_counter = 0
+			_last_state_time_ms = Time.get_ticks_msec()
+			_last_battle_turn = _turns_in_battle
+			battle_turn_changed = true
+	
+	if not battle_turn_changed:
+		if _state == _last_state:
+			_stuck_counter += 1
+		else:
+			_stuck_counter = 0
+			_last_state = _state
+			_last_state_time_ms = Time.get_ticks_msec()
 
 	# 状态特定的卡点阈值 (循环间隔约 200ms)
 	var threshold: int
 	match _state:
 		State.BATTLE:
-			# 战斗中 AI 正常思考/等待 30-60s，阈值设为 ~65s (325 次循环)
+			# 战斗中单回合卡点阈值：~65s (325 次循环)
+			# 正常出牌+结束回合约 10-30s，65s 允许充足缓冲
 			threshold = 325
 		State.MAP:
 			# 地图节点选择偶尔需要思考，~20s (100 次循环)
@@ -727,10 +741,11 @@ func _check_stuck() -> void:
 			"state": _state_name(_state),
 			"elapsed_ms": elapsed,
 			"scene": str(_current_scene.name) if _current_scene else "null",
+			"battle_turn": _turns_in_battle if _state == State.BATTLE else -1,
 		})
 		_stuck_counter = 0
 		# 尝试通用逃脱:点击屏幕中央
-		print("AIPlayer: 检测到卡点 (%s, %.1fs), 尝试点击屏幕中央" % [_state_name(_state), elapsed / 1000.0])
+		print("AIPlayer: 检测到卡点 (%s, %.1fs, turn=%d), 尝试点击屏幕中央" % [_state_name(_state), elapsed / 1000.0, _turns_in_battle])
 		AgentInput.click_at(Vector2(960, 540))
 
 # ==================== Goal 进度感知 (P1.1 Phase 2 H6, 2026-07-05 20:40) ====================
