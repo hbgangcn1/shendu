@@ -708,8 +708,20 @@ func _check_stuck() -> void:
 		_last_state = _state
 		_last_state_time_ms = Time.get_ticks_msec()
 
-	# 同一状态停留超过 50 次循环(约 10 秒)视为卡点
-	if _stuck_counter > 50:
+	# 状态特定的卡点阈值 (循环间隔约 200ms)
+	var threshold: int
+	match _state:
+		State.BATTLE:
+			# 战斗中 AI 正常思考/等待 30-60s，阈值设为 ~65s (325 次循环)
+			threshold = 325
+		State.MAP:
+			# 地图节点选择偶尔需要思考，~20s (100 次循环)
+			threshold = 100
+		_:
+			# 其他状态：~10s (50 次循环)
+			threshold = 50
+
+	if _stuck_counter > threshold:
 		var elapsed: int = Time.get_ticks_msec() - _last_state_time_ms
 		ExperienceMemory.record_stuck(_state_name(_state), "在同一状态停留过久", {
 			"state": _state_name(_state),
@@ -718,7 +730,7 @@ func _check_stuck() -> void:
 		})
 		_stuck_counter = 0
 		# 尝试通用逃脱:点击屏幕中央
-		print("AIPlayer: 检测到卡点,尝试点击屏幕中央")
+		print("AIPlayer: 检测到卡点 (%s, %.1fs), 尝试点击屏幕中央" % [_state_name(_state), elapsed / 1000.0])
 		AgentInput.click_at(Vector2(960, 540))
 
 # ==================== Goal 进度感知 (P1.1 Phase 2 H6, 2026-07-05 20:40) ====================
