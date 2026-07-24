@@ -51,6 +51,9 @@ var _stuck_counter: int = 0
 var _last_state: State = State.IDLE
 var _last_state_time_ms: int = 0
 var _loop_count: int = 0
+# P1.1 Phase 2.1 (2026-07-24 fix e175bfa1): 防止同 state-session 重复 fire stuck
+# 避免 3 分钟 stuck 触发 3 次 record_stuck → 上游生成 3 张重复 bug card
+var _stuck_fired_this_session: bool = false
 
 # ==================== 生命周期 ====================
 
@@ -712,6 +715,8 @@ func _check_stuck() -> void:
 			_last_state_time_ms = Time.get_ticks_msec()
 			_last_battle_turn = _turns_in_battle
 			battle_turn_changed = true
+			# 新回合开启新的 stuck-session 配额
+			_stuck_fired_this_session = false
 	
 	if not battle_turn_changed:
 		if _state == _last_state:
@@ -720,6 +725,8 @@ func _check_stuck() -> void:
 			_stuck_counter = 0
 			_last_state = _state
 			_last_state_time_ms = Time.get_ticks_msec()
+			# 状态切换开启新的 stuck-session 配额
+			_stuck_fired_this_session = false
 
 	# 状态特定的卡点阈值 (循环间隔约 200ms)
 	var threshold: int
@@ -735,7 +742,9 @@ func _check_stuck() -> void:
 			# 其他状态：~10s (50 次循环)
 			threshold = 50
 
-	if _stuck_counter > threshold:
+	# 同 state-session 只 fire 一次 stuck，避免上游多次 record_stuck 生成重复 bug card
+	# (BATTLE 单次卡 3 分钟 → 旧逻辑 3 次 fire；现在 1 次)
+	if _stuck_counter > threshold and not _stuck_fired_this_session:
 		var elapsed: int = Time.get_ticks_msec() - _last_state_time_ms
 		ExperienceMemory.record_stuck(_state_name(_state), "在同一状态停留过久", {
 			"state": _state_name(_state),
@@ -744,9 +753,16 @@ func _check_stuck() -> void:
 			"battle_turn": _turns_in_battle if _state == State.BATTLE else -1,
 		})
 		_stuck_counter = 0
-		# 尝试通用逃脱:点击屏幕中央
-		print("AIPlayer: 检测到卡点 (%s, %.1fs, turn=%d), 尝试点击屏幕中央" % [_state_name(_state), elapsed / 1000.0, _turns_in_battle])
-		AgentInput.click_at(Vector2(960, 540))
+		_stuck_fired_this_session = true
+		# 分层恢复策略：BATTLE 优先 EndTurnButton（更可能解开卡点），其他状态 fallback 屏幕中央
+		print("AIPlayer: 检测到卡点 (%s, %.1fs, turn=%d), 尝试分层恢复" % [_state_name(_state), elapsed / 1000.0, _turns_in_battle])
+		if _state == State.BATTLE:
+			# 先尝试 EndTurnButton（按 unique_name 精确点击）
+			if not AgentActions.click_button_by_name("EndTurnButton"):
+				# Fallback：屏幕中央
+				AgentInput.click_at(Vector2(960, 540))
+		else:
+			AgentInput.click_at(Vector2(960, 540))
 
 # ==================== Goal 进度感知 (P1.1 Phase 2 H6, 2026-07-05 20:40) ====================
 
