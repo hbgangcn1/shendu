@@ -35,7 +35,7 @@ const NodeType = _MapNodeScript.NodeType
 var _state: State = State.IDLE
 var _running: bool = false
 var _start_time_ms: int = 0
-var _max_runtime_ms: int = 120_000  # 默认 QA 运行 120 秒后自动退出
+var _max_runtime_ms: int = 7_200_000  # 2026-07-24 Robert: 不设时限；保留 2h 仅作「真挂死」安全网
 # P1.1 Phase 2 (H6, 2026-07-05 20:40): Goal 实时进度感知
 var _last_goal_progress_print_ms: int = 0
 const GOAL_PROGRESS_PRINT_INTERVAL_MS: int = 5000  # 每 5 秒 print 一次进度
@@ -78,8 +78,9 @@ func _ready() -> void:
 		var scene_name: String = _select_goal_scene_for_deck(current_deck, current_realm)
 		var loaded: int = _load_goals_from_scene(scene_name)
 		if loaded == 0:
-			# Fallback: P1.1 Phase 1 的硬编码 3 个 (防止 load_goal_scene 失败)
-			RunGoals.add_goal("max_runtime_seconds", 120, "normal")
+			# Fallback: P1.1 Phase 1 的硬编码（防止 load_goal_scene 失败）
+			# 2026-07-24 Robert: 移除 max_runtime_seconds 时限 goal。
+			# 只保留游戏 driven goals（survive/collect）+ LLM 主动 quit。
 			RunGoals.add_goal("survive_n_battles", 3, "high")
 			RunGoals.add_goal("collect_n_cards", 15, "normal")
 	# 2026-07-13：检测 --ai-player-mode=model flag (2026-07-17 增强：支持空格分隔形式)
@@ -135,7 +136,13 @@ func _parse_ai_player_mode() -> String:
 		i += 1
 	return MODE_SCRIPT
 
-# model 模式的观察循环：只检测状态 + 报告 stats + 监听时间，不做决策
+# model 模式的观察循环：只检测状态 + 报告 stats，不做决策，不主动 quit
+# 2026-07-24 Robert: 不在 Godot 端设置退出时限。
+# 退出路径仅 3 个：
+#   ①is_all_completed（通关/任务完成 game-driven）
+#   ②LLM 通过 AgentSocket 发 quit（LLM-driven）
+#   ③Runner 检测 health=stopped 后 kill -9 Godot（LLM rate limit）
+# _max_runtime_ms 保留为 7_200_000ms（2h）作为「真挂死」安全网，不应主动触发。
 func _observe_loop() -> void:
 	while _running:
 		_loop_count += 1
@@ -143,19 +150,19 @@ func _observe_loop() -> void:
 		var elapsed_sec: int = int(float(elapsed) / 1000.0)
 		RunGoals.report("elapsed_seconds", elapsed_sec)
 		RunGoals.report("loop_count", _loop_count)
-		# 检查是否所有 goal 都完成（model 模式同样尊重）
+		# 游戏自己触发通关/完成时退出（goal-driven）
 		if RunGoals.is_all_completed():
-			print("AIPlayer[model]: 所有 goals 已完成,退出")
+			print("AIPlayer[model]: 所有 goals 已完成, 退出")
 			print("AIPlayer[model]: 最终 stats: %s" % JSON.stringify(RunGoals.get_stats(), "  "))
 			_save_deck_health_snapshot()
 			var tree := _get_tree_safe()
 			if tree != null:
 				tree.quit()
 			return
+		# 「真挂死」安全网：2h 仍没动 → 记录 lifecycle 退出（不应常态触发）
 		if elapsed > _max_runtime_ms:
-			print("AIPlayer[model]: 达到软上限 %d 秒,退出" % int(float(_max_runtime_ms) / 1000.0))
-			# 2026-07-14: 软上限退出不算 stuck（正常的 QA 测试退出），改用 lifecycle 类型区分
-			ExperienceMemory.record("lifecycle", _state_name(_state), "达到软上限,强制退出", {"elapsed_ms": elapsed})
+			print("AIPlayer[model]: 异常：2h 未退出 → 强制退出（可能是 LLM/agent hang）")
+			ExperienceMemory.record("lifecycle", _state_name(_state), "max_runtime_hang_protection", {"elapsed_ms": elapsed})
 			_save_deck_health_snapshot()
 			var tree := _get_tree_safe()
 			if tree != null:
@@ -185,11 +192,10 @@ func _run_loop() -> void:
 				tree.quit()
 			return
 
-		# 软上限兜底
+		# 软上限兜底（script mode 仍保留 2h 安全网，但 2026-07-24 不应常态触发）
 		if elapsed > _max_runtime_ms:
-			print("AIPlayer: 达到软上限 %d 秒,退出" % int(float(_max_runtime_ms) / 1000.0))
-			# 2026-07-14: 软上限退出不算 stuck（正常的 QA 测试退出），改用 lifecycle 类型区分
-			ExperienceMemory.record("lifecycle", _state_name(_state), "达到软上限,强制退出", {"elapsed_ms": elapsed})
+			print("AIPlayer: 异常：2h 未退出 → 强制退出")
+			ExperienceMemory.record("lifecycle", _state_name(_state), "max_runtime_hang_protection", {"elapsed_ms": elapsed})
 			_save_deck_health_snapshot()
 			var tree := _get_tree_safe()
 			if tree != null:
@@ -423,13 +429,19 @@ func _handle_battle() -> void:
 	var played_any: bool = await _play_best_cards(bm, player)
 	print("AIPlayer: _play_best_cards 返回 %s,_cards_played_this_battle=%d" % [played_any, _cards_played_this_battle])
 
-	# 结束回合:优先按钮,后退直接调用
-	if AgentActions.click_button_by_name("EndTurnButton"):
-		print("AIPlayer: 触发结束回合(按钮)")
-		_turns_in_battle += 1
-		await _wait_ms(1000)
-		return
-	# Fallback:直接调用 battle_manager.player_end_turn()
+	# 结束回合：优先通过 BattleUI 找按钮（EndTurnButton 在 BattleUI 子场景中）
+	var end_turn_clicked: bool = false
+	var battle_ui: Node = _current_scene.get_node_or_null("BattleUI")
+	if battle_ui != null and is_instance_valid(battle_ui):
+		var end_turn_btn: Button = battle_ui.get_node_or_null("%EndTurnButton")
+		if end_turn_btn != null and is_instance_valid(end_turn_btn):
+			if AgentActions.click_button(end_turn_btn):
+				print("AIPlayer: 触发结束回合(通过 BattleUI 按钮)")
+				end_turn_clicked = true
+				_turns_in_battle += 1
+				await _wait_ms(1000)
+				return
+	# Fallback: 直接调用 battle_manager.player_end_turn()
 	if bm.current_state == bm.BattleStateEnum.CARD_SELECTION:
 		print("AIPlayer: 直接调用 player_end_turn()")
 		bm.player_end_turn()
@@ -757,8 +769,15 @@ func _check_stuck() -> void:
 		# 分层恢复策略：BATTLE 优先 EndTurnButton（更可能解开卡点），其他状态 fallback 屏幕中央
 		print("AIPlayer: 检测到卡点 (%s, %.1fs, turn=%d), 尝试分层恢复" % [_state_name(_state), elapsed / 1000.0, _turns_in_battle])
 		if _state == State.BATTLE:
-			# 先尝试 EndTurnButton（按 unique_name 精确点击）
-			if not AgentActions.click_button_by_name("EndTurnButton"):
+			# 先尝试 EndTurnButton（按 unique_name 精确点击，需在 BattleUI 子场景中查找）
+			var end_turn_clicked: bool = false
+			var battle_ui: Node = _current_scene.get_node_or_null("BattleUI")
+			if battle_ui != null and is_instance_valid(battle_ui):
+				var end_turn_btn: Button = battle_ui.get_node_or_null("%EndTurnButton")
+				if end_turn_btn != null and is_instance_valid(end_turn_btn):
+					if AgentActions.click_button(end_turn_btn):
+						end_turn_clicked = true
+			if not end_turn_clicked:
 				# Fallback：屏幕中央
 				AgentInput.click_at(Vector2(960, 540))
 		else:
