@@ -90,7 +90,8 @@ func start_battle(player_ref: Player, enemy_list: Array) -> void:
 
 ## 结束战斗
 func end_battle(result: int) -> void:
-	_change_state(BattleStateEnum.IDLE)
+	# 保持 BATTLE_WIN/BATTLE_LOSE 状态直到场景真正切换
+	# 这样 AI Player 等外部观察者能正确检测战斗结束
 	battle_ended.emit(result)
 	print("BattleManager: 战斗结束，结果=%d" % result)
 
