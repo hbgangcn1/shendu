@@ -210,13 +210,8 @@ func _on_battle_ended(result: int) -> void:
 				_disable_battle_input()
 				if is_inside_tree():
 					await get_tree().create_timer(0.5).timeout
-					if not is_inside_tree():
-						return
-					var fade_tween := create_tween()
-					fade_tween.tween_property(battle_ui, "modulate:a", 0.0, 0.4)
-					await fade_tween.finished
 					if is_inside_tree():
-						get_tree().change_scene_to_file("res://scenes/victory.tscn")
+						await _fade_battle_ui_and_change_scene("res://scenes/victory.tscn")
 				return
 			# 非最终Boss → 正常境界推进
 			GameState.current_realm = mini(2, GameState.current_realm + 1)
@@ -240,14 +235,9 @@ func _on_battle_ended(result: int) -> void:
 		_disable_battle_input()
 		if is_inside_tree():
 			await get_tree().create_timer(0.5).timeout
-			if not is_inside_tree():
-				return
-			# 整个 BattleUI 渐隐，避免直接闪现切场景
-			var fade_tween := create_tween()
-			fade_tween.tween_property(battle_ui, "modulate:a", 0.0, 0.4)
-			await fade_tween.finished
 			if is_inside_tree():
-				get_tree().change_scene_to_file("res://scenes/reward.tscn")
+				# 整个 BattleUI 渐隐，避免直接闪现切场景
+				await _fade_battle_ui_and_change_scene("res://scenes/reward.tscn")
 	else:
 		# 失败 → 跳转结算
 		GameState.hp = player.current_hp
@@ -258,13 +248,8 @@ func _on_battle_ended(result: int) -> void:
 		_disable_battle_input()
 		if is_inside_tree():
 			await get_tree().create_timer(0.5).timeout
-			if not is_inside_tree():
-				return
-			var fade_tween := create_tween()
-			fade_tween.tween_property(battle_ui, "modulate:a", 0.0, 0.4)
-			await fade_tween.finished
 			if is_inside_tree():
-				get_tree().change_scene_to_file("res://scenes/settlement.tscn")
+				await _fade_battle_ui_and_change_scene("res://scenes/settlement.tscn")
 
 func _on_generation_chain(chain: Array) -> void:
 	var chain_length: int = chain.size()
@@ -414,6 +399,31 @@ func _enable_battle_input() -> void:
 	var socket := get_node_or_null("/root/AgentSocket")
 	if socket and socket.has_method("set_input_paused"):
 		socket.set_input_paused(false)
+
+## 渐隐 BattleUI 后切换场景
+## 修复 b00eda7a stuck bug (2026-07-25)：
+## battle_ui 是 CanvasLayer（不是 CanvasItem），没有 modulate 属性。
+## 原 tween_property(battle_ui, "modulate:a", ...) 创建无 Tweeners 的 Tween，
+## 导致 await fade_tween.finished 永远阻塞，change_scene_to_file 永远不执行。
+## AI Player 在 BATTLE_WIN state 停留 3+ 分钟（observed: exp_20260725_105535_6）。
+## 修复：fade BattleUI 下所有 Control 子节点（CanvasItem 才有 modulate:a）。
+func _fade_battle_ui_and_change_scene(scene_path: String) -> void:
+	var fade_targets: Array[Control] = []
+	if battle_ui:
+		for child in battle_ui.get_children():
+			if child is Control:
+				fade_targets.append(child)
+	if not fade_targets.is_empty():
+		var fade_tween := create_tween()
+		fade_tween.set_parallel(true)
+		for ctrl in fade_targets:
+			fade_tween.tween_property(ctrl, "modulate:a", 0.0, 0.4)
+		await fade_tween.finished
+	else:
+		# Fallback：如果 BattleUI 没有 Control 子节点（理论不可能），硬等 0.4s
+		await get_tree().create_timer(0.4).timeout
+	if is_inside_tree():
+		get_tree().change_scene_to_file(scene_path)
 
 ## 读取当前战斗节点的场景名
 func _get_location_name() -> String:
