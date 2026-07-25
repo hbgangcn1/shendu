@@ -391,8 +391,8 @@ func _update_ui() -> void:
 ## 修复 AI Player stuck 100s bug 2026-07-22
 func _disable_battle_input() -> void:
 	# 1. BattleUI 设为不可交互 + 不处理（fade 期间 AI Player 的 click 直接被 Godot 吞掉）
+	# CanvasLayer 没有 mouse_filter 属性（继承自 CanvasLayer 而非 Control），仅设 process_mode
 	if battle_ui:
-		battle_ui.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		battle_ui.process_mode = Node.PROCESS_MODE_DISABLED
 	# 2. BattleManager 停止处理（不响应 end_turn / play_card 等）
 	if battle_manager:
@@ -404,6 +404,12 @@ func _disable_battle_input() -> void:
 
 ## 恢复战斗输入（新 battle 开始时调用）
 func _enable_battle_input() -> void:
+	# BattleUI 恢复处理
+	if battle_ui:
+		battle_ui.process_mode = Node.PROCESS_MODE_INHERIT
+	# BattleManager 恢复处理
+	if battle_manager:
+		battle_manager.process_mode = Node.PROCESS_MODE_INHERIT
 	# AgentSocket 恢复接受 click/key
 	var socket := get_node_or_null("/root/AgentSocket")
 	if socket and socket.has_method("set_input_paused"):

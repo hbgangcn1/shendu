@@ -591,8 +591,9 @@ static func create_elite_phantom_fire() -> Enemy:
 ## Boss HP 再次调整：106 → 127（+20%，2026-07-22 balance auto-dispatch #2，胜率>80%）
 ## Boss HP 三次调整：127 → 152（+20%，2026-07-23 balance auto-dispatch #3，胜率>80%）
 ## Boss HP 四次调整：152 → 182（+20%，2026-07-24 balance auto-dispatch #4，胜率>80%）
+## Boss HP 五次调整：182 → 218（+20%，2026-07-25 balance auto-dispatch #5，胜率>80%）
 static func create_boss_neon_spider_queen() -> Enemy:
-	var enemy := Enemy.new("霓虹蛛后", 182, WuXing.Element.WOOD, "boss_neon_spider_queen")
+	var enemy := Enemy.new("霓虹蛛后", 218, WuXing.Element.WOOD, "boss_neon_spider_queen")
 	enemy.description = "霓虹灯海中的蛛群女王，掌控木系灵力"
 	enemy.image_path = "res://assets/images/bosses/boss_metal_lord_souls_001.png"
 	enemy.intent_weights = {"attack": 50, "defense": 20, "buff": 15, "debuff": 10, "special": 5}
@@ -603,8 +604,9 @@ static func create_boss_neon_spider_queen() -> Enemy:
 ## Boss HP 再次调整：166 → 199（+20%，2026-07-22 balance auto-dispatch #2，胜率>80%）
 ## Boss HP 三次调整：199 → 239（+20%，2026-07-23 balance auto-dispatch #3，胜率>80%）
 ## Boss HP 四次调整：239 → 287（+20%，2026-07-24 balance auto-dispatch #4，胜率>80%）
+## Boss HP 五次调整：287 → 344（+20%，2026-07-25 balance auto-dispatch #5，胜率>80%）
 static func create_boss_furnace_giant() -> Enemy:
-	var enemy := Enemy.new("熔炉巨灵", 287, WuXing.Element.FIRE, "boss_furnace_giant")
+	var enemy := Enemy.new("熔炉巨灵", 344, WuXing.Element.FIRE, "boss_furnace_giant")
 	enemy.description = "工业区核心的熔炉精灵，吞噬一切的火焰巨人"
 	enemy.image_path = "res://assets/images/bosses/boss_water_abyssal_dragon_001.png"
 	enemy.intent_weights = {"attack": 60, "defense": 15, "buff": 10, "debuff": 10, "special": 5}
@@ -615,8 +617,9 @@ static func create_boss_furnace_giant() -> Enemy:
 ## Boss HP 再次调整：256 → 307（+20%，2026-07-22 balance auto-dispatch #2，胜率>80%）
 ## Boss HP 三次调整：307 → 368（+20%，2026-07-23 balance auto-dispatch #3，胜率>80%）
 ## Boss HP 四次调整：368 → 442（+20%，2026-07-24 balance auto-dispatch #4，胜率>80%）
+## Boss HP 五次调整：442 → 530（+20%，2026-07-25 balance auto-dispatch #5，胜率>80%）
 static func create_boss_tower_guardian() -> Enemy:
-	var enemy := Enemy.new("通天塔守卫", 442, WuXing.Element.EARTH, "boss_tower_guardian")
+	var enemy := Enemy.new("通天塔守卫", 530, WuXing.Element.EARTH, "boss_tower_guardian")
 	enemy.description = "通天塔底层的古老守卫，守护金丹期的最终试炼"
 	enemy.image_path = "res://assets/images/bosses/boss_earth_true_lord_001.png"
 	enemy.intent_weights = {"attack": 45, "defense": 30, "buff": 10, "debuff": 10, "special": 5}
