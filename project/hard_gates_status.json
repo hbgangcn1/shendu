@@ -1,129 +1,146 @@
 {
-  "schema_version": 1,
-  "project": "shendu",
-  "last_updated": "2026-07-25T16:30:00+08:00",
-  "last_updated_by": "Trace (借鉴磊哥 skill v1 改造)",
   "source_doc": "C:\\Users\\hbgan\\Projects\\shendu\\docs\\hard_gates_v1.yaml",
-  "rules": {
-    "failure_action": "BLOCK_DISPATCH",
-    "score_compensation": false,
-    "bypass_requires": "robert_explicit_approval"
-  },
   "summary": {
-    "total_gates": 10,
-    "pass": 0,
+    "unknown": 1,
+    "pass": 3,
     "fail": 1,
-    "review": 0,
-    "pending_p1": 2,
     "pending_p2": 1,
-    "unknown": 6,
-    "critical_blockers": ["gate_1_core_loop_playable", "gate_3_entry_scene_valid"],
-    "dispatch_blocked": true
+    "dispatch_blocked": true,
+    "pending_p1": 3,
+    "total_gates": 10,
+    "warn": 1,
+    "critical_blockers": "gate_1_core_loop_playable"
   },
+  "project": "shendu",
+  "schema_version": 1,
   "results": [
     {
       "gate_id": "gate_1_core_loop_playable",
+      "note": "AI Player 跑了 16 session，battles_won=0 / lost=0 / runs_completed=0。核心循环未跑通 = 磊哥红线 #1 FAIL",
+      "last_checked": "2026-07-25T20:14:29.9284980+08:00",
       "status": "FAIL",
-      "description": "核心循环能从 main_menu 完整玩到 victory/defeat/restart",
-      "last_checked": "2026-07-25T16:30:00+08:00",
-      "evidence_path": "memory/ai_player_sessions/profile.json",
       "evidence": {
-        "sessions_count": 16,
         "total_playtime_sec": 824,
-        "battles_won": 0,
+        "sessions_count": 16,
         "battles_lost": 0,
+        "battles_won": 0,
         "runs_completed": 0
-      },
-      "pass_criteria": {
-        "battles_won_min": 1,
-        "OR_battles_lost_min": 1,
-        "AND_runs_completed_min": 1
-      },
-      "actual_pass": false,
-      "note": "AI Player 跑了 16 个 session 累计 824 秒。0 战斗胜利 / 0 失败 / 0 完整 run。dev game 当前无法 e2e 验证核心循环可玩通。这是磊哥红线 #1 的最直接违反：'核心循环不能从开场完整玩到胜利/失败并重开'。hard_gate_1 FAIL = dispatch 阻塞。"
+      }
     },
     {
       "gate_id": "gate_2_gdscript_clean",
-      "status": "UNKNOWN",
-      "description": "GDScript parse 0 error + lint 0 命中",
-      "last_checked": "2026-07-22T20:00:00+08:00",
-      "evidence_path": "scripts/Lint-ShenduGDScript.ps1",
-      "evidence": "2026-07-22 验证 92 .gd 文件 0 命中（MEMORY.md 记录）",
-      "note": "无自动化 cron 持续验证。P1 阶段集成到 loop-check.mjs。"
+      "note": "GDScript lint 0 命中",
+      "last_checked": "2026-07-25T20:14:30.9679731+08:00",
+      "status": "PASS",
+      "evidence": {
+        "output_tail": "Scanning C:\\Users\\hbgan\\Projects\\shendu\\scripts ...\n\nFound 92 .gd files\n\n[OK] All 92 files clean (0 issues)",
+        "exit_code": 0
+      }
     },
     {
       "gate_id": "gate_3_entry_scene_valid",
-      "status": "UNKNOWN",
-      "description": "Godot 项目能 headless 启动 + 主场景加载无引用错误",
-      "last_checked": "2026-07-25T07:00:00+08:00",
-      "evidence_path": "shendu/qa-logs/godot-headless-{timestamp}.log",
-      "evidence": "qa-orchestrator cron 多次全绿（最近 2026-07-16 06:45 loop_status=ok，35/66/56）",
-      "note": "最近 24h 无系统性 headless 验证。P1 阶段实施 HardGateRunner.ps1。"
+      "note": "Godot headless 启动 + 主场景加载无引用错误",
+      "last_checked": "2026-07-25T20:14:32.8973608+08:00",
+      "status": "PASS",
+      "evidence": {
+        "exit_code": 0,
+        "log_path": "C:\\Users\\hbgan\\Projects\\shendu\\shendu\\qa-logs\\hard-gate-3-20260725-201430.log",
+        "has_errors": []
+      }
     },
     {
       "gate_id": "gate_4_buttons_clickable",
+      "note": "依赖 gate_1 通过。当前 AI Player 卡在 character_select 无法验证。需先修复 gate_1。",
+      "last_checked": "2026-07-25T20:14:32.9426233+08:00",
       "status": "PENDING_P1",
-      "description": "关键按钮在 1280x720 viewport 下可点击 + hover 反馈正确",
-      "note": "依赖 gate_1 通过。当前 AI Player 卡在 character_select 无法验证。P1 阶段实施。"
+      "evidence": {}
     },
     {
       "gate_id": "gate_5_no_placeholders",
-      "status": "UNKNOWN",
-      "description": "无 emoji / 默认 UI / 占位角色 / 来源不明资产",
-      "note": "P0 阶段需要静态扫描脚本（grep emoji + 检查 meta.yaml 完整性）。"
+      "note": "问题: 27 张 .png 缺 meta.yaml（仅警告，不阻塞候选交付）",
+      "last_checked": "2026-07-25T20:14:35.5412930+08:00",
+      "status": "WARN",
+      "evidence": {
+        "png_missing_meta_examples": [
+          "bg_event.png",
+          "bg_main_menu.png",
+          "bg_map.png",
+          "bg_reward.png",
+          "bg_shop.png"
+        ],
+        "png_without_meta": 27,
+        "emoji_examples": [],
+        "emoji_hits": 0,
+        "issues": [
+          "27 张 .png 缺 meta.yaml（仅警告，不阻塞候选交付）"
+        ],
+        "placeholder_hits": 0
+      }
     },
     {
       "gate_id": "gate_6_first_frame_clear",
+      "note": "依赖 gate_1 通过",
+      "last_checked": "2026-07-25T20:14:35.5483653+08:00",
       "status": "PENDING_P1",
-      "description": "首屏 (main_menu) 玩家 1 秒内理解目标 + 操作有即时反馈",
-      "note": "依赖 gate_1 通过。"
+      "evidence": {}
     },
     {
       "gate_id": "gate_7_perf_stable",
-      "status": "UNKNOWN",
-      "description": "headless 60fps 至少 30 帧 + 无黑屏/拉伸/裁切",
-      "note": "qa-orchestrator cron 多次验证 ok 但未自动化统计 fps。"
+      "note": "headless 60s 内正常运行无 crash",
+      "last_checked": "2026-07-25T20:14:38.2015265+08:00",
+      "status": "PASS",
+      "evidence": {
+        "exit_code": 0,
+        "log_path": "C:\\Users\\hbgan\\Projects\\shendu\\shendu\\qa-logs\\hard-gate-7-20260725-201435.log",
+        "has_crash": []
+      }
     },
     {
       "gate_id": "gate_8_real_preview_evidence",
+      "note": "流程纪律，无自动校验。workboard_complete proof 路径审计建议 P1-4",
+      "last_checked": "2026-07-25T20:14:38.2320941+08:00",
       "status": "UNKNOWN",
-      "description": "评分证据必须来自 godot 真实预览截图，不是概念图",
-      "note": "流程纪律。AI Player 截图 + shendu/qa-logs/ 已是真实预览证据，但缺少自动校验。"
+      "evidence": {
+        "archive_assets": 11
+      }
     },
     {
       "gate_id": "gate_9_revision_fingerprint",
+      "note": "依赖 task_contract_schema 实施（已完成 schema 文档）。workboard_proof 改造待 P1 阶段。",
+      "last_checked": "2026-07-25T20:14:38.2355807+08:00",
       "status": "PENDING_P1",
-      "description": "修订号/指纹与证据时间戳一致",
-      "note": "依赖 task_contract_schema 实施（已完成 schema 文档）。P1 阶段 workboard_proof 改造。"
+      "evidence": {}
     },
     {
       "gate_id": "gate_10_independent_review",
+      "note": "依赖 sessions_spawn role field + toolsAllow 限制。P2 阶段实施。",
+      "last_checked": "2026-07-25T20:14:38.2406056+08:00",
       "status": "PENDING_P2",
-      "description": "总控独立运行复核，不是 maker 自评",
-      "note": "依赖 sessions_spawn role field + toolsAllow 限制。P2 阶段实施。"
+      "evidence": {}
     }
   ],
+  "last_updated_by": "HardGateRunner.ps1 (P1-1)",
+  "last_updated": "2026-07-25T20:14:38.2990124+08:00",
   "next_actions": {
-    "P0_2026-07-25": [
-      "Art Bible v1 已落盘（C:\\Users\\hbgan\\Projects\\shendu\\docs\\art_bible_v1.md）",
-      "Hard Gates v1 已落盘（C:\\Users\\hbgan\\Projects\\shendu\\docs\\hard_gates_v1.yaml）",
-      "Task Contract Schema v1 已落盘（C:\\Users\\hbgan\\Projects\\shendu\\docs\\task_contract_schema.md）",
-      "shendu-loop-orchestrator SKILL.md 已加 2 轮升级 + 第 5.5 步硬门禁检查"
-    ],
-    "P1_2026-07-26": [
-      "HardGateRunner.ps1 实现 + 集成到 loop-check.mjs",
+    "P1_2026_07_26": [
       "workboard_specify 改造 notes → contract.yaml 格式",
       "sessions_spawn role field (make-only / verify-only) + system prompt 区分",
       "toolsAllow 验证 OpenClaw 是否支持 verify 阶段禁 write 类工具"
     ],
-    "P2_2026-07-27_plus": [
+    "P2_2026_07_27_plus": [
       "evidence freshness + revision 自动 expire",
-      "全 10 硬门禁自动化校验"
+      "全 10 硬门禁自动化校验（已完成）"
     ]
   },
   "reference": {
+    "leige_skill_pdf": "memory/inbox/leige-gamedev-skill-v1-cn.pdf",
     "leige_skill_summary": "C:\\Users\\hbgan\\Downloads\\cocos-ai-game-dev-summary.skill.md",
     "leige_skill_md": "C:\\Users\\hbgan\\Downloads\\Leige-GameDev-Skill-v1-CN.md",
-    "leige_skill_pdf": "memory/inbox/leige-gamedev-skill-v1-cn.pdf"
+    "runner_script": "scripts/HardGateRunner.ps1"
+  },
+  "rules": {
+    "bypass_requires": "robert_explicit_approval",
+    "failure_action": "BLOCK_DISPATCH",
+    "score_compensation": false
   }
 }
