@@ -778,7 +778,19 @@ func _check_stuck() -> void:
 					if AgentActions.click_button(end_turn_btn):
 						end_turn_clicked = true
 			if not end_turn_clicked:
-				# Fallback：屏幕中央
+				# Fallback 2：直接调用 battle_manager.player_end_turn()（如果还在选牌阶段）
+				# 2026-07-25 f5f8a59e fix: 当 EndTurnButton 不可点击/未找到时，
+				# 原逻辑只能点击屏幕中央，但屏幕中心点击不能推进 BattleManager 状态。
+				# AI Player 会卡 3.8 分钟（325 iterations × ~700ms）直到下次 stuck 触发。
+				# 补齐与 _handle_battle 一致的 bm.player_end_turn() fallback。
+				var bm := _get_battle_manager()
+				if bm != null and bm.current_state == bm.BattleStateEnum.CARD_SELECTION:
+					print("AIPlayer: stuck 恢复 - 直接调用 bm.player_end_turn()")
+					bm.player_end_turn()
+					_turns_in_battle += 1
+					end_turn_clicked = true
+			if not end_turn_clicked:
+				# Fallback 3：屏幕中央
 				AgentInput.click_at(Vector2(960, 540))
 		else:
 			AgentInput.click_at(Vector2(960, 540))
