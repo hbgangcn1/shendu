@@ -1,0 +1,256 @@
+# 蜃都 10 条硬门禁 (Hard Gates v1)
+# 借鉴磊哥 Cocos skill v1 (2026-07-25)，适配 Godot 4 + GDScript + OpenClaw + minimax-portal/MiniMax-M3 单模型
+# 作者：Trace + Robert 终审
+# 强制级别：loop_status 通过必须全部 PASS，任一 FAIL → dispatch 阻塞
+
+version: 1
+project: shendu
+date: 2026-07-25
+author: trace + robert
+based_on: leige-gamedev-skill-v1 磊哥 (cocos-creator-ai-dev)
+
+# ────────────────────────────────────────────────────────
+# 全局规则
+# ────────────────────────────────────────────────────────
+rules:
+  failure_action: BLOCK_DISPATCH  # 任一 FAIL → loop orchestrator 阻塞所有 dispatch
+  score_compensation: false       # 不允许用单项超分抵消硬门禁（磊哥红线）
+  bypass_requires: robert_explicit_approval  # 绕过硬门禁必须 Robert 显式同意
+
+# ────────────────────────────────────────────────────────
+# 10 条硬门禁
+# ────────────────────────────────────────────────────────
+hard_gates:
+
+  # ═══ G1: 核心循环可玩通 ═══
+  - id: gate_1_core_loop_playable
+    description: "核心循环能从 main_menu 完整玩到 victory/defeat/restart"
+    fail_impact: CRITICAL  # 直接判定 dev game 未达到可发布 demo 状态
+    check:
+      type: ai_player_e2e
+      command: "pwsh -NoProfile -File scripts/Run-AIPlayerSession.ps1 -Duration 10 -Mode model"
+      pass_criteria:
+        profile_battles_won_min: 1     # 至少 1 场胜利
+        OR
+        profile_battles_lost_min: 1    # 或至少 1 场失败（也算跑通）
+        AND
+        profile_runs_completed_min: 1
+      evidence_path: "memory/ai_player_sessions/profile.json"
+      evidence_fields:
+        - player_stats.battles_won
+        - player_stats.battles_lost
+        - player_stats.runs_completed
+    last_status: FAIL  # 2026-07-25 baseline: 0/0/0
+    last_checked: 2026-07-25
+    note: "AI Player 跑了 16 session 0 战斗完成。dev game 当前无法 e2e 验证。"
+
+  # ═══ G2: GDScript 静态干净 ═══
+  - id: gate_2_gdscript_clean
+    description: "GDScript parse 0 error + lint 0 命中"
+    fail_impact: HIGH
+    check:
+      type: lint
+      command: "pwsh -NoProfile -File scripts/Lint-ShenduGDScript.ps1"
+      pass_criteria:
+        exit_code: 0
+        # Lint-ShenduGDScript 扫 8 类风险 pattern，命中返回 N > 0
+    evidence_path: "scripts/Lint-ShenduGDScript.ps1 output"
+    current_status: PASS  # 2026-07-22 验证 92 .gd 全 clean
+    last_checked: 2026-07-22
+
+  # ═══ G3: 入口场景 + 依赖有效 ═══
+  - id: gate_3_entry_scene_valid
+    description: "Godot 项目能 headless 启动 + 主场景加载无引用错误"
+    fail_impact: CRITICAL
+    check:
+      type: godot_headless
+      command: "godot --headless --quit-after 60 --audio-driver Dummy"
+      pass_criteria:
+        exit_code: 0
+        stderr_contains_no: ["ERROR", "SCRIPT ERROR", "Parse Error", "Cannot find resource"]
+        main_scene_loaded: true
+    evidence_path: "shendu/qa-logs/godot-headless-{timestamp}.log"
+    current_status: PASS  # 已有 orchestrator headless 验证
+
+  # ═══ G4: 关键按钮可交互 ═══
+  - id: gate_4_buttons_clickable
+    description: "关键按钮在 1280x720 viewport 下可点击 + hover 反馈正确"
+    fail_impact: HIGH
+    check:
+      type: ai_player_interaction
+      command: "pwsh -NoProfile -File scripts/Run-AIPlayerSession.ps1 -Duration 3 -Mode script"
+      pass_criteria:
+        # AI Player 必须能在 character_select / map / battle 至少 1 个场景成功 click
+        scenes_with_successful_click_min: 1
+      evidence_path: "memory/ai_player_sessions/{run_id}.jsonl"
+    note: "需要 AI Player 先 gate_1 通过才能验证。当前因 gate_1 FAIL 暂时跳过。"
+
+  # ═══ G5: 无占位素材 ═══
+  - id: gate_5_no_placeholders
+    description: "无 emoji / 默认 UI / 占位角色 / 来源不明资产"
+    fail_impact: HIGH
+    check:
+      type: static_scan
+      check_commands:
+        - "禁止 emoji（磊哥红线 #2）：扫所有 .gd + .tscn 含 emoji unicode 范围"
+        - "禁止占位符：grep -r 'TBD\\|TODO\\|placeholder\\|FIXME' scripts/ scenes/ --include='*.gd'"
+        - "来源不明：所有 .png 必须有对应 meta.yaml 且含 prompt 字段"
+      pass_criteria:
+        emoji_count: 0
+        placeholder_count: 0
+        assets_without_meta: 0
+    evidence_path: "scripts/scan-no-placeholders.{timestamp}.log"
+    current_status: REVIEW  # 有 emoji 风险需要扫
+
+  # ═══ G6: 首屏目标清晰 + 即时反馈 ═══
+  - id: gate_6_first_frame_clear
+    description: "首屏 (main_menu) 玩家 1 秒内理解目标 + 操作有即时反馈"
+    fail_impact: MEDIUM
+    check:
+      type: visual_review
+      check_commands:
+        - "AI Player 第一次 decision 必须 confidence ≥ 0.7（profile['lessons']）"
+        - "截图证据：main_menu / character_select / map / battle 各 1 张"
+      evidence_path: "memory/ai_player_sessions/{run_id}.jsonl + screenshots/"
+    note: "强依赖 gate_1，gate_1 FAIL 时暂时跳过。"
+
+  # ═══ G7: 无明显卡顿/黑屏 ═══
+  - id: gate_7_perf_stable
+    description: "headless 60fps 至少 30 帧 + 无黑屏/拉伸/裁切"
+    fail_impact: HIGH
+    check:
+      type: godot_headless_perf
+      command: "godot --headless --audio-driver Dummy --quit-after 300"
+      pass_criteria:
+        min_fps: 30
+        black_screen_frames: 0
+        crash_count: 0
+    evidence_path: "shendu/qa-logs/perf-{timestamp}.log"
+
+  # ═══ G8: 评分证据来自真实预览 ═══
+  - id: gate_8_real_preview_evidence
+    description: "评分证据必须来自 godot 真实预览截图，不是概念图"
+    fail_impact: CRITICAL
+    check:
+      type: evidence_validation
+      check_commands:
+        - "workboard_complete proof.artifactPath 必须指向 screenshots/ 或 memory/ai_player_sessions/"
+        - "禁止引用 _archive/ 子目录（旧版本）"
+        - "禁止引用 image_generate 原始输出（未导入 godot）"
+      pass_criteria:
+        evidence_path_valid: true
+        evidence_fresh_within_hours: 24
+    note: "磊哥红线 #5：'不用单张概念图冒充游戏效果'。"
+
+  # ═══ G9: 修订号/指纹一致 ═══
+  - id: gate_9_revision_fingerprint
+    description: "修订号/指纹与证据时间戳一致，可证明新鲜度"
+    fail_impact: MEDIUM
+    check:
+      type: contract_validation
+      check_commands:
+        - "workboard 卡的 contract.revision 与 proof.evidence_revision 一致"
+        - "evidence_timestamp 与当前时间差 ≤ freshness_hours（默认 24h）"
+      pass_criteria:
+        revision_match: true
+        timestamp_fresh: true
+    note: "P1 阶段实施（task_contract_schema 已设计）"
+
+  # ═══ G10: 总控独立复核 ═══
+  - id: gate_10_independent_review
+    description: "总控独立运行复核，不是 maker 自评"
+    fail_impact: CRITICAL
+    check:
+      type: role_separation
+      check_commands:
+        - "workboard_complete 的 session_key 不能等于 maker spawn session_key"
+        - "verify 阶段 session 的 toolsAllow 必须不含 write/edit 类（待 P1 实施）"
+      pass_criteria:
+        maker_session_id_not_equal_reviewer_session_id: true
+    note: "P1 阶段实施（sessions_spawn role field + toolsAllow 限制）"
+    current_status: PENDING_P1  # 待 P1 实施
+
+# ────────────────────────────────────────────────────────
+# 实施优先级
+# ────────────────────────────────────────────────────────
+implementation:
+  phase_p0_2026-07-25:
+    - gate_1_core_loop_playable  # baseline 验证
+    - gate_2_gdscript_clean      # 已有 Lint-ShenduGDScript.ps1
+    - gate_3_entry_scene_valid   # 已有 headless 验证
+    - gate_5_no_placeholders     # 静态扫描即可
+    - gate_7_perf_stable         # 已有 headless 验证
+    - gate_8_real_preview_evidence  # 流程纪律
+
+  phase_p1_2026-07-26:
+    - gate_4_buttons_clickable   # 等 gate_1
+    - gate_6_first_frame_clear   # 等 gate_1
+    - gate_9_revision_fingerprint  # task_contract_schema 实施后
+
+  phase_p2_2026-07-27_plus:
+    - gate_10_independent_review  # sessions_spawn role + toolsAllow
+
+# ────────────────────────────────────────────────────────
+# 当前 baseline（2026-07-25）
+# ────────────────────────────────────────────────────────
+current_status_summary:
+  total_gates: 10
+  pass: 0   # 0/10 — 这是 dev game 现状，不能粉饰
+  pending_p1: 2  # gate_4, gate_6 强依赖 gate_1
+  pending_p2: 1  # gate_10
+  review: 1     # gate_5 需要扫描验证
+  fail: 1       # gate_1 — 核心循环不可玩
+  unknown: 5    # gate_2,3,7,8,9 假设 PASS（基于现有 lint / headless），但没系统性自动验证
+
+  critical_blockers_for_dispatch:
+    - gate_1_core_loop_playable  # 直接阻塞 dispatch
+    - gate_3_entry_scene_valid   # 直接阻塞 dispatch（最坏情况崩溃）
+
+# ────────────────────────────────────────────────────────
+# 与 shendu-loop-orchestrator 集成
+# ────────────────────────────────────────────────────────
+integration:
+  script_path: "scripts/HardGateRunner.ps1"  # TODO 创建
+  trigger:
+    - "loop-check.mjs 每 6h 跑一次"
+    - "workboard_dispatch 前必须全 PASS"
+    - "Daily Heartbeat Checks 加 §8 hard_gates"
+  output_format:
+    file: "shendu/project/hard_gates_status.json"
+    schema:
+      timestamp: "ISO 8601"
+      results:
+        - gate_id: "gate_1_core_loop_playable"
+          status: "PASS|FAIL|PENDING|UNKNOWN"
+          evidence_path: "..."
+          note: "..."
+
+# ────────────────────────────────────────────────────────
+# 借鉴磊哥原文 + 蜃都适配说明
+# ────────────────────────────────────────────────────────
+reference:
+  leige_original_10_gates:
+    1. "核心循环不能从开场完整玩到胜利/失败并重开"  # → gate_1
+    2. "TypeScript 或运行日志存在未解释的 error"     # → gate_2 (GDScript)
+    3. "入口场景、资产依赖、Prefab 引用无效"          # → gate_3 (Godot scene + resource)
+    4. "关键按钮/触控在目标宽高比下不可用"            # → gate_4 (1280x720 viewport)
+    5. "出现占位素材、默认 UI、emoji、来源不明资产"     # → gate_5
+    6. "首屏目标不清、操作无即时反馈"                  # → gate_6
+    7. "明显卡顿、黑屏、拉伸、裁切、安全区遮挡"        # → gate_7 (headless 60fps)
+    8. "评分证据不是实际运行中的预览"                  # → gate_8
+    9. "修订号/指纹与证据不一致"                     # → gate_9
+    10. "只有执行方自评，没有总控独立复核"             # → gate_10
+
+  key_adaptation_decisions:
+    - "gate_2: TypeScript → GDScript + lint"
+    - "gate_3: Prefab → Godot resource ref"
+    - "gate_4: 横竖屏宽高比 → 单一 1280x720 viewport（dev game 桌面端）"
+    - "gate_9/10: P1/P2 实施，依赖 sessions_spawn role field + toolsAllow"
+    - "score_compensation=false: 不允许用其他指标掩盖硬门禁失败"
+    - "bypass_requires=robert_explicit_approval: 任何绕过必须 Robert 签字"
+
+# ────────────────────────────────────────────────────────
+# 修订历史
+# ────────────────────────────────────────────────────────
+changelog:
+  - v1 (2026-07-25): 初版（借鉴磊哥 Cocos skill + 蜃都实际约束适配）
