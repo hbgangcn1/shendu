@@ -720,7 +720,20 @@ func _handle_victory() -> void:
 
 var _last_battle_turn: int = -1  # 记录上一次的战斗回合数
 
+# 2026-07-26 fix(3274d1ec): BattleDemo 是 dev/test scene（scenes/battle_demo.tscn，
+# 348 字节），没有真实的 turn 流转。AI Player 跑进 BattleDemo 后会永远卡 230s+
+# （battle_turn 不推进 → per-turn reset 不触发）。视为非真实卡点：跳过 stuck 检测。
+const TEST_SCENE_NAMES: PackedStringArray = ["BattleDemo"]
+
+func _is_test_scene() -> bool:
+	if _current_scene == null:
+		return false
+	return TEST_SCENE_NAMES.has(_current_scene.name)
+
 func _check_stuck() -> void:
+	# BattleDemo 等测试 scene：跳过 stuck 检测（避免撑大 stuck metric）
+	if _is_test_scene():
+		return
 	# 战斗内按回合重置卡点计数器：每个新回合是新的上下文
 	var battle_turn_changed: bool = false
 	if _state == State.BATTLE:
