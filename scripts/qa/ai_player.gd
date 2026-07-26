@@ -54,6 +54,9 @@ var _loop_count: int = 0
 # P1.1 Phase 2.1 (2026-07-24 fix e175bfa1): 防止同 state-session 重复 fire stuck
 # 避免 3 分钟 stuck 触发 3 次 record_stuck → 上游生成 3 张重复 bug card
 var _stuck_fired_this_session: bool = false
+# 2026-07-26 fix: 允许周期性恢复重试（首次恢复失败时），只 fire 1 次 stuck event
+var _stuck_recovery_retry_interval_ms: int = 10000  # 每 10 秒重试一次恢复
+var _last_stuck_recovery_attempt_ms: int = 0
 
 # ==================== 生命周期 ====================
 
@@ -754,8 +757,6 @@ func _check_stuck() -> void:
 			# 其他状态：~10s (50 次循环)
 			threshold = 50
 
-	# 同 state-session 只 fire 一次 stuck，避免上游多次 record_stuck 生成重复 bug card
-	# (BATTLE 单次卡 3 分钟 → 旧逻辑 3 次 fire；现在 1 次)
 	if _stuck_counter > threshold and not _stuck_fired_this_session:
 		var elapsed: int = Time.get_ticks_msec() - _last_state_time_ms
 		ExperienceMemory.record_stuck(_state_name(_state), "在同一状态停留过久", {
@@ -768,32 +769,14 @@ func _check_stuck() -> void:
 		_stuck_fired_this_session = true
 		# 分层恢复策略：BATTLE 优先 EndTurnButton（更可能解开卡点），其他状态 fallback 屏幕中央
 		print("AIPlayer: 检测到卡点 (%s, %.1fs, turn=%d), 尝试分层恢复" % [_state_name(_state), elapsed / 1000.0, _turns_in_battle])
-		if _state == State.BATTLE:
-			# 先尝试 EndTurnButton（按 unique_name 精确点击，需在 BattleUI 子场景中查找）
-			var end_turn_clicked: bool = false
-			var battle_ui: Node = _current_scene.get_node_or_null("BattleUI")
-			if battle_ui != null and is_instance_valid(battle_ui):
-				var end_turn_btn: Button = battle_ui.get_node_or_null("%EndTurnButton")
-				if end_turn_btn != null and is_instance_valid(end_turn_btn):
-					if AgentActions.click_button(end_turn_btn):
-						end_turn_clicked = true
-			if not end_turn_clicked:
-				# Fallback 2：直接调用 battle_manager.player_end_turn()（如果还在选牌阶段）
-				# 2026-07-25 f5f8a59e fix: 当 EndTurnButton 不可点击/未找到时，
-				# 原逻辑只能点击屏幕中央，但屏幕中心点击不能推进 BattleManager 状态。
-				# AI Player 会卡 3.8 分钟（325 iterations × ~700ms）直到下次 stuck 触发。
-				# 补齐与 _handle_battle 一致的 bm.player_end_turn() fallback。
-				var bm := _get_battle_manager()
-				if bm != null and bm.current_state == bm.BattleStateEnum.CARD_SELECTION:
-					print("AIPlayer: stuck 恢复 - 直接调用 bm.player_end_turn()")
-					bm.player_end_turn()
-					_turns_in_battle += 1
-					end_turn_clicked = true
-			if not end_turn_clicked:
-				# Fallback 3：屏幕中央
-				AgentInput.click_at(Vector2(960, 540))
-		else:
-			AgentInput.click_at(Vector2(960, 540))
+		_stuck_recovery()
+	# 2026-07-26 fix: stuck event 已 fire，但恢复失败（回合没推进）时允许周期性重试恢复
+	elif _stuck_fired_this_session and _stuck_counter > threshold:
+		var now_ms: int = Time.get_ticks_msec()
+		if now_ms - _last_stuck_recovery_attempt_ms >= _stuck_recovery_retry_interval_ms:
+			print("AIPlayer: 周期性恢复重试 (%s, turn=%d)" % [_state_name(_state), _turns_in_battle])
+			_last_stuck_recovery_attempt_ms = now_ms
+			_stuck_recovery()
 
 # ==================== Goal 进度感知 (P1.1 Phase 2 H6, 2026-07-05 20:40) ====================
 
@@ -1029,3 +1012,29 @@ func _wait_ms(ms: int) -> void:
 	if tree == null:
 		return
 	await tree.create_timer(float(ms) / 1000.0).timeout
+
+# ==================== 卡点恢复逻辑（2026-07-26 fix） ====================
+
+func _stuck_recovery() -> void:
+	if _state == State.BATTLE:
+		# 先尝试 EndTurnButton（按 unique_name 精确点击，需在 BattleUI 子场景中查找）
+		var end_turn_clicked: bool = false
+		var battle_ui: Node = _current_scene.get_node_or_null("BattleUI")
+		if battle_ui != null and is_instance_valid(battle_ui):
+			var end_turn_btn: Button = battle_ui.get_node_or_null("%EndTurnButton")
+			if end_turn_btn != null and is_instance_valid(end_turn_btn):
+				if AgentActions.click_button(end_turn_btn):
+					end_turn_clicked = true
+		if not end_turn_clicked:
+			# Fallback 2：直接调用 battle_manager.player_end_turn()（如果还在选牌阶段）
+			var bm := _get_battle_manager()
+			if bm != null and bm.current_state == bm.BattleStateEnum.CARD_SELECTION:
+				print("AIPlayer: stuck 恢复 - 直接调用 bm.player_end_turn()")
+				bm.player_end_turn()
+				_turns_in_battle += 1
+				end_turn_clicked = true
+		if not end_turn_clicked:
+			# Fallback 3：屏幕中央
+			AgentInput.click_at(Vector2(960, 540))
+	else:
+		AgentInput.click_at(Vector2(960, 540))
