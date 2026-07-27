@@ -593,8 +593,9 @@ static func create_elite_phantom_fire() -> Enemy:
 ## Boss HP 四次调整：152 → 182（+20%，2026-07-24 balance auto-dispatch #4，胜率>80%）
 ## Boss HP 五次调整：182 → 218（+20%，2026-07-25 balance auto-dispatch #5，胜率>80%）
 ## Boss HP 六次调整：218 → 262（+20%，2026-07-26 balance auto-dispatch #6，胜率>80%）
+## Boss HP 七次调整：262 → 314（+20%，2026-07-27 balance auto-dispatch #7，胜率>80%）
 static func create_boss_neon_spider_queen() -> Enemy:
-	var enemy := Enemy.new("霓虹蛛后", 262, WuXing.Element.WOOD, "boss_neon_spider_queen")
+	var enemy := Enemy.new("霓虹蛛后", 314, WuXing.Element.WOOD, "boss_neon_spider_queen")
 	enemy.description = "霓虹灯海中的蛛群女王，掌控木系灵力"
 	enemy.image_path = "res://assets/images/bosses/boss_metal_lord_souls_001.png"
 	enemy.intent_weights = {"attack": 50, "defense": 20, "buff": 15, "debuff": 10, "special": 5}
