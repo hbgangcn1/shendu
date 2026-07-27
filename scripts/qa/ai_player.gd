@@ -398,6 +398,13 @@ func _handle_battle() -> void:
 		await _wait_ms(500)
 		return
 
+	# 2026-07-27 fix: BattleDemo 等测试 scene 没有真实战斗流程，直接跳过处理
+	# 避免 AI Player 在 BattleDemo 中卡死 (stuck 230s+)
+	if _is_test_scene():
+		print("AIPlayer: 检测到测试场景 %s，跳过战斗处理" % _current_scene.name)
+		await _wait_ms(500)
+		return
+
 	var bm := _get_battle_manager()
 	if bm == null:
 		print("AIPlayer: 未找到 BattleManager,等待")
