@@ -252,8 +252,12 @@ func _detect_state() -> void:
 			_state = State.CHARACTER_SELECT
 		"GameMapScene":
 			_state = State.MAP
-		"BattleScene", "BattleDemo":
+		"BattleScene":
 			_state = State.BATTLE
+		"BattleDemo":
+			# 2026-07-27 fix: BattleDemo 等测试场景没有真实战斗流程
+			# 在 _detect_state 就识别为 IDLE，避免主循环死循环调用 _handle_battle
+			_state = State.IDLE
 		"RewardScene":
 			_state = State.REWARD
 		"ShopScene":
