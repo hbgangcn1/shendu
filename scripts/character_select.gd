@@ -58,6 +58,17 @@ func _ready() -> void:
 	auto_select_timer.one_shot = true
 	auto_select_timer.start()
 
+	# 2026-07-27 gate_1 fix C: headless/AI Player mode 直接确认 (跳过 click deadlock)
+	# 根因: AgentSocket._do_click 用 Input.parse_input_event() 触发 InputEventMouseButton
+	#       → 在 headless mode + AI Player 路径下不可靠 (TOOLS.md 2026-07-26 00:08)
+	#       → character_select.gd._on_card_gui_input 只接 InputEventMouseButton 但收不到 AI Player click
+	#       → AI Player 在 character_select 永远卡死 (22 sessions, 0 battles_won)
+	# 修复: 检测 cmdline flag --qa-auto-run / --agent-mode 时直接调 _confirm_selection()
+	#       类似 commit a555a1b BattleDemo skip 纵深防御模式
+	if _is_headless_mode():
+		print("角色选择：headless 模式直接确认 (跳过 click)")
+		_confirm_selection()
+
 	# 确认按钮
 	confirm_button.pressed.connect(_confirm_selection)
 
@@ -102,6 +113,14 @@ func _on_auto_select_timeout() -> void:
 	_confirm_selection()
 
 # ==================== 私有方法 ====================
+
+func _is_headless_mode() -> bool:
+	var args: PackedStringArray = OS.get_cmdline_user_args()
+	for arg in args:
+		if arg in ["--qa-auto-run", "--agent-mode", "--headless"]:
+			return true
+	# Fallback: 已知 flag 是 --qa-auto-run (agent_socket.gd:20)
+	return "--qa-auto-run" in args
 
 func _update_focus() -> void:
 	for i: int in range(cards.size()):
