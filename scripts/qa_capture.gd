@@ -6,6 +6,7 @@ extends Node
 # 蜃都 VLM loop 的游戏内截帧来源。启动后等几帧确保主场景渲染完，
 # 抓一次 viewport 到 res://qa-captures/viewport_capture.png。
 # 重启 Godot 会重抓（autoload 每次启动跑一次）。
+# 2026-07-29 fix: scene change 时也重抓（之前只 _ready 抓一次 → 5 天 stale）
 #
 # ⚠️ 手动启动（编辑器 F5）时不跑，避免在用户玩的时候偷偷写文件。
 #    Agent 跑测试时启动 godot ... -- --qa-auto-run 才会触发。
@@ -18,14 +19,20 @@ const HEADLESS_TIMEOUT_SECONDS := 30.0
 # 与 agent_socket.gd / scene_walker.gd / agent_inspector.gd 同款，4 处保持同步
 const AGENT_FLAG := "--qa-auto-run"
 
+var _last_captured_scene: String = ""
+var _is_agent_mode: bool = false
+
 func _ready() -> void:
 	if AGENT_FLAG not in OS.get_cmdline_user_args():
 		return  # 手动启动游戏时不跑
+	_is_agent_mode = true
 	# 检测 headless 模式
 	var is_headless := OS.has_feature("headless")
 	if is_headless:
 		print("ViewportCapture: headless mode detected, starting timeout watchdog (%ss)" % HEADLESS_TIMEOUT_SECONDS)
-		# 启动超时 watchdog
+		# Hook scene change 立即重抓（之前只 _ready 抓一次 → viewport_capture.png 持续 stale）
+		if get_tree():
+			get_tree().connect("tree_changed", Callable(self, "_on_tree_changed"))
 	await get_tree().create_timer(WAIT_SECONDS).timeout
 	_capture()
 	if is_headless:
@@ -33,14 +40,37 @@ func _ready() -> void:
 		print("ViewportCapture: headless capture done, quitting")
 		get_tree().quit()
 
+func _on_tree_changed() -> void:
+	if not _is_agent_mode:
+		return
+	var tree := get_tree()
+	if tree == null:
+		return
+	var current := tree.current_scene
+	if current == null:
+		return
+	var scene_path: String = current.scene_file_path
+	if scene_path != "" and scene_path != _last_captured_scene:
+		_last_captured_scene = scene_path
+		print("ViewportCapture: scene change → ", scene_path, " → recapture")
+		_capture()
+
 func _capture() -> void:
 	# 2026-07-28 headless 守护：headless 模式无 viewport texture → get_image() 必返回 null
-	# 跳过早退，避免 log 噪音累积（之前 5min 内累积 1 个 ERROR + 占 log 几十行）
+	# 2026-07-29 fix: 即使 headless 也要写一个 black placeholder（拿真实 viewport size）
+	# 否则 vlm_request 一直引用 stale viewport_capture.png（5 天前的截图）
+	# → minimax thought 里 viewport_mismatch warning 持续存在 → 坐标缩放错
+	var img: Image = null
 	if OS.has_feature("headless"):
-		print("ViewportCapture: headless mode → skip get_image()")
-		return
-	# 用 main viewport 的 texture（get_viewport() 返回 root viewport）
-	var img: Image = get_viewport().get_texture().get_image()
+		# headless 模式：拿 root viewport size 写一个 black placeholder
+		var vp_rect := get_viewport().get_visible_rect()
+		var w := int(vp_rect.size.x)
+		var h := int(vp_rect.size.y)
+		img = Image.create(w, h, false, Image.FORMAT_RGBA8)
+		img.fill(Color.BLACK)
+		print("ViewportCapture: headless → wrote black placeholder (%dx%d)" % [w, h])
+	else:
+		img = get_viewport().get_texture().get_image()
 	if img == null:
 		push_error("ViewportCapture: get_image() returned null")
 		return
