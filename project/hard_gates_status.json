@@ -1,131 +1,10 @@
 {
-  "summary": {
-    "total_gates": 10,
-    "fail": 1,
-    "warn": 0,
-    "pending_p2": 1,
-    "critical_blockers": "gate_1_core_loop_playable",
-    "pending_p1": 3,
-    "dispatch_blocked": true,
-    "pass": 4,
-    "unknown": 1
-  },
-  "last_updated_by": "HardGateRunner.ps1 (P1-1)",
   "reference": {
-    "leige_skill_summary": "C:\\Users\\hbgan\\Downloads\\cocos-ai-game-dev-summary.skill.md",
-    "leige_skill_pdf": "memory/inbox/leige-gamedev-skill-v1-cn.pdf",
     "runner_script": "scripts/HardGateRunner.ps1",
+    "leige_skill_pdf": "memory/inbox/leige-gamedev-skill-v1-cn.pdf",
+    "leige_skill_summary": "C:\\Users\\hbgan\\Downloads\\cocos-ai-game-dev-summary.skill.md",
     "leige_skill_md": "C:\\Users\\hbgan\\Downloads\\Leige-GameDev-Skill-v1-CN.md"
   },
-  "source_doc": "C:\\Users\\hbgan\\Projects\\shendu\\docs\\hard_gates_v1.yaml",
-  "results": [
-    {
-      "gate_id": "gate_1_core_loop_playable",
-      "last_checked": "2026-07-27T00:46:11.9862844+08:00",
-      "status": "FAIL",
-      "evidence": {
-        "battles_won": 0,
-        "total_playtime_sec": 824,
-        "battles_lost": 0,
-        "sessions_count": 16,
-        "runs_completed": 0
-      },
-      "note": "AI Player 跑了 16 session，battles_won=0 / lost=0 / runs_completed=0。核心循环未跑通 = 磊哥红线 #1 FAIL"
-    },
-    {
-      "gate_id": "gate_2_gdscript_clean",
-      "last_checked": "2026-07-27T00:46:12.8645514+08:00",
-      "status": "PASS",
-      "evidence": {
-        "output_tail": "Scanning C:\\Users\\hbgan\\Projects\\shendu\\scripts ...\n\nFound 92 .gd files\n\n[OK] All 92 files clean (0 issues)",
-        "exit_code": 0
-      },
-      "note": "GDScript lint 0 命中"
-    },
-    {
-      "gate_id": "gate_3_entry_scene_valid",
-      "last_checked": "2026-07-27T00:46:14.6483921+08:00",
-      "status": "PASS",
-      "evidence": {
-        "log_path": "C:\\Users\\hbgan\\Projects\\shendu\\shendu\\qa-logs\\hard-gate-3-20260727-004612.log",
-        "has_errors": [],
-        "exit_code": 0
-      },
-      "note": "Godot headless 启动 + 主场景加载无引用错误"
-    },
-    {
-      "gate_id": "gate_4_buttons_clickable",
-      "last_checked": "2026-07-27T00:46:14.6595081+08:00",
-      "status": "PENDING_P1",
-      "evidence": {},
-      "note": "依赖 gate_1 通过。当前 AI Player 卡在 character_select 无法验证。需先修复 gate_1。"
-    },
-    {
-      "gate_id": "gate_5_no_placeholders",
-      "last_checked": "2026-07-27T00:46:16.4469225+08:00",
-      "status": "PASS",
-      "evidence": {
-        "placeholder_hits": 0,
-        "emoji_examples": [],
-        "png_without_meta": 0,
-        "emoji_hits": 0,
-        "png_missing_meta_examples": [],
-        "issues": []
-      },
-      "note": "无占位/emoji/无 meta 资产"
-    },
-    {
-      "gate_id": "gate_6_first_frame_clear",
-      "last_checked": "2026-07-27T00:46:16.4561450+08:00",
-      "status": "PENDING_P1",
-      "evidence": {},
-      "note": "依赖 gate_1 通过"
-    },
-    {
-      "gate_id": "gate_7_perf_stable",
-      "last_checked": "2026-07-27T00:46:18.7237569+08:00",
-      "status": "PASS",
-      "evidence": {
-        "log_path": "C:\\Users\\hbgan\\Projects\\shendu\\shendu\\qa-logs\\hard-gate-7-20260727-004616.log",
-        "has_crash": [],
-        "exit_code": 0
-      },
-      "note": "headless 60s 内正常运行无 crash"
-    },
-    {
-      "gate_id": "gate_8_real_preview_evidence",
-      "last_checked": "2026-07-27T00:46:18.7649782+08:00",
-      "status": "UNKNOWN",
-      "evidence": {
-        "archive_assets": 11
-      },
-      "note": "流程纪律，无自动校验。workboard_complete proof 路径审计建议 P1-4"
-    },
-    {
-      "gate_id": "gate_9_revision_fingerprint",
-      "last_checked": "2026-07-27T00:46:43.9737329+08:00",
-      "status": "PENDING_P1",
-      "evidence": {
-        "with_revision": 0,
-        "example_card_ids": [
-          "48f42423-679f-44ae-a6ce-8c8906752cfa",
-          "e2bef0ba-28d9-4c44-a815-a72b9e61b661",
-          "37ff3205-0aab-484b-8b52-408d226c7c89"
-        ],
-        "total": 39,
-        "pass_ratio": 0,
-        "with_contract": 0
-      },
-      "note": "需要 contract field >= 50% 才能 PASS。当前：0/39 = 0%。Run workboard_specify 升级现有 cards。"
-    },
-    {
-      "gate_id": "gate_10_independent_review",
-      "last_checked": "2026-07-27T00:46:43.9761273+08:00",
-      "status": "PENDING_P2",
-      "evidence": {},
-      "note": "依赖 sessions_spawn role field + toolsAllow 限制。P2 阶段实施。"
-    }
-  ],
   "next_actions": {
     "P1_2026_07_26": [
       "workboard_specify 改造 notes → contract.yaml 格式",
@@ -138,11 +17,132 @@
     ]
   },
   "schema_version": 1,
-  "project": "shendu",
-  "last_updated": "2026-07-27T00:46:44.1771990+08:00",
+  "last_updated": "2026-07-27T16:05:09.0789728+08:00",
   "rules": {
-    "score_compensation": false,
     "failure_action": "BLOCK_DISPATCH",
-    "bypass_requires": "robert_explicit_approval"
-  }
+    "bypass_requires": "robert_explicit_approval",
+    "score_compensation": false
+  },
+  "results": [
+    {
+      "evidence": {
+        "sessions_count": 22,
+        "battles_won": 0,
+        "total_playtime_sec": 4262,
+        "runs_completed": 0,
+        "battles_lost": 0
+      },
+      "status": "FAIL",
+      "gate_id": "gate_1_core_loop_playable",
+      "note": "AI Player 跑了 22 session，battles_won=0 / lost=0 / runs_completed=0。核心循环未跑通 = 磊哥红线 #1 FAIL",
+      "last_checked": "2026-07-27T16:04:28.3501937+08:00"
+    },
+    {
+      "evidence": {
+        "output_tail": "Scanning C:\\Users\\hbgan\\Projects\\shendu\\scripts ...\n\nFound 92 .gd files\n\n[OK] All 92 files clean (0 issues)",
+        "exit_code": 0
+      },
+      "status": "PASS",
+      "gate_id": "gate_2_gdscript_clean",
+      "note": "GDScript lint 0 命中",
+      "last_checked": "2026-07-27T16:04:29.3992398+08:00"
+    },
+    {
+      "evidence": {
+        "exit_code": 0,
+        "log_path": "C:\\Users\\hbgan\\Projects\\shendu\\shendu\\qa-logs\\hard-gate-3-20260727-160429.log",
+        "has_errors": []
+      },
+      "status": "PASS",
+      "gate_id": "gate_3_entry_scene_valid",
+      "note": "Godot headless 启动 + 主场景加载无引用错误",
+      "last_checked": "2026-07-27T16:04:31.2791195+08:00"
+    },
+    {
+      "evidence": {},
+      "status": "PENDING_P1",
+      "gate_id": "gate_4_buttons_clickable",
+      "note": "依赖 gate_1 通过。当前 AI Player 卡在 character_select 无法验证。需先修复 gate_1。",
+      "last_checked": "2026-07-27T16:04:31.2948311+08:00"
+    },
+    {
+      "evidence": {
+        "png_without_meta": 0,
+        "png_missing_meta_examples": [],
+        "emoji_examples": [],
+        "placeholder_hits": 0,
+        "issues": [],
+        "emoji_hits": 0
+      },
+      "status": "PASS",
+      "gate_id": "gate_5_no_placeholders",
+      "note": "无占位/emoji/无 meta 资产",
+      "last_checked": "2026-07-27T16:04:33.9481044+08:00"
+    },
+    {
+      "evidence": {},
+      "status": "PENDING_P1",
+      "gate_id": "gate_6_first_frame_clear",
+      "note": "依赖 gate_1 通过",
+      "last_checked": "2026-07-27T16:04:33.9549380+08:00"
+    },
+    {
+      "evidence": {
+        "exit_code": 0,
+        "log_path": "C:\\Users\\hbgan\\Projects\\shendu\\shendu\\qa-logs\\hard-gate-7-20260727-160433.log",
+        "has_crash": []
+      },
+      "status": "PASS",
+      "gate_id": "gate_7_perf_stable",
+      "note": "headless 60s 内正常运行无 crash",
+      "last_checked": "2026-07-27T16:04:36.2114053+08:00"
+    },
+    {
+      "evidence": {
+        "archive_assets": 11
+      },
+      "status": "UNKNOWN",
+      "gate_id": "gate_8_real_preview_evidence",
+      "note": "流程纪律，无自动校验。workboard_complete proof 路径审计建议 P1-4",
+      "last_checked": "2026-07-27T16:04:36.2676116+08:00"
+    },
+    {
+      "evidence": {
+        "with_revision": 0,
+        "total": 4,
+        "pass_ratio": 0,
+        "example_card_ids": [
+          "fdd59337-734d-4452-b0da-2e03291c9fe8",
+          "fb9f86ae-34d1-4123-936a-940abdf67052",
+          "339f6c3d-e0aa-461d-84b8-fa96cac8843c"
+        ],
+        "with_contract": 0
+      },
+      "status": "PENDING_P1",
+      "gate_id": "gate_9_revision_fingerprint",
+      "note": "需要 contract field >= 50% 才能 PASS。当前：0/4 = 0%。Run workboard_specify 升级现有 cards。",
+      "last_checked": "2026-07-27T16:05:08.8517627+08:00"
+    },
+    {
+      "evidence": {},
+      "status": "PENDING_P2",
+      "gate_id": "gate_10_independent_review",
+      "note": "依赖 sessions_spawn role field + toolsAllow 限制。P2 阶段实施。",
+      "last_checked": "2026-07-27T16:05:08.8564164+08:00"
+    }
+  ],
+  "summary": {
+    "pending_p2": 1,
+    "total_gates": 10,
+    "critical_blockers": "gate_1_core_loop_playable",
+    "warn": 0,
+    "fail": 1,
+    "pass": 4,
+    "pending_p1": 3,
+    "dispatch_blocked": true,
+    "unknown": 1
+  },
+  "source_doc": "C:\\Users\\hbgan\\Projects\\shendu\\docs\\hard_gates_v1.yaml",
+  "project": "shendu",
+  "last_updated_by": "HardGateRunner.ps1 (P1-1)"
 }

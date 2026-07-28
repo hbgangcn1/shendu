@@ -154,8 +154,8 @@ func _observe_loop() -> void:
 		RunGoals.report("elapsed_seconds", elapsed_sec)
 		RunGoals.report("loop_count", _loop_count)
 		# 游戏自己触发通关/完成时退出（goal-driven）
-		if RunGoals.is_all_completed():
-			print("AIPlayer[model]: 所有 goals 已完成, 退出")
+		if RunGoals.should_quit():
+			print("AIPlayer[model]: should_quit 返回 true, 退出")
 			print("AIPlayer[model]: 最终 stats: %s" % JSON.stringify(RunGoals.get_stats(), "  "))
 			_save_deck_health_snapshot()
 			var tree := _get_tree_safe()
@@ -185,9 +185,9 @@ func _run_loop() -> void:
 		RunGoals.report("elapsed_seconds", elapsed_sec)
 		RunGoals.report("loop_count", _loop_count)
 
-		# 检查是否所有 goal 都完成
-		if RunGoals.is_all_completed():
-			print("AIPlayer: 所有 goals 已完成,退出")
+		# 检查是否所有 goal 都完成（或 max_runtime_seconds 触发）
+		if RunGoals.should_quit():
+			print("AIPlayer: should_quit 返回 true, 退出")
 			print("AIPlayer: 最终 stats: %s" % JSON.stringify(RunGoals.get_stats(), "  "))
 			_save_deck_health_snapshot()
 			var tree := _get_tree_safe()

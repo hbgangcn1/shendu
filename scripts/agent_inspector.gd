@@ -8,22 +8,30 @@ extends Node
 # 数据源：GameState autoload + 当前 scene + viewport size + engine info
 
 const STATE_FILE := "res://.agent_state.json"
-const POLL_INTERVAL := 0.5  # 500ms
+# 2026-07-28 节流：原 0.5s + or 帧门控 → headless 模式时间门控先触发，节流无效
+# 改为 1.0s（每 1s dump 一次）+ 帧门控只作为 headless 限 FPS 时的兜底（一般触发不到）
+const POLL_INTERVAL := 1.0  # 1s
 # 与 qa_capture.gd / scene_walker.gd / agent_socket.gd 同款，4 处保持同步
 const AGENT_FLAG := "--qa-auto-run"
+const THROTTLE_FRAMES := 60  # 帧门控兜底（正常情况时间门控先触发）
 
 var _timer: float = 0.0
+var _frame_count: int = 0
 
 func _ready() -> void:
 	if AGENT_FLAG not in OS.get_cmdline_user_args():
 		return  # 手动启动游戏时不写 agent state
-	print("AgentInspector: writing to %s every %.1fs" % [STATE_FILE, POLL_INTERVAL])
+	print("AgentInspector: writing to %s every %.1fs (frame throttle as fallback)" % [STATE_FILE, POLL_INTERVAL])
 	_write_state()  # 立即写一次
 
 func _process(delta: float) -> void:
+	_frame_count += 1
 	_timer += delta
-	if _timer >= POLL_INTERVAL:
+	# 时间门控（1.0s）为主，帧门控（60帧）作为 headless 限 FPS 时的兜底
+	# 之前用 `or` 导致 0.5s 时间门控永远先触发 → 节流形同虚设 → 5min 34808 行
+	if _timer >= POLL_INTERVAL or _frame_count >= THROTTLE_FRAMES:
 		_timer = 0.0
+		_frame_count = 0
 		_write_state()
 
 func _write_state() -> void:

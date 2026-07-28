@@ -113,6 +113,10 @@ func _do_key(key_name: String) -> void:
 	print("AgentSocket[%d]: key %s (code %d)" % [_exec_count, key_name, keycode])
 
 func _do_capture(path: String) -> void:
+	# 2026-07-28 headless 守护：headless 模式无 viewport texture
+	if OS.has_feature("headless"):
+		print("AgentSocket: headless mode → skip capture")
+		return
 	var img: Image = get_viewport().get_texture().get_image()
 	if img == null:
 		push_error("AgentSocket: get_image() returned null")
