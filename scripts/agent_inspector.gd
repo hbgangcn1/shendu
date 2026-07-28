@@ -17,12 +17,28 @@ const THROTTLE_FRAMES := 60  # 帧门控兜底（正常情况时间门控先触�
 
 var _timer: float = 0.0
 var _frame_count: int = 0
+# 2026-07-29 fix: scene change 时立即 flush state（不让 1s 节流 race condition 制造 state drift）
+# 真因：1s 节流 + Godot 切 scene（sub-100ms）→ viewport_capture.png 是新 scene 但 state.json 残留旧 scene
+# → AI Player client 写 vlm_request 时拿 stale state → minimax 返回 click_X_Y 但 client 按旧 scene apply → dead-lock
+var _last_scene_path: String = ""
 
 func _ready() -> void:
 	if AGENT_FLAG not in OS.get_cmdline_user_args():
 		return  # 手动启动游戏时不写 agent state
 	print("AgentInspector: writing to %s every %.1fs (frame throttle as fallback)" % [STATE_FILE, POLL_INTERVAL])
+	# Hook scene change 立即 flush（解决 1s 节流 race condition）
+	if get_tree():
+		get_tree().connect("tree_changed", Callable(self, "_on_tree_changed"))
 	_write_state()  # 立即写一次
+
+func _on_tree_changed() -> void:
+	# tree_changed 触发条件：任何节点 add/remove/rename + current_scene 切换
+	# 但触发频繁，所以我们要 deduplicate by scene path
+	var current_path: String = _get_scene_name()
+	if current_path != "" and current_path != _last_scene_path:
+		_last_scene_path = current_path
+		print("AgentInspector: scene change detected → ", current_path, " → immediate flush")
+		_write_state()
 
 func _process(delta: float) -> void:
 	_frame_count += 1
