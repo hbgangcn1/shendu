@@ -34,8 +34,11 @@ func _ready() -> void:
 func _on_tree_changed() -> void:
 	# tree_changed 触发条件：任何节点 add/remove/rename + current_scene 切换
 	# 但触发频繁，所以我们要 deduplicate by scene path
-	# 关键：current_scene 在 scene 切换瞬间可能为 null → 先做 null check
-	var current := get_tree().current_scene
+	# 关键：tree 还没初始化 / node freed 时 get_tree() 可能为 null → 三重 guard
+	var tree := get_tree()
+	if tree == null:
+		return  # tree 还没初始化（启动早期或 tree shutdown）
+	var current := tree.current_scene
 	if current == null:
 		return  # scene 切换瞬间，current_scene 还没指向新 scene，等下一 tick
 	var current_path: String = _get_scene_name()
