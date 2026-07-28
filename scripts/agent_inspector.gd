@@ -21,6 +21,8 @@ var _frame_count: int = 0
 # 真因：1s 节流 + Godot 切 scene（sub-100ms）→ viewport_capture.png 是新 scene 但 state.json 残留旧 scene
 # → AI Player client 写 vlm_request 时拿 stale state → minimax 返回 click_X_Y 但 client 按旧 scene apply → dead-lock
 var _last_scene_path: String = ""
+# 2026-07-29 fix: verbose print 风暴 — 只在 _ready 写一次 property 列表，运行时只写 state
+var _verbose_printed: bool = false
 
 func _ready() -> void:
 	if AGENT_FLAG not in OS.get_cmdline_user_args():
@@ -76,13 +78,22 @@ func _write_state() -> void:
 	if gs:
 		state["game_state_keys"] = []
 		var props = gs.get_property_list()
-		print("AgentInspector: GameState property count = ", props.size())
+		# 2026-07-29 fix: verbose print 风暴 — 每秒 40+ 行 property list 会让 stdout buffer 满
+		# → Godot 进程死掉 → AI Player session 启动后立即退出
+		# 改成：只在 _ready 写一次 property 列表，运行时只写 state 不写 detail
+		if _verbose_printed == false:
+			print("AgentInspector: GameState property count = ", props.size())
+			for prop in props:
+				print("  prop: ", prop.name, " usage=", prop.usage, " type=", prop.type, " has_script_var=", bool(prop.usage & PROPERTY_USAGE_SCRIPT_VARIABLE))
+				if prop.usage & PROPERTY_USAGE_SCRIPT_VARIABLE:
+					var prop_name: String = prop.name
+					var val = gs.get(prop_name)
+					print("    -> val=", val, " type=", typeof(val), " is_null=", val == null, " is_object=", val is Object)
+			_verbose_printed = true
 		for prop in props:
-			print("  prop: ", prop.name, " usage=", prop.usage, " type=", prop.type, " has_script_var=", bool(prop.usage & PROPERTY_USAGE_SCRIPT_VARIABLE))
 			if prop.usage & PROPERTY_USAGE_SCRIPT_VARIABLE:
 				var prop_name: String = prop.name
 				var val = gs.get(prop_name)
-				print("    -> val=", val, " type=", typeof(val), " is_null=", val == null, " is_object=", val is Object)
 				if val != null and not (val is Object and not (val is Array) and not (val is Dictionary)):
 					state["game_state_keys"].append(prop_name)
 					state[prop_name] = val
