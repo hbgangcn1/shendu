@@ -40,13 +40,18 @@ func _on_tree_changed() -> void:
 	var tree := get_tree()
 	if tree == null:
 		return  # tree 还没初始化（启动早期或 tree shutdown）
-	var current := tree.current_scene
-	if current == null:
-		return  # scene 切换瞬间，current_scene 还没指向新 scene，等下一 tick
+	# 2026-07-29 fix: tree_changed 触发时 current_scene 可能是切换前的旧 scene
+	# （change_scene_to_file 是 deferred async）→ 写 state.scene 是 stale
+	# 10:26 LLM 看到 viewport_capture=character_select 但 state.scene=main.tscn → state drift 仍在
+	# fix: 等 2 帧让 scene 切换完成再 flush
+	await get_tree().process_frame
+	await get_tree().process_frame
+	if tree.current_scene == null:
+		return
 	var current_path: String = _get_scene_name()
 	if current_path != "" and current_path != _last_scene_path:
 		_last_scene_path = current_path
-		print("AgentInspector: scene change detected → ", current_path, " → immediate flush")
+		print("AgentInspector: scene change detected → ", current_path, " → immediate flush (after 2 frames)")
 		_write_state()
 
 func _process(delta: float) -> void:
