@@ -1,0 +1,127 @@
+{
+  "_comment": "蜃都 Goal 场景库 — P1.1 Phase 1 Step 2 (2026-07-05) 外部配置层",
+  "_comment_schema": "version 1, scenes 字典 {scene_name: Array<{type, value, priority}>}",
+  "_comment_in_sync_with": "goal_templates.gd (sync verified 2026-07-29)",
+  "version": 1,
+  "scenes": {
+    "battle_baseline": [
+      {
+        "type": "survive_n_battles",
+        "value": 3,
+        "priority": "high"
+      },
+      {
+        "type": "max_runtime_seconds",
+        "value": 600,
+        "priority": "normal"
+      },
+      {
+        "type": "collect_n_cards",
+        "value": 8,
+        "priority": "normal"
+      }
+    ],
+    "battle_deep": [
+      {
+        "type": "survive_n_battles",
+        "value": 5,
+        "priority": "high"
+      },
+      {
+        "type": "trigger_n_chains",
+        "value": 8,
+        "priority": "high"
+      },
+      {
+        "type": "reach_realm_n",
+        "value": 2,
+        "priority": "normal"
+      },
+      {
+        "type": "max_runtime_seconds",
+        "value": 180,
+        "priority": "normal"
+      }
+    ],
+    "battle_should_lose": [
+      {
+        "type": "first_loss",
+        "value": 0,
+        "priority": "high"
+      },
+      {
+        "type": "max_runtime_seconds",
+        "value": 60,
+        "priority": "normal"
+      }
+    ],
+    "battle_full_clear": [
+      {
+        "type": "complete_run",
+        "value": 0,
+        "priority": "high"
+      },
+      {
+        "type": "max_runtime_seconds",
+        "value": 240,
+        "priority": "normal"
+      }
+    ],
+    "deck_health_check": [
+      {
+        "type": "collect_n_cards",
+        "value": 8,
+        "priority": "high"
+      },
+      {
+        "type": "survive_n_battles",
+        "value": 1,
+        "priority": "normal"
+      },
+      {
+        "type": "max_runtime_seconds",
+        "value": 600,
+        "priority": "normal"
+      }
+    ],
+    "map_exploration": [
+      {
+        "type": "visit_node_types",
+        "value": 4,
+        "priority": "high"
+      },
+      {
+        "type": "max_runtime_seconds",
+        "value": 120,
+        "priority": "normal"
+      }
+    ],
+    "long_run": [
+      {
+        "type": "max_runtime_seconds",
+        "value": 300,
+        "priority": "high"
+      }
+    ],
+    "loop_stress": [
+      {
+        "type": "loop_count_n",
+        "value": 50,
+        "priority": "high"
+      },
+      {
+        "type": "max_runtime_seconds",
+        "value": 180,
+        "priority": "normal"
+      }
+    ],
+    "single_goal_max_runtime": [
+      {
+        "type": "max_runtime_seconds",
+        "value": 10,
+        "priority": "high"
+      }
+    ],
+    "empty": []
+  }
+}
