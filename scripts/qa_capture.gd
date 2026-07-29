@@ -46,12 +46,11 @@ func _ready() -> void:
 		# Hook scene change 立即重抓（之前只 _ready 抓一次 → viewport_capture.png 持续 stale）
 		if get_tree():
 			get_tree().connect("tree_changed", Callable(self, "_on_tree_changed"))
+		# 2026-07-29 v3: 不要立即 quit() — 会杀 AIPlayer session
+		# 改为 HEADLESS_TIMEOUT_SECONDS watchdog 在 _process 里超时再 quit
+		# qa-orchestrator 本身用 --quit-after 100s 强杀，QA capture 不需要主动 quit
 	await get_tree().create_timer(WAIT_SECONDS).timeout
 	_capture()
-	if is_headless:
-		# headless 下捕获完（或失败）后主动退出，防止卡死
-		print("ViewportCapture: headless capture done, quitting")
-		get_tree().quit()
 
 func _on_tree_changed() -> void:
 	if not _is_agent_mode:
