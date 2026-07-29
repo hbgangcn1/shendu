@@ -46,6 +46,10 @@ func _on_tree_changed() -> void:
 	var tree := get_tree()
 	if tree == null:
 		return
+	# 2026-07-29 fix: 等 2 帧让 scene 切换完成（change_scene_to_file 是 deferred async）
+	# 否则会抓切换前旧 scene 的 viewport
+	await get_tree().process_frame
+	await get_tree().process_frame
 	var current := tree.current_scene
 	if current == null:
 		return
