@@ -76,19 +76,26 @@ func _capture() -> void:
 	# 2026-07-29 fix: 即使 headless 也要写一个 black placeholder（拿真实 viewport size）
 	# 否则 vlm_request 一直引用 stale viewport_capture.png（5 天前的截图）
 	# → minimax thought 里 viewport_mismatch warning 持续存在 → 坐标缩放错
-	# 2026-07-29 v2: OS.has_feature("headless") 在 Godot 4.7 + "--headless --audio-driver Dummy" 启动时
-	# **返回 false**（之前 15:02 qa-orchestrator 跑的 session 报 ERROR: get_image() returned null 但没看到
-	# "headless mode detected" 或 "wrote black placeholder" log）。改用 DisplayServer.get_name() == "headless"
-	# + --headless cmdline 检查双重检测。
+	# 2026-07-29 v3: 实际上 Godot 4.7 headless 模式下 get_texture().get_image() **可用**
+	# 只是需要等几帧渲染。先尝试真实捕获，失败才 fallback 到 placeholder。
 	var img: Image = null
 	if _is_headless_mode():
-		# headless 模式：拿 root viewport size 写一个 black placeholder
+		# headless 模式：先尝试真实捕获 viewport texture
+		var texture := get_viewport().get_texture()
+		if texture:
+			img = texture.get_image()
+		if img:
+			print("ViewportCapture: headless → captured real viewport (%dx%d)" % [img.get_width(), img.get_height()])
+		else:
+			print("ViewportCapture: headless → get_image() returned null, fallback to black placeholder")
+	if img == null:
+		# fallback: 写 black placeholder
 		var vp_rect := get_viewport().get_visible_rect()
 		var w := int(vp_rect.size.x)
 		var h := int(vp_rect.size.y)
 		img = Image.create(w, h, false, Image.FORMAT_RGBA8)
 		img.fill(Color.BLACK)
-		print("ViewportCapture: headless → wrote black placeholder (%dx%d)" % [w, h])
+		print("ViewportCapture: headless → fallback black placeholder (%dx%d)" % [w, h])
 	else:
 		img = get_viewport().get_texture().get_image()
 	if img == null:
