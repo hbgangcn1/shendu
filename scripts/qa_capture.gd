@@ -22,12 +22,25 @@ const AGENT_FLAG := "--qa-auto-run"
 var _last_captured_scene: String = ""
 var _is_agent_mode: bool = false
 
+# 2026-07-29 v2: 双重 headless 检测
+# OS.has_feature("headless") 在 Godot 4.7 + "--headless --audio-driver Dummy" 启动时返回 false
+# 必须同时检查 DisplayServer.get_name() == "headless" + --headless 在 cmdline_args
+func _is_headless_mode() -> bool:
+	if OS.has_feature("headless"):
+		return true
+	if DisplayServer.get_name() == "headless":
+		return true
+	for arg in OS.get_cmdline_args():
+		if arg == "--headless":
+			return true
+	return false
+
 func _ready() -> void:
 	if AGENT_FLAG not in OS.get_cmdline_user_args():
 		return  # 手动启动游戏时不跑
 	_is_agent_mode = true
 	# 检测 headless 模式
-	var is_headless := OS.has_feature("headless")
+	var is_headless := _is_headless_mode()
 	if is_headless:
 		print("ViewportCapture: headless mode detected, starting timeout watchdog (%ss)" % HEADLESS_TIMEOUT_SECONDS)
 		# Hook scene change 立即重抓（之前只 _ready 抓一次 → viewport_capture.png 持续 stale）
@@ -64,8 +77,12 @@ func _capture() -> void:
 	# 2026-07-29 fix: 即使 headless 也要写一个 black placeholder（拿真实 viewport size）
 	# 否则 vlm_request 一直引用 stale viewport_capture.png（5 天前的截图）
 	# → minimax thought 里 viewport_mismatch warning 持续存在 → 坐标缩放错
+	# 2026-07-29 v2: OS.has_feature("headless") 在 Godot 4.7 + "--headless --audio-driver Dummy" 启动时
+	# **返回 false**（之前 15:02 qa-orchestrator 跑的 session 报 ERROR: get_image() returned null 但没看到
+	# "headless mode detected" 或 "wrote black placeholder" log）。改用 DisplayServer.get_name() == "headless"
+	# + --headless cmdline 检查双重检测。
 	var img: Image = null
-	if OS.has_feature("headless"):
+	if _is_headless_mode():
 		# headless 模式：拿 root viewport size 写一个 black placeholder
 		var vp_rect := get_viewport().get_visible_rect()
 		var w := int(vp_rect.size.x)
