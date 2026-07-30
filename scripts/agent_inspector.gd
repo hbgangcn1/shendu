@@ -108,9 +108,14 @@ func _write_state() -> void:
 		state["current_scene_class"] = current.get_class()
 		state["current_scene_name"] = current.name
 		state["current_scene_groups"] = current.get_groups()
-		# 如果在战斗场景，额外读取 BattleManager/Player 状态
+		# 2026-07-30 fix (D1): 不同 scene 写对应 state，让 headless LLM 能基于 state 决策
+		# 之前只有 BattleScene/BattleDemo 有专属 state writer，map scene 啥也没写 → LLM 看黑截图瞎猜
 		if current.name in ["BattleScene", "BattleDemo"]:
 			_write_battle_state(state, current)
+		elif current.name == "GameMap" or (current.scene_file_path and "map.tscn" in current.scene_file_path):
+			_write_map_state(state, current)
+		elif current.name == "CharacterSelect" or (current.scene_file_path and "character_select" in current.scene_file_path):
+			_write_character_select_state(state, current)
 	# 写文件
 	var json: String = JSON.stringify(state, "  ")
 	var f := FileAccess.open(STATE_FILE, FileAccess.WRITE)
@@ -119,6 +124,58 @@ func _write_state() -> void:
 		f.close()
 	else:
 		push_error("AgentInspector: failed to open %s for writing" % STATE_FILE)
+
+## 2026-07-30 fix (D1): 写 map scene 状态
+## 让 LLM 在 headless 模式下能基于 state.json 选节点（不再依赖 viewport_capture.png 黑截图）
+## 输出：
+##   reachable_nodes: [{id, type_name, x, y, column, layer, is_reachable, is_visited}]
+##   current_node_id, visited_node_ids （从 GameState 来）
+##   selected_node_id （如果玩家已点击未确认）
+func _write_map_state(state: Dictionary, current_scene: Node) -> void:
+	var realm_map = current_scene.get("_realm_map")
+	if realm_map == null:
+		return
+	var nodes = realm_map.get("nodes")
+	if nodes == null or nodes.size() == 0:
+		return
+	var reachable: Array = []
+	var all_nodes: Array = []
+	for node in nodes:
+		if node == null:
+			continue
+		var entry: Dictionary = {
+			"id": node.id if "id" in node else "",
+			"type_name": node.get_type_name() if node.has_method("get_type_name") else "未知",
+			"x": float(node.x) if "x" in node else 0.0,
+			"y": float(node.y) if "y" in node else 0.0,
+			"column": int(node.column) if "column" in node else 0,
+			"layer": int(node.layer) if "layer" in node else 0,
+			"is_reachable": bool(node.is_reachable) if "is_reachable" in node else false,
+			"is_visited": bool(node.is_visited) if "is_visited" in node else false,
+		}
+		all_nodes.append(entry)
+		if entry["is_reachable"] and not entry["is_visited"]:
+			reachable.append(entry)
+	state["map_nodes"] = all_nodes
+	state["reachable_nodes"] = reachable
+	# 当前选中（如果玩家点了未确认）— 让 LLM 知道下一步是不是 confirm
+	var selected = current_scene.get("_selected_node")
+	if selected and "id" in selected:
+		state["selected_node_id"] = selected.id
+		state["selected_node_type"] = selected.get_type_name() if selected.has_method("get_type_name") else ""
+
+## 2026-07-30 fix (D1): 写 character_select scene 状态
+## 输出 available_characters 列表（id + name + element）
+func _write_character_select_state(state: Dictionary, current_scene: Node) -> void:
+	# CharacterSelect 场景的 available_characters 列表通常在场景节点上或 GameState
+	# 尝试从 _characters 节点 / _char_data 列表取
+	var chars_node = current_scene.get_node_or_null("CharacterList")
+	if chars_node:
+		state["character_select_count"] = chars_node.get_child_count()
+	# 当前选中（玩家高亮）
+	var focused = current_scene.get("_focused_index")
+	if focused != null:
+		state["character_focused_index"] = int(focused)
 
 func _write_battle_state(state: Dictionary, current_scene: Node) -> void:
 	var bm = current_scene.get_node_or_null("BattleManager")
@@ -131,6 +188,7 @@ func _write_battle_state(state: Dictionary, current_scene: Node) -> void:
 		state["max_hp"] = player.max_hp
 		state["spirit_stones"] = player.current_energy  # battle uses current_energy
 		state["max_energy"] = player.max_energy
+		state["block"] = player.current_block if "current_block" in player else 0
 		# 手牌数量：优先读 BattleUI.hand_count（single source of truth，避免 race）
 		# 修复数据漂移 bug 2026-07-15: state JSON hand=1 vs 截图 3 张
 		var ui = current_scene.get_node_or_null("BattleUI")
@@ -143,6 +201,25 @@ func _write_battle_state(state: Dictionary, current_scene: Node) -> void:
 		state["mo_nian"] = player.mo_nian
 		state["erosion"] = player.erosion
 		state["turn"] = bm.turn_number
+		# 2026-07-30 fix (D1): 手牌详情 — LLM 需要知道哪张能出
+		# 之前只有 hand_count (数量)，没有 cards id/cost/damage/block → LLM 不知道出什么
+		if player.hand and player.hand.size() > 0:
+			var hand_cards: Array = []
+			for i in range(player.hand.size()):
+				var c = player.hand[i]
+				if c == null:
+					continue
+				var card_info: Dictionary = {
+					"index": i,
+					"id": c.id if "id" in c else "",
+					"name": c.name if "name" in c else "",
+					"cost": int(c.cost) if "cost" in c else 0,
+					"damage": int(c.damage) if "damage" in c else 0,
+					"block": int(c.block) if "block" in c else 0,
+					"playable": int(c.cost) <= int(player.current_energy) if "cost" in c and "current_energy" in player else false,
+				}
+				hand_cards.append(card_info)
+			state["hand_cards"] = hand_cards
 	# 敌人状态
 	var enemies = bm.get("enemies")
 	if enemies and enemies.size() > 0:
