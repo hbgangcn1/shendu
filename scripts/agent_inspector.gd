@@ -138,16 +138,31 @@ func _write_map_state(state: Dictionary, current_scene: Node) -> void:
 	var nodes = realm_map.get("nodes")
 	if nodes == null or nodes.size() == 0:
 		return
+	# 2026-07-31 (D1 v2): 用 panel.position 代替 node.x/node.y
+	# 原代码读 node.x/y 但这些字段是 0.0（_init 没设），实际位置在 _node_ui_map[id].position
+	# 取 panel.position + 节点中心 (NODE_SIZE/2) 才是真正的 viewport 坐标
+	var node_ui_map = current_scene.get("_node_ui_map")
+	if node_ui_map == null:
+		node_ui_map = {}
+	const MAP_NODE_SIZE = 88.0
 	var reachable: Array = []
 	var all_nodes: Array = []
 	for node in nodes:
 		if node == null:
 			continue
+		# 计算实际 viewport 坐标（panel.position + NODE_SIZE/2）
+		var actual_x: float = 0.0
+		var actual_y: float = 0.0
+		if node.id in node_ui_map:
+			var panel = node_ui_map[node.id]
+			if panel and "position" in panel:
+				actual_x = panel.position.x + MAP_NODE_SIZE / 2.0
+				actual_y = panel.position.y + MAP_NODE_SIZE / 2.0
 		var entry: Dictionary = {
 			"id": node.id if "id" in node else "",
 			"type_name": node.get_type_name() if node.has_method("get_type_name") else "未知",
-			"x": float(node.x) if "x" in node else 0.0,
-			"y": float(node.y) if "y" in node else 0.0,
+			"x": actual_x,
+			"y": actual_y,
 			"column": int(node.column) if "column" in node else 0,
 			"layer": int(node.layer) if "layer" in node else 0,
 			"is_reachable": bool(node.is_reachable) if "is_reachable" in node else false,
