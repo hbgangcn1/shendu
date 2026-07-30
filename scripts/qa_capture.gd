@@ -78,6 +78,7 @@ func _capture() -> void:
 	# → minimax thought 里 viewport_mismatch warning 持续存在 → 坐标缩放错
 	# 2026-07-29 v3: 实际上 Godot 4.7 headless 模式下 get_texture().get_image() **可用**
 	# 只是需要等几帧渲染。先尝试真实捕获，失败才 fallback 到 placeholder。
+	# 2026-07-30 fix: 移除重复的 get_image() 调用（bug 导致 Parameter 't' is null）
 	var img: Image = null
 	if _is_headless_mode():
 		# headless 模式：先尝试真实捕获 viewport texture
@@ -87,7 +88,7 @@ func _capture() -> void:
 		if img:
 			print("ViewportCapture: headless → captured real viewport (%dx%d)" % [img.get_width(), img.get_height()])
 		else:
-			print("ViewportCapture: headless → get_image() returned null, fallback to black placeholder")
+			print("ViewportCapture: headless → get_image() returned null, fallback to black fallback image")
 	if img == null:
 		# fallback: 写 black placeholder
 		var vp_rect := get_viewport().get_visible_rect()
@@ -95,9 +96,8 @@ func _capture() -> void:
 		var h := int(vp_rect.size.y)
 		img = Image.create(w, h, false, Image.FORMAT_RGBA8)
 		img.fill(Color.BLACK)
-		print("ViewportCapture: headless → fallback black placeholder (%dx%d)" % [w, h])
-	else:
-		img = get_viewport().get_texture().get_image()
+		print("ViewportCapture: headless → fallback black fill (%dx%d)" % [w, h])
+	# 不再重复调用 get_image() — img 已经包含有效图像或 placeholder
 	if img == null:
 		push_error("ViewportCapture: get_image() returned null")
 		return
