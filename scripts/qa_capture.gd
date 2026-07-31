@@ -79,6 +79,10 @@ func _capture() -> void:
 	# 2026-07-29 v3: 实际上 Godot 4.7 headless 模式下 get_texture().get_image() **可用**
 	# 只是需要等几帧渲染。先尝试真实捕获，失败才 fallback 到 placeholder。
 	# 2026-07-30 fix: 移除重复的 get_image() 调用（bug 导致 Parameter 't' is null）
+	# 2026-07-31 fix: 【关键】非 headless 路径也写黑图 — 因为 if _is_headless_mode() 永远不进 headless 分支，
+	#   导致 img 仍为 null，然后 fallback 写黑图。原本这条分支是给 headless 失败兜底，
+	#   但 _capture() 设计目的就是为了拿真实 viewport（不然 ai_player_client 截图发给 minimax 没意义）。
+	#   修复：非 headless 模式下，先 await process_frame 让 viewport 渲染，然后强制 get_image()，失败才写 placeholder + warning
 	var img: Image = null
 	if _is_headless_mode():
 		# headless 模式：先尝试真实捕获 viewport texture
@@ -89,18 +93,28 @@ func _capture() -> void:
 			print("ViewportCapture: headless → captured real viewport (%dx%d)" % [img.get_width(), img.get_height()])
 		else:
 			print("ViewportCapture: headless → get_image() returned null, fallback to black fallback image")
+	else:
+		# 非 headless（2026-07-31）：Godot 4.7 GUI 模式 viewport texture 可用 — 必须拿真实画面给 minimax
+		# 7/31 验证：5:36 force-run non-headless session 后，agent_state.json viewport=1920x1218 但
+		# viewport_capture.png 仍 11935 字节黑图（因为下面 if img==null fallback 分支被执行）。
+		# 修：await process_frame 让 viewport 完成渲染 → force get_image() → 失败 push_error + return（不写黑图）
+		await RenderingServer.frame_post_draw
+		var texture2 := get_viewport().get_texture()
+		if texture2:
+			img = texture2.get_image()
+		if img:
+			print("ViewportCapture: non-headless → captured real viewport (%dx%d)" % [img.get_width(), img.get_height()])
+		else:
+			push_error("ViewportCapture: non-headless get_image() returned null — display 异常，不写黑图避免误导 minimax")
+			return
 	if img == null:
-		# fallback: 写 black placeholder
+		# headless fallback: 写 black placeholder 拿真实 viewport size
 		var vp_rect := get_viewport().get_visible_rect()
 		var w := int(vp_rect.size.x)
 		var h := int(vp_rect.size.y)
 		img = Image.create(w, h, false, Image.FORMAT_RGBA8)
 		img.fill(Color.BLACK)
 		print("ViewportCapture: headless → fallback black fill (%dx%d)" % [w, h])
-	# 不再重复调用 get_image() — img 已经包含有效图像或 placeholder
-	if img == null:
-		push_error("ViewportCapture: get_image() returned null")
-		return
 
 	# 确保输出目录存在
 	if not DirAccess.dir_exists_absolute(CAPTURE_DIR):
