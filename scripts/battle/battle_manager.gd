@@ -36,14 +36,18 @@ signal battle_ended(result: int)  # 0=胜利 1=失败
 signal generation_chain_triggered(chain: Array)  # 五行相生链触发
 signal chain_length_changed(length: int)  # 相生链长度变化（UI用）
 signal battle_log(message: String)  # 战斗日志（转发到UI）
+signal battle_stuck_diagnostic(state_data: Dictionary)  # 卡死自动诊断信号
 
 # ==================== 状态属性 ====================
 
 const MAX_TURNS := 100  # 防止无限循环的最大回合数
+const STUCK_TIMEOUT_SECONDS := 60  # 卡死检测超时（秒）
 
 var current_state: BattleStateEnum = BattleStateEnum.IDLE
 var turn_number: int = 0
 var selected_enemy_index: int = 0  # 选中的敌人索引
+var _stuck_timer: float = 0.0  # 卡死检测计时器
+var _stuck_diagnostic_emitted: bool = false  # 是否已发出卡死诊断信号
 
 # ==================== 战斗单位 ====================
 
@@ -60,7 +64,7 @@ const CHAIN_MAX_TRIGGERS: int = 5  # 单回合相生触发上限
 const CHAIN_DECAY_TABLE: Array[float] = [1.0, 1.0, 0.75, 0.5, 0.25]
 
 var _has_last_element: bool = false  # 是否有上一张打出的卡牌
-var last_played_element: WuXing.Element = WuXing.Element.METAL  # 上一张打出的卡牌元素 (占位初始值)
+var last_played_element: int = WuXing.Element.METAL  # 上一张打出的卡牌元素 (占位初始值)
 var generation_chain: Array = []  # 当前相生链
 var pending_generation_bonus: Dictionary = {}  # 待结算的相生增益
 var _chain_trigger_count: int = 0  # 本回合相生触发次数
@@ -70,6 +74,39 @@ var pending_damage_multiplier: float = 1.0  # 临时伤害倍率（相生加成�
 
 func _ready() -> void:
 	pass
+
+func _process(delta: float) -> void:
+	# 卡死检测：在 CARD_SELECTION 状态下累计时间
+	if current_state == BattleStateEnum.CARD_SELECTION:
+		_stuck_timer += delta
+		if _stuck_timer >= STUCK_TIMEOUT_SECONDS and not _stuck_diagnostic_emitted:
+			_stuck_diagnostic()
+	else:
+		# 离开选牌阶段时重置计时器
+		if _stuck_timer > 0.0:
+			_stuck_timer = 0.0
+			_stuck_diagnostic_emitted = false
+
+## 卡死自动诊断
+func _stuck_diagnostic() -> void:
+	_stuck_diagnostic_emitted = true
+	
+	var state_data: Dictionary = {
+		"state": get_state_name(),
+		"turn": turn_number,
+		"stuck_timer": _stuck_timer,
+		"player_hp": player.current_hp if player else 0,
+		"player_max_hp": player.max_hp if player else 0,
+		"enemies_count": enemies.size(),
+		"alive_enemies": enemies.count(func(e): return e.is_alive),
+		"hand_size": player.hand.size() if player else 0,
+		"energy": player.current_energy if player else 0,
+		"generation_chain_length": generation_chain.size(),
+		"scene": get_tree().current_scene.name if get_tree().current_scene else "null",
+	}
+	
+	battle_stuck_diagnostic.emit(state_data)
+	print("BattleManager: 卡死诊断已触发 - 状态=%s, 回合=%d, 计时=%.1fs" % [state_data.state, state_data.turn, state_data.stuck_timer])
 
 # ==================== 战斗流程 ====================
 
@@ -285,7 +322,7 @@ func _process_card_effect(card: CardDataResource) -> void:
 				if target_enemy != null:
 					var is_chain := generation_chain.size() > 1
 					var actual_damage: int = target_enemy.take_damage(
-						final_damage, action_element as WuXing.Element, is_chain
+						final_damage, action_element as int, is_chain
 					)
 					print("BattleManager: %s 使用 %s 对 %s 造成 %d 伤害%s" % [
 						player.actor_name, card.name, target_enemy.actor_name, actual_damage,
@@ -387,7 +424,7 @@ func _enemy_action(enemy: Actor) -> void:
 # ==================== 五行相生链检测 ====================
 
 func _check_generation_chain(card: CardDataResource) -> void:
-	var card_element: WuXing.Element = card.element
+	var card_element: int = card.element
 
 	# 检查是否与上一张牌形成相生关系
 	if _has_last_element and WuXing.is_generation(last_played_element, card_element):
