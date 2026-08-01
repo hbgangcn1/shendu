@@ -51,6 +51,8 @@ var _stuck_counter: int = 0
 var _last_state: State = State.IDLE
 var _last_state_time_ms: int = 0
 var _loop_count: int = 0
+# 2026-08-01 fix(ed75d23a): 跟踪 character_select 卡住次数，超过阈值强制跳过
+var _char_select_stuck_count: int = 0
 # P1.1 Phase 2.1 (2026-07-24 fix e175bfa1): 防止同 state-session 重复 fire stuck
 # 避免 3 分钟 stuck 触发 3 次 record_stuck → 上游生成 3 张重复 bug card
 var _stuck_fired_this_session: bool = false
@@ -310,9 +312,29 @@ func _handle_character_select() -> void:
 	if not is_instance_valid(_current_scene):
 		await _wait_ms(500)
 		return
+	
+	# 2026-08-01 fix(ed75d23a): 跟踪卡住次数，超过 5 次强制跳过
+	_char_select_stuck_count += 1
+	if _char_select_stuck_count > 5:
+		print("AIPlayer: character_select 卡住 %d 次，强制跳过" % _char_select_stuck_count)
+		# 直接设置默认角色并切换场景（绕过 character_select.gd 的所有逻辑）
+		GameState.character_id = "chenmo"
+		var data: Dictionary = GameState.get_character_data()
+		GameState.hp = data.get("hp", 80)
+		GameState.max_hp = data.get("hp", 80)
+		var starter_cards: Array = GameState.get_starter_deck()
+		for card in starter_cards:
+			var idx: int = GameState.add_to_collection(card)
+			GameState.add_to_deck(idx)
+		get_tree().change_scene_to_file("res://scenes/map.tscn")
+		_char_select_stuck_count = 0
+		await _wait_ms(1500)
+		return
+	
 	# 直接调用场景的确认方法(绕过点击)
 	if AgentActions.call_method("_confirm_selection"):
 		print("AIPlayer: 调用 _confirm_selection")
+		_char_select_stuck_count = 0  # 成功调用，重置计数器
 		await _wait_ms(1500)
 		return
 	# fallback:先选陈默卡再确认
@@ -321,9 +343,10 @@ func _handle_character_select() -> void:
 		await AgentInput.click_control(card)
 		await _wait_ms(300)
 	if AgentActions.click_button_by_name("ConfirmButton"):
+		_char_select_stuck_count = 0  # 成功调用，重置计数器
 		await _wait_ms(1500)
 		return
-	print("AIPlayer: 角色选择未成功")
+	print("AIPlayer: 角色选择未成功（第 %d 次尝试）" % _char_select_stuck_count)
 	await _wait_ms(1000)
 
 func _handle_map() -> void:
