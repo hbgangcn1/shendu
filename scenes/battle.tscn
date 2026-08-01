@@ -1,0 +1,215 @@
+[gd_scene load_steps=6 format=3 uid="uid://battle001"]
+
+[ext_resource type="Script" path="res://scripts/ui/battle_ui.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/images/backgrounds/bg_battle.png" id="2"]
+[ext_resource type="PackedScene" path="res://scenes/player_portrait_overlay.tscn" id="3"]
+[ext_resource type="Script" path="res://scripts/main_battle.gd" id="4"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_log"]
+bg_color = Color(0.08, 0.08, 0.12, 0.85)
+border_width_left = 1
+border_width_right = 1
+border_width_top = 1
+border_width_bottom = 1
+border_color = Color(0.3, 0.3, 0.4, 1)
+content_margin_left = 8
+content_margin_right = 8
+content_margin_top = 6
+content_margin_bottom = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bottom"]
+bg_color = Color(0.05, 0.05, 0.1, 0.92)
+border_width_top = 1
+border_color = Color(0.3, 0.3, 0.5, 0.8)
+content_margin_left = 12
+content_margin_right = 12
+content_margin_top = 6
+content_margin_bottom = 6
+
+[node name="Battle" type="Node2D"]
+script = ExtResource("4")
+
+[node name="BattleUI" parent="." type="CanvasLayer"]
+script = ExtResource("1")
+
+[node name="PlayerPortraitOverlay" parent="BattleUI" instance=ExtResource("3")]
+offset_left = 80.0
+offset_top = 440.0
+offset_right = 400.0
+offset_bottom = 840.0
+z_index = 0
+
+[node name="Background" parent="BattleUI" type="TextureRect"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+stretch_mode = 6
+expand_mode = 1
+texture = ExtResource("2")
+
+[node name="MainHBox" parent="BattleUI" type="HBoxContainer"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 0
+
+[node name="GameArea" parent="BattleUI/MainHBox" type="VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 0
+
+[node name="TopBar" parent="BattleUI/MainHBox/GameArea" type="HBoxContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 60)
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="TurnLabel" parent="BattleUI/MainHBox/GameArea/TopBar" type="Label"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+text = "回合 0 | 空闲"
+
+[node name="EnemyArea" parent="BattleUI/MainHBox/GameArea" type="HBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="EnemyContainer" parent="BattleUI/MainHBox/GameArea/EnemyArea" type="HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="BottomPanel" parent="BattleUI/MainHBox/GameArea" type="PanelContainer"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_bottom")
+
+[node name="BottomVBox" parent="BattleUI/MainHBox/GameArea/BottomPanel" type="VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="PlayerInfoRow" parent="BattleUI/MainHBox/GameArea/BottomPanel/BottomVBox" type="HBoxContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 50)
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="PlayerHPLabel" parent="BattleUI/MainHBox/GameArea/BottomPanel/BottomVBox/PlayerInfoRow" type="Label"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "HP: 80/80"
+
+[node name="PlayerShieldLabel" parent="BattleUI/MainHBox/GameArea/BottomPanel/BottomVBox/PlayerInfoRow" type="Label"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "盾: 0"
+
+[node name="PlayerEnergyLabel" parent="BattleUI/MainHBox/GameArea/BottomPanel/BottomVBox/PlayerInfoRow" type="Label"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "能量: 10/10"
+
+[node name="DeckInfoRow" parent="BattleUI/MainHBox/GameArea/BottomPanel/BottomVBox" type="HBoxContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 42)
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="DrawPileLabel" parent="BattleUI/MainHBox/GameArea/BottomPanel/BottomVBox/DeckInfoRow" type="Label"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "牌库: 0"
+
+[node name="DiscardPileLabel" parent="BattleUI/MainHBox/GameArea/BottomPanel/BottomVBox/DeckInfoRow" type="Label"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "弃牌堆: 0"
+
+[node name="StatusRow" parent="BattleUI/MainHBox/GameArea/BottomPanel/BottomVBox" type="HBoxContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 42)
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="MoNianLabel" parent="BattleUI/MainHBox/GameArea/BottomPanel/BottomVBox/StatusRow" type="Label"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "魔念: 0"
+
+[node name="ErosionLabel" parent="BattleUI/MainHBox/GameArea/BottomPanel/BottomVBox/StatusRow" type="Label"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "侵蚀: 0"
+
+[node name="OverloadBar" parent="BattleUI/MainHBox/GameArea/BottomPanel/BottomVBox/StatusRow" type="ProgressBar"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(140, 24)
+max_value = 10.0
+value = 0.0
+show_percentage = false
+
+[node name="HandSizeLabel" parent="BattleUI/MainHBox/GameArea/BottomPanel/BottomVBox/StatusRow" type="Label"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "手牌: 0/5"
+
+[node name="HandContainer" parent="BattleUI/MainHBox/GameArea/BottomPanel/BottomVBox" type="HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(0, 146)
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="EndTurnButton" parent="BattleUI/MainHBox/GameArea/BottomPanel/BottomVBox" type="Button"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(400, 90)
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 30
+text = "结束回合"
+
+[node name="LogToggle" parent="BattleUI/MainHBox" type="Button"]
+layout_mode = 2
+custom_minimum_size = Vector2(48, 0)
+theme_override_font_sizes/font_size = 24
+text = "◀"
+
+[node name="LogPanel" parent="BattleUI/MainHBox" type="PanelContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(266, 0)
+theme_override_styles/panel = SubResource("StyleBoxFlat_log")
+
+[node name="LogScroll" parent="BattleUI/MainHBox/LogPanel" type="ScrollContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="BattleLogLabel" parent="BattleUI/MainHBox/LogPanel/LogScroll" type="RichTextLabel"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+bbcode_enabled = true
+text = ""
+scroll_active = true
+theme_override_colors/default_color = Color(0.85, 0.85, 0.9, 1)
+theme_override_font_sizes/normal_font_size = 22
