@@ -110,7 +110,7 @@ func _write_state() -> void:
 		state["current_scene_groups"] = current.get_groups()
 		# 2026-07-30 fix (D1): 不同 scene 写对应 state，让 headless LLM 能基于 state 决策
 		# 之前只有 BattleScene/BattleDemo 有专属 state writer，map scene 啥也没写 → LLM 看黑截图瞎猜
-		if current.name in ["BattleScene", "BattleDemo"]:
+		if current.name in ["Battle", "BattleScene", "BattleDemo"]:
 			_write_battle_state(state, current)
 		elif current.name == "GameMap" or (current.scene_file_path and "map.tscn" in current.scene_file_path):
 			_write_map_state(state, current)
