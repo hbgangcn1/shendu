@@ -350,13 +350,20 @@ func _build_decision_hints(by_type: Dictionary, unvisited_reachable: int, total:
 
 ## 将 layout 写到 user://ai-player-map-layout.json（ai_player_client.py 读这个）
 ## 还同时写一份 workspace 镜像让 Phase E consume / agent 能访问
+##
+## 2026-08-06 fix: 原来用 `res://../.openclaw/workspace/...` 是 Godot 4 不允许的 path —
+## Godot 资源路径不能 `..` 跳出项目根，ProjectSettings.globalize_path 返 project 父目录
+## 写进去是无关路径，workspace 镜像实际不出现。改用 absolute path 固定到
+## `C:\Users\hbgan\.openclaw\workspace\shendu\ai-player-map-layout.json`。
+##
+## user:// 写主源（标准 Godot 用法），workspace absolute 写镜像（供 Phase E / agent 读）。
 func save_map_layout_to_disk(layout: Dictionary) -> String:
 	if layout.is_empty():
 		return ""
 	var json_str: String = JSON.stringify(layout, "  ")
 	var user_path: String = "user://ai-player-map-layout.json"
-	var workspace_path: String = "res://../.openclaw/workspace/shendu/ai-player-map-layout.json"
-	var abs_workspace: String = ProjectSettings.globalize_path(workspace_path)
+	# 2026-08-06: 用 absolute path 代替 `res://../...`（Godot 4 不允许 `..` 跳出项目根）
+	var abs_workspace: String = "C:/Users/hbgan/.openclaw/workspace/shendu/ai-player-map-layout.json"
 	# user:// 写主源
 	var user_file := FileAccess.open(user_path, FileAccess.WRITE)
 	if user_file != null:
