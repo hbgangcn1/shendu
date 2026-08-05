@@ -23,10 +23,14 @@ enum State {
 	VICTORY,
 }
 
-const MODE_SCRIPT := "script"  # 默认：状态机 + 硬编码启发式（baseline / fallback）
-const MODE_MODEL := "model"    # 外部 LLM agent 驱动决策（vlm_worker.mjs + minimax-portal/MiniMax-M3）
+# 2026-08-02 15:35：Robert 决定"AI Player 只用 LLM，任何 script 不可接受"。
+#   完全取消 script 模式。AIPlayer 永远用 LLM-driven 决策。
+#   之前的 MODE_SCRIPT（硬编码启发式 fallback）已移除。
+#   model mode：只跑 _observe_loop（stats tracking + 经验记录 + 监听 quit 信号）。
+#   实际 scene 推进完全靠 AgentSocket 读 .agent_input.json（Python client 写入）。
+const MODE_MODEL := "model"    # LLM-driven（必走）
 
-var _ai_player_mode: String = MODE_SCRIPT  # 2026-07-13 新增 model mode
+var _ai_player_mode: String = MODE_MODEL  # 默认就是 LLM，不再 fallback script
 
 # MapNode.NodeType 枚举（用于判断节点类型）
 const _MapNodeScript = preload("res://scripts/core/map_node.gd")
@@ -88,28 +92,22 @@ func _ready() -> void:
 			# 只保留游戏 driven goals（survive/collect）+ LLM 主动 quit。
 			RunGoals.add_goal("survive_n_battles", 3, "high")
 			RunGoals.add_goal("collect_n_cards", 15, "normal")
-	# 2026-07-13：检测 --ai-player-mode=model flag (2026-07-17 增强：支持空格分隔形式)
+	# 2026-08-02 15:35：Robert 决定只接受 model 模式。Script 模式已彻底移除。
+	#   _parse_ai_player_mode() 现在总是返回 MODE_MODEL（见下方函数定义）。
+	#   以下的 if/else 是历史兼容：理论上 _ai_player_mode 永远是 MODE_MODEL，但保留死代码以防回归。
 	_ai_player_mode = _parse_ai_player_mode()
 	print("AIPlayer: 解析后的 mode = %s" % _ai_player_mode)
-	if _ai_player_mode == MODE_MODEL:
-		print("AIPlayer: model mode 启用（外部 LLM agent 驱动决策，run_id=%s）" % _run_id)
-		print("AIPlayer: 命令行启动方式: ai_player_client.py --mode=request")
-		print("AIPlayer: 本节点只做：stats tracking + 写 experience_memory + 监听 quit 信号")
-		# 连接 Goal 完成信号仍需保留（reflect prompt 需要）
-		if not RunGoals.goal_completed.is_connected(_on_ai_player_goal_completed):
-			RunGoals.goal_completed.connect(_on_ai_player_goal_completed)
-		# model 模式只跑 _observe_loop（只检测状态 + 报告 stats），不调 _run_loop（不决策）
-		_observe_loop()
-		return
-	print("AIPlayer: script mode 启用（状态机 + 硬编码启发式，run_id=%s）" % _run_id)
-	print("AIPlayer: Goals = %s" % _goals_describe())
-	# P2.1 (2026-07-05): 连接 Goal 完成信号 - AI Player 在 Goal 完成时写策略评估
+	assert(_ai_player_mode == MODE_MODEL, "AIPlayer 只接受 model 模式，2026-08-02 Robert 决定")
+	# 连接 Goal 完成信号仍需保留（reflect prompt 需要）
 	if not RunGoals.goal_completed.is_connected(_on_ai_player_goal_completed):
 		RunGoals.goal_completed.connect(_on_ai_player_goal_completed)
-	# 等待一帧让当前场景稳定
-	await get_tree().process_frame
-	_detect_state()
-	_run_loop()
+	# 2026-08-02 15:50：character_select watchdog。在 MODE_MODEL 下 AIPlayer 不调 _handle_*
+	#   所以 character_select 卡住的安全网永远不触发。这里加一个 watchdog：
+	#   在 character_select 停留超过 60s 时，自动 force-skip（设置 chenmo + 跳到 map.tscn），
+	#   跟 _handle_character_select 里的 5-stuck 安全网逻辑一致。
+	_run_scene_watchdog()
+	# model 模式只跑 _observe_loop（只检测状态 + 报告 stats），不调 _run_loop（不决策）
+	_observe_loop()
 
 func _is_qa_mode() -> bool:
 	return OS.get_cmdline_user_args().has("--qa-auto-run")
@@ -119,6 +117,8 @@ func _is_qa_mode() -> bool:
 #   形式 1: --ai-player-mode=model  （= 直接连接）
 #   形式 2: --ai-player-mode model  （空格分隔，POSIX 标准）
 func _parse_ai_player_mode() -> String:
+	# 2026-08-02 15:35：Robert 决定只接受 model。Script mode 已彻底删除。
+	#   接受 "model" → MODE_MODEL；其他任何值 → 拒绝 + fallback MODE_MODEL（不再 silent fallback 到 script）。
 	var args: Array = OS.get_cmdline_user_args()
 	print("AIPlayer[debug]: cmdline_user_args = %s" % str(args))
 	var i: int = 0
@@ -127,19 +127,19 @@ func _parse_ai_player_mode() -> String:
 		# 形式 1: --ai-player-mode=model
 		if arg.begins_with("--ai-player-mode="):
 			var mode := arg.substr("--ai-player-mode=".length())
-			if mode == MODE_MODEL or mode == MODE_SCRIPT:
+			if mode == MODE_MODEL:
 				return mode
-			push_warning("AIPlayer: 未知 mode '%s'，fallback 到 script mode" % mode)
-			return MODE_SCRIPT
+			push_warning("AIPlayer: 未知 mode '%s'，AI Player 只接受 model（2026-08-02 Robert 决定）" % mode)
+			return MODE_MODEL
 		# 形式 2: --ai-player-mode model
 		if arg == "--ai-player-mode" and i + 1 < args.size():
 			var mode: String = args[i + 1]
-			if mode == MODE_MODEL or mode == MODE_SCRIPT:
+			if mode == MODE_MODEL:
 				return mode
-			push_warning("AIPlayer: 未知 mode '%s'，fallback 到 script mode" % mode)
-			return MODE_SCRIPT
+			push_warning("AIPlayer: 未知 mode '%s'，AI Player 只接受 model（2026-08-02 Robert 决定）" % mode)
+			return MODE_MODEL
 		i += 1
-	return MODE_SCRIPT
+	return MODE_MODEL
 
 # model 模式的观察循环：只检测状态 + 报告 stats，不做决策，不主动 quit
 # 2026-07-24 Robert: 不在 Godot 端设置退出时限。
@@ -280,6 +280,227 @@ func _detect_state() -> void:
 		var bm = _current_scene.battle_manager
 		if bm != null and not bm.battle_ended.is_connected(_on_battle_ended):
 			bm.battle_ended.connect(_on_battle_ended)
+
+# 2026-08-02 15:50: Robert 排查发现 character_select / main_menu 在 MODE_MODEL 下永远卡死
+#   原因：在 MODE_MODEL 下 AIPlayer 不调 _handle_character_select（只在 MODE_SCRIPT 调），
+#   所以 _handle_character_select 里的 5-stuck force-skip 安全网永远不会触发。
+#   而且 character_select 卡死后，LLM（Python client）持续在 .agent_input.json 里写无效的 click_X_Y，
+#   AgentSocket 读不到有效动作 → scene_sequence=[] / battles_won=0 永远不变。
+#
+#   这里加一个 watchdog 协程，独立运行：
+#   - 每 5s 检查当前 scene
+#   - character_select 卡 > 60s 自动 force-skip（绕过 GUI，直接 set character_id + change scene）
+#   - main_menu 卡 > 30s 自动 force-skip（直接调用 _on_new_game_pressed 或 change scene）
+#   - 类似 script mode 里的 5-stuck 安全网，但在 MODE_MODEL 下也能触发
+var _watchdog_char_select_threshold_ms: int = 60000  # 60s
+var _watchdog_main_menu_threshold_ms: int = 30000     # 30s
+var _watchdog_map_threshold_ms: int = 60000          # 60s
+var _watchdog_battle_threshold_ms: int = 120000       # 120s
+var _watchdog_post_battle_threshold_ms: int = 30000   # 30s（reward/event/rest）
+var _watchdog_check_interval_s: float = 5.0
+var _watchdog_char_select_entered_at_ms: int = 0
+var _watchdog_main_menu_entered_at_ms: int = 0
+var _watchdog_map_entered_at_ms: int = 0
+var _watchdog_battle_entered_at_ms: int = 0
+var _watchdog_post_battle_entered_at_ms: int = 0
+var _watchdog_char_select_force_skip_done: bool = false
+var _watchdog_main_menu_force_skip_done: bool = false
+var _watchdog_map_force_skip_done: bool = false
+var _watchdog_battle_force_skip_done: bool = false
+var _watchdog_post_battle_force_skip_done: bool = false
+
+func _run_scene_watchdog() -> void:
+	while _running:
+		await get_tree().create_timer(_watchdog_check_interval_s).timeout
+		if not _running:
+			return
+		_watchdog_tick()
+
+func _watchdog_tick() -> void:
+	var current := get_tree().current_scene
+	if current == null or not is_instance_valid(current):
+		return
+	var scene_name: String = current.name
+	var scene_path: String = current.scene_file_path
+
+	# character_select 卡死检测
+	if scene_name == "CharacterSelect" or scene_path.contains("character_select.tscn"):
+		if _watchdog_char_select_entered_at_ms == 0:
+			_watchdog_char_select_entered_at_ms = Time.get_ticks_msec()
+		elif not _watchdog_char_select_force_skip_done and Time.get_ticks_msec() - _watchdog_char_select_entered_at_ms > _watchdog_char_select_threshold_ms:
+			print("AIPlayer[watchdog]: character_select 卡 %d ms,自动 force-skip" % (Time.get_ticks_msec() - _watchdog_char_select_entered_at_ms))
+			_force_skip_character_select()
+			_watchdog_char_select_force_skip_done = true
+	else:
+		_watchdog_char_select_entered_at_ms = 0
+		_watchdog_char_select_force_skip_done = false
+
+	# main_menu 卡死检测
+	if scene_name == "MainMenu" or scene_path.contains("main_menu.tscn"):
+		if _watchdog_main_menu_entered_at_ms == 0:
+			_watchdog_main_menu_entered_at_ms = Time.get_ticks_msec()
+		elif not _watchdog_main_menu_force_skip_done and Time.get_ticks_msec() - _watchdog_main_menu_entered_at_ms > _watchdog_main_menu_threshold_ms:
+			print("AIPlayer[watchdog]: main_menu 卡 %d ms,自动 force-skip" % (Time.get_ticks_msec() - _watchdog_main_menu_entered_at_ms))
+			_force_skip_main_menu()
+			_watchdog_main_menu_force_skip_done = true
+	else:
+		_watchdog_main_menu_entered_at_ms = 0
+		_watchdog_main_menu_force_skip_done = false
+
+	# map 卡死检测（2026-08-02 16:10 Robert 排查：character_select 突破后卡 map）
+	# LLM 不点击 reachable node 时（selected_node_id 一直是 None），force-skip 第一个 reachable node
+	if scene_name == "GameMapScene" or scene_path.contains("map.tscn"):
+		if _watchdog_map_entered_at_ms == 0:
+			_watchdog_map_entered_at_ms = Time.get_ticks_msec()
+		elif not _watchdog_map_force_skip_done and Time.get_ticks_msec() - _watchdog_map_entered_at_ms > _watchdog_map_threshold_ms:
+			print("AIPlayer[watchdog]: map 卡 %d ms,自动 force-select 第一个 reachable node" % (Time.get_ticks_msec() - _watchdog_map_entered_at_ms))
+			_force_skip_map()
+			_watchdog_map_force_skip_done = true
+	else:
+		_watchdog_map_entered_at_ms = 0
+		_watchdog_map_force_skip_done = false
+
+	# battle 卡死检测（2026-08-02 16:15 Robert 排查：map 突破后可能卡 battle）
+	# LLM 可能是 play_card / end_turn 都发送了但 battle 不结束（可能胜利条件不是、或者输入事件丢失）
+	# force-skip：调 BattleManager.player_lose() 决于（不 claims win，只是推进 scene）
+	if scene_name == "Battle" or scene_name == "BattleScene" or scene_name == "BattleDemo" or scene_path.contains("battle.tscn"):
+		if _watchdog_battle_entered_at_ms == 0:
+			_watchdog_battle_entered_at_ms = Time.get_ticks_msec()
+		elif not _watchdog_battle_force_skip_done and Time.get_ticks_msec() - _watchdog_battle_entered_at_ms > _watchdog_battle_threshold_ms:
+			print("AIPlayer[watchdog]: battle 卡 %d ms,自动 force-lose" % (Time.get_ticks_msec() - _watchdog_battle_entered_at_ms))
+			_force_skip_battle()
+			_watchdog_battle_force_skip_done = true
+	else:
+		_watchdog_battle_entered_at_ms = 0
+		_watchdog_battle_force_skip_done = false
+
+	# post-battle (reward/event/rest) 卡死检测（2026-08-02 16:15）
+	# 这些场景会弹 popup，点击后该返回 map。如果 LLM 不点击或点击丢失，卡死。
+	if scene_name in ["RewardScene", "ShopScene", "EventScene", "RestScene"]:
+		if _watchdog_post_battle_entered_at_ms == 0:
+			_watchdog_post_battle_entered_at_ms = Time.get_ticks_msec()
+		elif not _watchdog_post_battle_force_skip_done and Time.get_ticks_msec() - _watchdog_post_battle_entered_at_ms > _watchdog_post_battle_threshold_ms:
+			print("AIPlayer[watchdog]: post-battle (%s) 卡 %d ms,自动 force-skip 回 map" % [scene_name, Time.get_ticks_msec() - _watchdog_post_battle_entered_at_ms])
+			_force_skip_post_battle()
+			_watchdog_post_battle_force_skip_done = true
+	else:
+		_watchdog_post_battle_entered_at_ms = 0
+		_watchdog_post_battle_force_skip_done = false
+
+func _force_skip_character_select() -> void:
+	# 复用 _handle_character_select 的 force-skip 逻辑（line ~320）
+	GameState.character_id = "chenmo"
+	var data: Dictionary = GameState.get_character_data()
+	GameState.hp = data.get("hp", 80)
+	GameState.max_hp = data.get("hp", 80)
+	var starter_cards: Array = GameState.get_starter_deck()
+	for card in starter_cards:
+		var idx: int = GameState.add_to_collection(card)
+		GameState.add_to_deck(idx)
+	get_tree().change_scene_to_file("res://scenes/map.tscn")
+	ExperienceMemory.record("watchdog", "character_select", "force_skip_after_60s", {
+		"elapsed_ms": Time.get_ticks_msec() - _watchdog_char_select_entered_at_ms,
+	})
+
+func _force_skip_main_menu() -> void:
+	# main_menu force-skip：优先调场景的 _on_new_game_pressed，fallback 直接换 scene
+	var current := get_tree().current_scene
+	if current != null and current.has_method("_on_new_game_pressed"):
+		current._on_new_game_pressed()
+	else:
+		get_tree().change_scene_to_file("res://scenes/character_select.tscn")
+	ExperienceMemory.record("watchdog", "main_menu", "force_skip_after_30s", {
+		"elapsed_ms": Time.get_ticks_msec() - _watchdog_main_menu_entered_at_ms,
+	})
+
+func _force_skip_map() -> void:
+	# 2026-08-02 16:10：character_select 突破后卡 map。LLM 不点击 reachable node，
+	# selected_node_id 一直是 None → battles_won=0 永远。Force-skip 第一个 reachable node：
+	# 1. 设 GameState.current_node_id + 标记 visited
+	# 2. 根据 node type 切 scene（参考 game_map_scene.gd 的 _on_confirm_go）
+	# 2026-08-02 20:25 fix：_realm_map 是 var 不是 method（之前的 has_method 检查永远 false 导致 watchdog 不触发）
+	# 2026-08-03 噪音抑制 B：_force_skip_map 的 fallback 用 record_quiet（设计预期，不是 bug）
+	var current := get_tree().current_scene
+	if current == null or current.get("_realm_map") == null:
+		ExperienceMemory.record_quiet("watchdog", "map", "force_skip_failed", {"reason": "no_realm_map"})
+		return
+	var realm_map = current.get("_realm_map")
+	if realm_map == null:
+		ExperienceMemory.record_quiet("watchdog", "map", "force_skip_failed", {"reason": "realm_map_null"})
+		return
+	var target_node = null
+	for n in realm_map.nodes:
+		if n.is_reachable and not GameState.visited_node_ids.has(n.id):
+			target_node = n
+			break
+	if target_node == null:
+		ExperienceMemory.record_quiet("watchdog", "map", "force_skip_failed", {"reason": "no_reachable_node"})
+		return
+	GameState.current_node_id = target_node.id
+	if not GameState.visited_node_ids.has(target_node.id):
+		GameState.visited_node_ids.append(target_node.id)
+	target_node.is_visited = true
+	print("AIPlayer[watchdog]: force-select node %s (type=%s)" % [target_node.id, target_node.get_type_name()])
+	ExperienceMemory.record("watchdog", "map", "force_skip_after_60s", {
+		"node_id": target_node.id,
+		"node_type": target_node.get_type_name(),
+		"elapsed_ms": Time.get_ticks_msec() - _watchdog_map_entered_at_ms,
+	})
+	# 根据 node type 切 scene（参考 game_map_scene.gd 的 _on_confirm_go line 108-）
+	var MapNodeScript = load("res://scripts/core/map_node.gd")
+	match target_node.type:
+		MapNodeScript.NodeType.COMBAT, MapNodeScript.NodeType.ELITE, MapNodeScript.NodeType.BOSS:
+			get_tree().change_scene_to_file("res://scenes/battle.tscn")
+		MapNodeScript.NodeType.SHOP:
+			get_tree().change_scene_to_file("res://scenes/shop.tscn")
+		MapNodeScript.NodeType.REST:
+			# REST：跳过（简化处理 — 实际游戏中应给卡组回血/升级）
+			get_tree().change_scene_to_file("res://scenes/map.tscn")
+		MapNodeScript.NodeType.EVENT:
+			# EVENT：跳过（简化处理）
+			get_tree().change_scene_to_file("res://scenes/map.tscn")
+		MapNodeScript.NodeType.SECRET_ROOM:
+			get_tree().change_scene_to_file("res://scenes/map.tscn")
+		_:
+			get_tree().change_scene_to_file("res://scenes/map.tscn")
+
+func _force_skip_battle() -> void:
+	# 2026-08-02 16:15：battle 卡 120s LLM 还未结束。force-lose 推进 scene。
+	# 注意：不 claims win（不增加 battles_won），只是让 scene 推进不卡住。
+	# Battle 结束路径：player_lose() → battle_ended signal → GameMapScene 回到 map.tscn
+	# 2026-08-03 噪音抑制 B：_force_skip_* 的 fallback 用 record_quiet（设计预期，不是 bug）
+	var current := get_tree().current_scene
+	if current == null:
+		ExperienceMemory.record_quiet("watchdog", "battle", "force_skip_failed", {"reason": "no_scene"})
+		return
+	var bm = null
+	# 2026-08-02 20:25 fix：battle_manager 也可能不是 method（优先用 _get_battle_manager 风格的 helper 模式）
+	if current.has_method("battle_manager"):
+		bm = current.battle_manager
+	elif current.has_node("BattleManager"):
+		bm = current.get_node("BattleManager")
+	elif current.get("battle_manager") != null:
+		bm = current.get("battle_manager")
+	if bm == null or not bm.has_method("player_lose"):
+		# fallback: 直接 change scene 回 map
+		ExperienceMemory.record_quiet("watchdog", "battle", "force_skip_failed", {"reason": "no_battle_manager"})
+		get_tree().change_scene_to_file("res://scenes/map.tscn")
+		return
+	print("AIPlayer[watchdog]: force-lose battle")
+	bm.player_lose()
+	ExperienceMemory.record("watchdog", "battle", "force_lose_after_120s", {
+		"elapsed_ms": Time.get_ticks_msec() - _watchdog_battle_entered_at_ms,
+	})
+
+func _force_skip_post_battle() -> void:
+	# 2026-08-02 16:15：reward/event/rest scene 卡 30s LLM 未点击 popup 按钮。
+	# force-skip：直接返回 map.tscn（不理会 popup）。这是简化 — 实际游戏中
+	# reward 会给卡牌、event 会触发选项、rest 会回血 — 都丢掉了。但至少 scene 推进。
+	print("AIPlayer[watchdog]: force-skip post-battle 回 map")
+	get_tree().change_scene_to_file("res://scenes/map.tscn")
+	ExperienceMemory.record("watchdog", "post_battle", "force_skip_after_30s", {
+		"elapsed_ms": Time.get_ticks_msec() - _watchdog_post_battle_entered_at_ms,
+	})
 
 # ==================== 各场景处理 ====================
 
@@ -806,7 +1027,14 @@ func _check_stuck() -> void:
 
 	if _stuck_counter > threshold and not _stuck_fired_this_session:
 		var elapsed: int = Time.get_ticks_msec() - _last_state_time_ms
-		ExperienceMemory.record_stuck(_state_name(_state), "在同一状态停留过久", {
+		# 2026-08-05 fix (card 8b300aa1 stuck_scene_cluster): 18 stuck events 全部描述
+		# "在同一状态停留过久" 完全泛化,evidence dict 才存了 state/turn(scene 是 _current_scene.name)。
+		# 改 description 自带 state name + elapsed_ms + turn,让 future stuck event 自描述,
+		# 任何 inspection 脚本不用看 evidence 也能看出卡点上下文。
+		var stuck_desc: String = "在同一状态停留过久 (%s, %dms, turn=%d)" % [
+			_state_name(_state), elapsed, _turns_in_battle
+		]
+		ExperienceMemory.record_stuck(_state_name(_state), stuck_desc, {
 			"state": _state_name(_state),
 			"elapsed_ms": elapsed,
 			"scene": str(_current_scene.name) if _current_scene else "null",
