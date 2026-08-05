@@ -222,3 +222,157 @@ func get_removal_cost() -> int:
 func legacy_add_to_deck(card_data: Dictionary) -> void:
 	var idx: int = add_to_collection(card_data)
 	add_to_deck(idx)
+
+# ==================== 2026-08-05 方案 D：map layout export for AI Player ====================
+## 2026-08-03 Robert 提议的“让 minimax 看到结构”路径。
+## 背景：AI Player 之前只看屏幕截图 + 内存状态，minimax 不能直接读 .tscn 节点结构。
+## 每次进入 map scene 时 export 一份 map layout（节点 ID / 类型 / column / reachable
+## / visited / connections）写到 user://ai-player-map-layout.json，phase_e_consume
+## 或 ai_player_client.py 读这个文件加到 minimax prompt 上下文。
+##
+## 优势：
+## - minimax 能看到 “当前可选 5 个节点里 3 个是 COMBAT 1 个是 REST 1 个是 SHOP”
+##   而不是只看像素。
+## - 决策更准：卡节点选择 / 五行相生 / 牌组缺的元素等策略性 decision。
+## - Phase E design_concerns 也会更准（"为什么 AI Player 一直选 COMBAT"）被 minimax
+##   看到后能 propose “加引导 + 五行图例”。
+
+func export_map_layout_for_ai_player() -> Dictionary:
+	var layout: Dictionary = {
+		"exported_at": Time.get_datetime_string_from_system(),
+		"run_id": _generate_run_id_for_layout() if has_method("_generate_run_id_for_layout") else "",
+		"current_realm": current_realm,
+		"realm_name": get_realm_name(),
+		"current_node_id": current_node_id,
+		"visited_node_ids": visited_node_ids.duplicate(),
+		"hp": hp,
+		"max_hp": max_hp,
+		"spirit_stones": spirit_stones,
+		"dao_xing": dao_xing,
+		"mo_nian": mo_nian,
+		"map_available": game_map != null,
+		"columns": [],
+		"stats": {
+			"total_nodes": 0,
+			"reachable_count": 0,
+			"unvisited_reachable_count": 0,
+			"by_type": {},
+		},
+	}
+	if game_map == null:
+		return layout
+
+	# 从 game_map.realms[current_realm] 读节点 + 连接 + 可达状态
+	if not game_map.has_method("get_realm_map"):
+		return layout
+	var realm_map = game_map.get_realm_map(current_realm)
+	if realm_map == null:
+		return layout
+
+	# 五行枚举中文名 (起于 design/00-MASTER.md §五)
+	const NODE_TYPE_NAMES := {
+		0: "未知",
+		1: "COMBAT", 2: "ELITE", 3: "BOSS",
+		4: "EVENT", 5: "SHOP", 6: "REST", 7: "SECRET_ROOM",
+	}
+
+	var by_type: Dictionary = {}
+	var total: int = 0
+	var reachable_count: int = 0
+	var unvisited_reachable_count: int = 0
+	var columns_arr: Array = []
+
+	# realm_map 有 nodes + columns 字段（参考 game_map.gd）
+	if realm_map.has_method("get") and realm_map.get("columns") != null:
+		var cols: Array = realm_map.columns
+		for ci in range(cols.size()):
+			var col_nodes: Array = cols[ci]
+			var col_export: Array = []
+			for n in col_nodes:
+				if n == null:
+					continue
+				total += 1
+				var node_type: int = int(n.get("type", 0)) if n is Dictionary else int(n.type)
+				var node_id: String = str(n.get("id", "")) if n is Dictionary else str(n.id)
+				var is_reachable: bool = bool(n.get("is_reachable", false)) if n is Dictionary else bool(n.is_reachable)
+				var is_visited: bool = visited_node_ids.has(node_id)
+				if is_reachable:
+					reachable_count += 1
+					if not is_visited:
+						unvisited_reachable_count += 1
+				var type_name: String = NODE_TYPE_NAMES.get(node_type, "未知")
+				by_type[type_name] = int(by_type.get(type_name, 0)) + 1
+				# 读连接（可达节点 list）
+				var conns: Array = []
+				if n is Dictionary and n.get("connections") != null:
+					for c in n.connections:
+						conns.append(str(c))
+				col_export.append({
+					"id": node_id,
+					"type": type_name,
+					"reachable": is_reachable,
+					"visited": is_visited,
+					"connections": conns,
+				})
+			columns_arr.append({
+				"column_index": ci,
+				"node_count": col_export.size(),
+				"nodes": col_export,
+			})
+
+	layout["columns"] = columns_arr
+	layout["stats"] = {
+		"total_nodes": total,
+		"reachable_count": reachable_count,
+		"unvisited_reachable_count": unvisited_reachable_count,
+		"by_type": by_type,
+	}
+
+	# 提示 minimax 的“未来决策上下文”文本（人类可读 + LLM 友好）
+	layout["decision_hints"] = _build_decision_hints(by_type, unvisited_reachable_count, total)
+	return layout
+
+func _build_decision_hints(by_type: Dictionary, unvisited_reachable: int, total: int) -> String:
+	var hints: Array = []
+	if unvisited_reachable == 0:
+		hints.append("⚠️ 没有 unvisited_reachable 节点 (all visited or locked) — 需要走 back or restart")
+	if int(by_type.get("REST", 0)) == 0 and unvisited_reachable > 0:
+		hints.append("ℹ️ 可选节点里没有 REST — HP < 30% 时考虑走 ELITE/BOSS 拿薬手 / 走 EVENT 拿暗器")
+	if int(by_type.get("SHOP", 0)) > 0 and spirit_stones >= 100:
+		hints.append("🛒 有 SHOP 且 spirit_stones >= 100 — 可以考虑 SHOP 买卡")
+	if int(by_type.get("EVENT", 0)) > 0 and mo_nian >= 3:
+		hints.append("⚡ 有 EVENT 且 mo_nian >= 3 — EVENT 可能有净魔念选项")
+	if total == 0:
+		hints.append("⚠️ map 未生成 (total=0) — 报 bug：game_map 未调用 generate()")
+	if hints.is_empty():
+		hints.append("✓ 地图状态正常，可正常选点")
+	return " | ".join(hints)
+
+## 将 layout 写到 user://ai-player-map-layout.json（ai_player_client.py 读这个）
+## 还同时写一份 workspace 镜像让 Phase E consume / agent 能访问
+func save_map_layout_to_disk(layout: Dictionary) -> String:
+	if layout.is_empty():
+		return ""
+	var json_str: String = JSON.stringify(layout, "  ")
+	var user_path: String = "user://ai-player-map-layout.json"
+	var workspace_path: String = "res://../.openclaw/workspace/shendu/ai-player-map-layout.json"
+	var abs_workspace: String = ProjectSettings.globalize_path(workspace_path)
+	# user:// 写主源
+	var user_file := FileAccess.open(user_path, FileAccess.WRITE)
+	if user_file != null:
+		user_file.store_string(json_str)
+		user_file.close()
+	# workspace 镜像（供 Phase E / 外部访问）
+	var ws_dir: String = abs_workspace.get_base_dir()
+	if not DirAccess.dir_exists_absolute(ws_dir):
+		DirAccess.make_dir_recursive_absolute(ws_dir)
+	var ws_file := FileAccess.open(abs_workspace, FileAccess.WRITE)
+	if ws_file != null:
+		ws_file.store_string(json_str)
+		ws_file.close()
+	return user_path
+
+func _generate_run_id_for_layout() -> String:
+	# 复用 ai_player.gd 的 run_id 生成模式（timestamp 格式）
+	return Time.get_datetime_string_from_system().replace("-", "").replace(":", "").replace("T", "_")
+
