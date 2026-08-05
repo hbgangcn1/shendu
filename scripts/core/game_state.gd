@@ -262,10 +262,10 @@ func export_map_layout_for_ai_player() -> Dictionary:
 	if game_map == null:
 		return layout
 
-	# 从 game_map.realms[current_realm] 读节点 + 连接 + 可达状态
-	if not game_map.has_method("get_realm_map"):
+	# 从 game_map.get_current_realm() 读 RealmMap（不调 get_realm_map — game_map.gd 没这个方法）
+	if not game_map.has_method("get_current_realm"):
 		return layout
-	var realm_map = game_map.get_realm_map(current_realm)
+	var realm_map = game_map.get_current_realm()
 	if realm_map == null:
 		return layout
 
@@ -282,43 +282,44 @@ func export_map_layout_for_ai_player() -> Dictionary:
 	var unvisited_reachable_count: int = 0
 	var columns_arr: Array = []
 
-	# realm_map 有 nodes + columns 字段（参考 game_map.gd）
-	if realm_map.has_method("get") and realm_map.get("columns") != null:
-		var cols: Array = realm_map.columns
-		for ci in range(cols.size()):
-			var col_nodes: Array = cols[ci]
-			var col_export: Array = []
-			for n in col_nodes:
-				if n == null:
-					continue
-				total += 1
-				var node_type: int = int(n.get("type", 0)) if n is Dictionary else int(n.type)
-				var node_id: String = str(n.get("id", "")) if n is Dictionary else str(n.id)
-				var is_reachable: bool = bool(n.get("is_reachable", false)) if n is Dictionary else bool(n.is_reachable)
-				var is_visited: bool = visited_node_ids.has(node_id)
-				if is_reachable:
-					reachable_count += 1
-					if not is_visited:
-						unvisited_reachable_count += 1
-				var type_name: String = NODE_TYPE_NAMES.get(node_type, "未知")
-				by_type[type_name] = int(by_type.get(type_name, 0)) + 1
-				# 读连接（可达节点 list）
-				var conns: Array = []
-				if n is Dictionary and n.get("connections") != null:
-					for c in n.connections:
-						conns.append(str(c))
-				col_export.append({
-					"id": node_id,
-					"type": type_name,
-					"reachable": is_reachable,
-					"visited": is_visited,
-					"connections": conns,
-				})
-			columns_arr.append({
-				"column_index": ci,
-				"node_count": col_export.size(),
-				"nodes": col_export,
+	# RealmMap 有 columns property (Array[Array[MapNode]]) — 访问用 property
+	# RealmMap.columns 返 Array[Array[MapNode]]，不是 dict，不要用 .get()
+	var cols: Array = realm_map.columns
+	for ci in range(cols.size()):
+		var col_nodes: Array = cols[ci]
+		var col_export: Array = []
+		for n in col_nodes:
+			if n == null:
+				continue
+			total += 1
+			# MapNode 是 Object (class_name MapNode) — 直接用 property access
+			var node_type: int = int(n.type) if n.has_method("get") and "type" in n else 0
+			var node_id: String = str(n.id) if n.has_method("get") and "id" in n else ""
+			var is_reachable: bool = bool(n.is_reachable) if n.has_method("get") and "is_reachable" in n else false
+			var is_visited: bool = visited_node_ids.has(node_id)
+			if is_reachable:
+				reachable_count += 1
+				if not is_visited:
+					unvisited_reachable_count += 1
+			var type_name: String = NODE_TYPE_NAMES.get(node_type, "未知")
+			by_type[type_name] = int(by_type.get(type_name, 0)) + 1
+			# 读连接（Array[String]）
+			var conns: Array = []
+			if n.has_method("get") and "connections" in n:
+				for c in n.connections:
+					conns.append(str(c))
+			col_export.append({
+				"id": node_id,
+				"type": type_name,
+				"reachable": is_reachable,
+				"visited": is_visited,
+				"connections": conns,
 			})
+		columns_arr.append({
+			"column_index": ci,
+			"node_count": col_export.size(),
+			"nodes": col_export,
+		})
 
 	layout["columns"] = columns_arr
 	layout["stats"] = {
