@@ -78,6 +78,15 @@ func _ready() -> void:
 	_update_top_bar()
 	_draw_map()
 	_update_reachable()
+	# 2026-08-06 方案 D 完成：update_reachable 后 export map layout（让 minimax 看到节点结构）
+	# game_state.gd.export_map_layout_for_ai_player() 读 game_map.realms[current_realm]
+	# 写 {columns, stats, decision_hints} 到 user:// + workspace 镜像。
+	# ai_player_client.py DirectRouter 读这个文件、压成 minimax 友好 markdown、
+	# 注入 _fill_prompt 的 {map_layout} 替换。AI Player 不再只看像素视觉，
+	# 能直接选"5 个可达节点里 3 个是 COMBAT 1 个 REST 1 个 SHOP"而不是猜图标。
+	# trigger：每次进 map scene 都重写（_ready 频繁被叫 → write overwrite，小 file 几 ms）。
+	var map_layout: Dictionary = GameState.export_map_layout_for_ai_player()
+	GameState.save_map_layout_to_disk(map_layout)
 	_connect_signals()
 	_add_deck_button()
 	_add_menu_button()
