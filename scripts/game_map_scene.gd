@@ -160,6 +160,10 @@ func _generate_map() -> void:
 
 	print("地图场景：生成地图 %s" % realm_id)
 
+# ==================== HP 闪烁动画 ====================
+
+var _hp_pulse_tween: Tween = null
+
 func _update_top_bar() -> void:
 	for label: Label in [realm_label, hp_label, spirit_stones_label, %DaoXingLabel]:
 		UITheme.apply_body_label(label, 16)
@@ -169,6 +173,26 @@ func _update_top_bar() -> void:
 	spirit_stones_label.text = "灵石: %d" % GameState.spirit_stones
 	dao_xing_label.text = "道行: %d" % GameState.dao_xing
 	dao_xing_label.tooltip_text = "道行：击败敌人获得，后续版本可用于领悟技能、解锁天赋等。当前版本暂无消耗用途。"
+	_update_hp_color()
+
+## 2026-08-05 art_review fix (5069241b): HP<30% 时数字变红 + 1.5s 循环闪烁
+## 闪烁频率不超过 1.5s/周期，避免癫痫风险（AI Player 建议）
+func _update_hp_color() -> void:
+	if GameState.max_hp <= 0:
+		return
+	var ratio: float = float(GameState.hp) / float(GameState.max_hp)
+	if ratio < 0.3:
+		hp_label.add_theme_color_override("font_color", Color(1.0, 0.25, 0.15))
+		if _hp_pulse_tween == null or not _hp_pulse_tween.is_valid():
+			_hp_pulse_tween = create_tween().set_loops()
+			_hp_pulse_tween.tween_property(hp_label, "modulate:a", 0.35, 0.75)
+			_hp_pulse_tween.tween_property(hp_label, "modulate:a", 1.0, 0.75)
+	else:
+		hp_label.add_theme_color_override("font_color", UITheme.TEXT_PRIMARY)
+		if _hp_pulse_tween != null and _hp_pulse_tween.is_valid():
+			_hp_pulse_tween.kill()
+		_hp_pulse_tween = null
+		hp_label.modulate.a = 1.0
 
 func _draw_map() -> void:
 	for child: Node in nodes_container.get_children():
