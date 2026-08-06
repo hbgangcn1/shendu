@@ -295,13 +295,17 @@ func _detect_state() -> void:
 var _watchdog_char_select_threshold_ms: int = 60000  # 60s
 var _watchdog_main_menu_threshold_ms: int = 30000     # 30s
 var _watchdog_map_threshold_ms: int = 60000          # 60s
-var _watchdog_battle_threshold_ms: int = 120000       # 120s
+var _watchdog_battle_threshold_ms: int = 60000       # 60s (2026-08-06: 从 120s 降到 60s, 跟 map 一致)
+var _watchdog_battle_end_turn_threshold_ms: int = 90000 # 90s (end_turn 阶段, 给 LLM 60s 没出牌, 再 30s 试 end_turn)
+var _watchdog_battle_force_lose_threshold_ms: int = 120000 # 120s (真不行了才 force-lose)
 var _watchdog_post_battle_threshold_ms: int = 30000   # 30s（reward/event/rest）
 var _watchdog_check_interval_s: float = 5.0
 var _watchdog_char_select_entered_at_ms: int = 0
 var _watchdog_main_menu_entered_at_ms: int = 0
 var _watchdog_map_entered_at_ms: int = 0
 var _watchdog_battle_entered_at_ms: int = 0
+var _watchdog_battle_end_turn_attempted_at_ms: int = 0  # 2026-08-06: 阶段 1/2 end_turn 试 timestamp
+var _watchdog_battle_force_lose_attempted_at_ms: int = 0  # 2026-08-06: 阶段 3 force-lose 试 timestamp
 var _watchdog_post_battle_entered_at_ms: int = 0
 var _watchdog_char_select_force_skip_done: bool = false
 var _watchdog_main_menu_force_skip_done: bool = false
@@ -361,18 +365,37 @@ func _watchdog_tick() -> void:
 		_watchdog_map_force_skip_done = false
 
 	# battle 卡死检测（2026-08-02 16:15 Robert 排查：map 突破后可能卡 battle）
-	# LLM 可能是 play_card / end_turn 都发送了但 battle 不结束（可能胜利条件不是、或者输入事件丢失）
-	# force-skip：调 BattleManager.player_lose() 决于（不 claims win，只是推进 scene）
+	# 2026-08-06 21:00 升级：3 阶段 fallback，先试 end_turn 再 force-lose
+	# 原因：force-lose 直接放弃 battle → battles_won=0 永远不增长。改 3 阶段：
+	#   阶段 1 (60s): 试 end_turn（推进战斗状态，可能赢/输/到下一回合）
+	#   阶段 2 (90s): 再试 end_turn（如果第一次没生效）
+	#   阶段 3 (120s): 真不行了 force-lose（放弃推进 scene）
+	# end_turn 是低风险操作（跟 LLM 应该发的 action 一样），只是比 LLM 快
 	if scene_name == "Battle" or scene_name == "BattleScene" or scene_name == "BattleDemo" or scene_path.contains("battle.tscn"):
 		if _watchdog_battle_entered_at_ms == 0:
 			_watchdog_battle_entered_at_ms = Time.get_ticks_msec()
-		elif not _watchdog_battle_force_skip_done and Time.get_ticks_msec() - _watchdog_battle_entered_at_ms > _watchdog_battle_threshold_ms:
-			print("AIPlayer[watchdog]: battle 卡 %d ms,自动 force-lose" % (Time.get_ticks_msec() - _watchdog_battle_entered_at_ms))
-			_force_skip_battle()
-			_watchdog_battle_force_skip_done = true
+			_watchdog_battle_end_turn_attempted_at_ms = 0
+			_watchdog_battle_force_lose_attempted_at_ms = 0
+		else:
+			var elapsed: int = Time.get_ticks_msec() - _watchdog_battle_entered_at_ms
+			# 阶段 3：120s force-lose
+			if _watchdog_battle_force_lose_attempted_at_ms == 0 and elapsed >= _watchdog_battle_force_lose_threshold_ms:
+				print("AIPlayer[watchdog]: battle 卡 %d ms,end_turn 也试过了 → force-lose" % elapsed)
+				_force_skip_battle()
+				_watchdog_battle_force_lose_attempted_at_ms = Time.get_ticks_msec()
+			# 阶段 2：90s 再试 end_turn
+			elif _watchdog_battle_end_turn_attempted_at_ms != 0 and _watchdog_battle_force_lose_attempted_at_ms == 0 and elapsed - _watchdog_battle_end_turn_attempted_at_ms >= 30000:
+				print("AIPlayer[watchdog]: battle 卡 %d ms,end_turn 第一次没生效 → 再试 end_turn" % elapsed)
+				_force_end_turn_battle()
+			# 阶段 1：60s 第一次试 end_turn
+			elif _watchdog_battle_end_turn_attempted_at_ms == 0 and elapsed >= _watchdog_battle_threshold_ms:
+				print("AIPlayer[watchdog]: battle 卡 %d ms → 先试 end_turn（不直接 force-lose）" % elapsed)
+				_force_end_turn_battle()
+				_watchdog_battle_end_turn_attempted_at_ms = Time.get_ticks_msec()
 	else:
 		_watchdog_battle_entered_at_ms = 0
-		_watchdog_battle_force_skip_done = false
+		_watchdog_battle_end_turn_attempted_at_ms = 0
+		_watchdog_battle_force_lose_attempted_at_ms = 0
 
 	# post-battle (reward/event/rest) 卡死检测（2026-08-02 16:15）
 	# 这些场景会弹 popup，点击后该返回 map。如果 LLM 不点击或点击丢失，卡死。
@@ -465,6 +488,7 @@ func _force_skip_map() -> void:
 			get_tree().change_scene_to_file("res://scenes/map.tscn")
 
 func _force_skip_battle() -> void:
+	# 2026-08-06: 阶段 3 fallback — end_turn 也试过了才调这个。
 	# 2026-08-02 16:15：battle 卡 120s LLM 还未结束。force-lose 推进 scene。
 	# 注意：不 claims win（不增加 battles_won），只是让 scene 推进不卡住。
 	# Battle 结束路径：player_lose() → battle_ended signal → GameMapScene 回到 map.tscn
@@ -489,6 +513,30 @@ func _force_skip_battle() -> void:
 	print("AIPlayer[watchdog]: force-lose battle")
 	bm.player_lose()
 	ExperienceMemory.record("watchdog", "battle", "force_lose_after_120s", {
+		"elapsed_ms": Time.get_ticks_msec() - _watchdog_battle_entered_at_ms,
+	})
+
+func _force_end_turn_battle() -> void:
+	# 2026-08-06：阶段 1/2 — battle 卡 60s/90s 后先试 end_turn，再 force-lose。
+	# 跟 _force_skip_battle 区别：end_turn 是低风险，可能赢（battles_won++）也可能输。
+	# 跟 LLM 应该发的 action 一样，只是不等 LLM。优先选这个而不是直接 force-lose。
+	var current := get_tree().current_scene
+	if current == null:
+		ExperienceMemory.record_quiet("watchdog", "battle", "force_end_turn_failed", {"reason": "no_scene"})
+		return
+	var bm = null
+	if current.has_method("battle_manager"):
+		bm = current.battle_manager
+	elif current.has_node("BattleManager"):
+		bm = current.get_node("BattleManager")
+	elif current.get("battle_manager") != null:
+		bm = current.get("battle_manager")
+	if bm == null or not bm.has_method("player_end_turn"):
+		ExperienceMemory.record_quiet("watchdog", "battle", "force_end_turn_failed", {"reason": "no_battle_manager_or_no_end_turn"})
+		return
+	print("AIPlayer[watchdog]: force-end-turn battle")
+	bm.player_end_turn()
+	ExperienceMemory.record("watchdog", "battle", "force_end_turn_after_60s", {
 		"elapsed_ms": Time.get_ticks_msec() - _watchdog_battle_entered_at_ms,
 	})
 
