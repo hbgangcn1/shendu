@@ -269,11 +269,19 @@ func export_map_layout_for_ai_player() -> Dictionary:
 	if realm_map == null:
 		return layout
 
-	# 五行枚举中文名 (起于 design/00-MASTER.md §五)
+	# 节点类型 enum → minimax 友好英文名
+	# 2026-08-06 fix: 原来这个 dict 跟 MapNode.NodeType enum 完全错位
+	# (MapNode 定义 COMBAT=0, ELITE=1, EVENT=2, SHOP=3, REST=4, BOSS=5, SECRET_ROOM=6；
+	# 老 dict 把 0 映射成 "未知", 把 1 映射成 "COMBAT" 等)，导致 10/14 节点 type 显示
+	# "未知"，minimax 看 map layout 完全不知道节点类型，决策被 watchdog 60s force-skip。
 	const NODE_TYPE_NAMES := {
-		0: "未知",
-		1: "COMBAT", 2: "ELITE", 3: "BOSS",
-		4: "EVENT", 5: "SHOP", 6: "REST", 7: "SECRET_ROOM",
+		0: "COMBAT",
+		1: "ELITE",
+		2: "EVENT",
+		3: "SHOP",
+		4: "REST",
+		5: "BOSS",
+		6: "SECRET_ROOM",
 	}
 
 	var by_type: Dictionary = {}
@@ -292,10 +300,14 @@ func export_map_layout_for_ai_player() -> Dictionary:
 			if n == null:
 				continue
 			total += 1
-			# MapNode 是 Object (class_name MapNode) — 直接用 property access
-			var node_type: int = int(n.type) if n.has_method("get") and "type" in n else 0
-			var node_id: String = str(n.id) if n.has_method("get") and "id" in n else ""
-			var is_reachable: bool = bool(n.is_reachable) if n.has_method("get") and "is_reachable" in n else false
+			# MapNode extends RefCounted — property 直接访问
+			# 2026-08-06 fix: 原来 `n.has_method("get") and "xxx" in n` 是 Dict 访问模式，
+			# Object 上 has_method("get") 永远 false → 全部 fallback to 0 / "" / false，
+			# 10/14 节点 type 显示"未知"，connections 是 "<RefCounted#-9223371967061555584>"
+			# raw object 字符串 — minimax 看 layout 完全不知道节点结构和连接。
+			var node_type: int = int(n.type)
+			var node_id: String = String(n.id)
+			var is_reachable: bool = bool(n.is_reachable)
 			var is_visited: bool = visited_node_ids.has(node_id)
 			if is_reachable:
 				reachable_count += 1
@@ -303,11 +315,13 @@ func export_map_layout_for_ai_player() -> Dictionary:
 					unvisited_reachable_count += 1
 			var type_name: String = NODE_TYPE_NAMES.get(node_type, "未知")
 			by_type[type_name] = int(by_type.get(type_name, 0)) + 1
-			# 读连接（Array[String]）
+			# 读连接（Array[MapNode]）→ 取每个 MapNode.id 字符串
 			var conns: Array = []
-			if n.has_method("get") and "connections" in n:
-				for c in n.connections:
-					conns.append(str(c))
+			for c in n.connections:
+				if c is MapNode:
+					conns.append(String(c.id))
+				else:
+					conns.append(String(c))
 			col_export.append({
 				"id": node_id,
 				"type": type_name,
