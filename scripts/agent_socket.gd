@@ -58,10 +58,10 @@ func _clear_file() -> void:
 
 func _execute(cmd: Dictionary) -> void:
 	# 2026-07-22: input_paused 时跳过 click/key，但保留 change_scene / quit / capture
-	# 避免 LLM 在 fade 期间发 click 触发已死信号链路造成 100s stuck
+	# 2026-08-08: label-based actions (select_node / play_card / confirm_select / select_chenmo / select_suwan) 也允许
 	if _input_paused:
 		var action: String = cmd.get("action", "")
-		if action in ["change_scene", "quit", "capture"]:
+		if action in ["change_scene", "quit", "capture", "select_node", "play_card", "confirm_select", "select_chenmo", "select_suwan"]:
 			pass  # 允许
 		else:
 			print("AgentSocket: paused, skip action=%s" % action)
@@ -78,8 +78,90 @@ func _execute(cmd: Dictionary) -> void:
 			_do_change_scene(String(cmd.get("path", "")))
 		"quit":
 			get_tree().quit()
+		# 2026-08-08 fix: label-based actions for AI Player (LLM 选 label, agent_socket 反查 click 坐标)
+		# 解决 click miss 根本问题：LLM 不再猜坐标，选 node_id / card index，agent_socket 拿 state.json 坐标
+		"select_node":
+			_do_select_node(String(cmd.get("node_id", "")))
+		"play_card":
+			_do_play_card(int(cmd.get("index", -1)))
+		"confirm_select":
+			_do_confirm_select()
+		"select_chenmo":
+			_do_select_character(0)
+		"select_suwan":
+			_do_select_character(1)
 		_:
 			push_error("AgentSocket: unknown action: %s" % action)
+
+## 2026-08-08: 读 agent_state.json 给 label-based action 用
+## state.json 由 agent_inspector.gd 每秒写一次，含 reachable_nodes / hand_cards / selected_node_id 等
+func _read_state_file() -> Dictionary:
+	var state_path := "res://.agent_state.json"
+	if not FileAccess.file_exists(state_path):
+		return {}
+	var f := FileAccess.open(state_path, FileAccess.READ)
+	if f == null:
+		return {}
+	var content := f.get_as_text()
+	f.close()
+	var parsed = JSON.parse_string(content)
+	if parsed == null or not (parsed is Dictionary):
+		return {}
+	return parsed
+
+## 2026-08-08: label-based action handlers
+func _do_select_node(node_id: String) -> void:
+	if node_id.is_empty():
+		push_warning("AgentSocket: select_node without node_id")
+		return
+	var state := _read_state_file()
+	if state.is_empty():
+		push_warning("AgentSocket: state.json missing/empty, can't select_node")
+		return
+	var reachable: Array = state.get("reachable_nodes", [])
+	for n in reachable:
+		if typeof(n) == TYPE_DICTIONARY and n.get("id") == node_id:
+			var x: int = int(n.get("x", 0))
+			var y: int = int(n.get("y", 0))
+			print("AgentSocket: select_node %s → click (%d, %d)" % [node_id, x, y])
+			_do_click(x, y)
+			_exec_count += 1
+			return
+	push_warning("AgentSocket: node_id %s not in reachable_nodes (count=%d)" % [node_id, reachable.size()])
+
+func _do_play_card(index: int) -> void:
+	# 2026-08-08: battle UI coord mapping 还没做（hand_cards 不带屏幕坐标）
+	# 暂时 log，等 BattleUI 加 screen position 字段后再补 click
+	# TODO: 读 hand_cards[index].screen_pos 后 _do_click
+	print("AgentSocket: play_card index=%d (TODO: 需 BattleUI 提供 card screen_pos)" % index)
+	_exec_count += 1
+
+func _do_confirm_select() -> void:
+	var current := get_tree().current_scene
+	if current == null:
+		push_warning("AgentSocket: confirm_select no current scene")
+		return
+	if current.has_method("_confirm_selection"):
+		print("AgentSocket: confirm_select → calling _confirm_selection()")
+		current.call("_confirm_selection")
+		_exec_count += 1
+	else:
+		push_warning("AgentSocket: current scene has no _confirm_selection method")
+
+func _do_select_character(index: int) -> void:
+	var current := get_tree().current_scene
+	if current == null:
+		push_warning("AgentSocket: select_character no current scene")
+		return
+	# character_select.gd: cards = [chenmo_card, suwan_card], focused_index 0/1
+	if "_focused_index" in current:
+		current.set("_focused_index", index)
+	if current.has_method("_update_focus"):
+		current.call("_update_focus")
+		print("AgentSocket: select_character index=%d → _focused_index=%d" % [index, index])
+		_exec_count += 1
+	else:
+		push_warning("AgentSocket: current scene has no _update_focus method")
 
 func _do_click(x: int, y: int) -> void:
 	# 模拟鼠标左键按下+释放
