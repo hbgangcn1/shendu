@@ -39,6 +39,16 @@ func _ready() -> void:
 		_confirm_selection()
 		# 即使 _confirm_selection() 失败，继续执行后续代码（failsafe timer 会重试）
 	
+	# 2026-08-08 fix: AI Player 模式下提前确认（不等 5s failsafe）
+	# 根因：agent_inspector 1s 写一次 state.json，failsafe 在 5s 后才 fire
+	#      → AI Player session 1min 测试时 character_select 还没确认，game_map 已加载
+	#      → LLM 看不到 character_id / reachable_nodes，0 推进
+	# 修复：检测 AI Player 模式（--ai-player-mode arg）时立即设 character_id = chenmo（不需玩家选择）
+	if OS.get_cmdline_user_args().has("--ai-player-mode"):
+		print("角色选择：AI Player 模式，提前设 character_id = chenmo")
+		focused_index = 0
+		_confirm_selection()
+	
 	cards = [chenmo_card, suwan_card]
 
 	# 2026-08-01 fix(ed75d23a): 样式初始化延迟到下一帧，避免阻塞场景加载
