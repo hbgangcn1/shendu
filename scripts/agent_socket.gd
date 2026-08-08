@@ -84,6 +84,10 @@ func _execute(cmd: Dictionary) -> void:
 			_do_select_node(String(cmd.get("node_id", "")))
 		"play_card":
 			_do_play_card(int(cmd.get("index", -1)))
+		# 2026-08-08: end_turn bypass click，跟 play_card 同款 —— 直接调 BattleManager.player_end_turn()
+		# client.py 原本走 self.agent.key("space")，但 battle 可能是按钮不是热键，space 不一定起作用
+		"end_turn":
+			_do_end_turn()
 		"confirm_select":
 			_do_confirm_select()
 		"select_chenmo":
@@ -183,6 +187,22 @@ func _do_play_card(index: int) -> void:
 		return
 	var result: bool = bm.call("player_play_card", index)
 	print("AgentSocket: play_card index=%d → bm.player_play_card()=%s" % [index, str(result)])
+	_exec_count += 1
+
+func _do_end_turn() -> void:
+	# 2026-08-08: 跟 play_card 同款，绕过 click，直接调 BattleManager.player_end_turn()
+	# client.py 原本走 self.agent.key("space") —— battle 的结束回合可能是按钮（不是热键），
+	# Input.parse_input_event 同样不触发按钮的 pressed 信号，直接调方法最可靠
+	var scene := get_tree().current_scene
+	if scene == null:
+		push_warning("AgentSocket: end_turn no current scene")
+		return
+	var bm = scene.get_node_or_null("BattleManager")
+	if bm == null or not bm.has_method("player_end_turn"):
+		push_warning("AgentSocket: BattleManager has no player_end_turn method")
+		return
+	print("AgentSocket: end_turn → bm.player_end_turn()")
+	bm.call("player_end_turn")
 	_exec_count += 1
 
 func _do_confirm_select() -> void:
