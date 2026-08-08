@@ -32,6 +32,16 @@ func _ready() -> void:
 	if get_tree():
 		get_tree().connect("tree_changed", Callable(self, "_on_tree_changed"))
 	_write_state()  # 立即写一次
+	# 2026-08-03 00:10 fix: headless 模式下 Timer node 依赖 Node._process 调度（也会被 headless 减慢）。
+	# 用 get_tree().create_timer() — SceneTreeTimer 直接由 SceneTree 调度，不需 _process 也能跑。
+	_schedule_state_write()
+
+func _schedule_state_write() -> void:
+	_write_state()
+	var timer: SceneTreeTimer = get_tree().create_timer(1.0)
+	await timer.timeout
+	if is_instance_valid(self) and is_inside_tree():
+		_schedule_state_write()
 
 func _on_tree_changed() -> void:
 	# tree_changed 触发条件：任何节点 add/remove/rename + current_scene 切换
@@ -53,6 +63,16 @@ func _on_tree_changed() -> void:
 		_last_scene_path = current_path
 		print("AgentInspector: scene change detected → ", current_path, " → immediate flush (after 2 frames)")
 		_write_state()
+		# 2026-08-08 fix: map scene 的 _realm_map 在 _ready() 里通过 _generate_map() 同步设，
+		# 但 _on_tree_changed 2 帧后调 _write_state 时偶尔 _realm_map 还是 null（race）。
+		# 影响：LLM 看不到 reachable_nodes，0 visited，game 不推进。
+		# 修复：如果是 map scene 且 _realm_map 还是 null，等 0.5s 再 retry 一次。
+		if "map.tscn" in current_path:
+			var current_node := tree.current_scene
+			if current_node and current_node.get("_realm_map") == null:
+				print("AgentInspector: map scene _realm_map still null after 2 frames, retry in 0.5s")
+				await get_tree().create_timer(0.5).timeout
+				_write_state()
 
 func _process(delta: float) -> void:
 	_frame_count += 1
