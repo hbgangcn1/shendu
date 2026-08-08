@@ -1,0 +1,24 @@
+asset_id: icon_earth_v001
+asset_type: ui_icon
+display_name: 土元素图标
+element: earth
+target_size: "512x512"
+aspect_ratio: "1:1"
+usage: element_icon
+prompt: "Simple readable game UI icon for 蜃都 Chinese urban fantasy game. Subject: Earth element icon — a bold stylized mountain or rock crystal shape. Style: ink brush symbol + cyberpunk neon outline, minimal details. Chinese ink wash texture with neon accents. Color palette: amber #D4A017 as primary, sienna brown #8D6E63 as accent, subtle golden neon glow on edges."
+model: minimax-portal/image-01
+version: v001
+review_status: pass
+review_score: 89.45
+review_date: "2026-06-17"
+created_at: "2026-06-17"
+source_file: icon_earth.png
+
+implements_philosophy: [rule_9_progressive_disclosure]
+avoids_red_lines: [red_6_ui_overload]
+
+# ↓ 2026-07-04 schema backfill (loop-check 33 warn) ↓
+minimax_attempts: 1
+qwen_attempts: 0
+current_model: minimax-portal/image-01
+next_asset_resets_to: minimax-portal/image-01

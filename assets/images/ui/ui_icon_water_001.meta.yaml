@@ -1,0 +1,29 @@
+asset_id: ui_icon_water_001
+asset_type: ui_icon
+display_name: 水属性符号
+element: water
+target_size: 512x512
+aspect_ratio: '1:1'
+usage: 卡牌元素角标 + 战斗 UI 显示 + 选角界面
+version: v001
+review_status: pass
+review_score: 85.0
+review_date: '2026-07-02T13:25:50+08:00'
+review_model: kimi-k2.7-code (independent checker)
+source_file: ui_icon_water_001.png
+model: qwen-image-2.0-pro-2026-06-22
+created_at: '2026-07-02T13:25:50+08:00'
+generation_attempts: 1
+implements_philosophy:
+- rule_9_progressive_disclosure
+references:
+- design/00-MASTER.md §四
+no_text_compliant: true
+
+# ↓ 2026-07-04 schema backfill (loop-check 33 warn) ↓
+minimax_attempts: 0
+qwen_attempts: 1
+current_model: qwen-image-2.0-pro-2026-06-22
+model_switched_at: 2026-07-02T13:25:50+08:00
+switch_reason: "first-attempt qwen (design: ui symbol set, brushwork calligraphy)"
+next_asset_resets_to: minimax-portal/image-01

@@ -1,0 +1,27 @@
+asset_id: world_anchor_v2_001
+asset_type: anchor
+display_name: 蜃都世界锚点图
+element: neutral
+target_size: "1920x1080"
+aspect_ratio: "16:9"
+usage: 世界观定调、章节背景
+prompt: |
+  Epic panoramic cityscape of Shendu, Chinese megacity on ancient spiritual veins. Five layered zones: village alleys with night market and banyan trees, abandoned factories with graffiti and rusty pipes, CBD glass skyscrapers with neon, data centers with server racks and blue LED lights, mystical tower shrouded in glowing clouds. Five-element energy streams flow between layers. Night scene, cinematic wide shot.
+model: wan-image-pro/wan2.7-image-pro
+version: v002
+review_status: pass
+review_score: 86
+review_date: "2026-06-19"
+created_at: "2026-06-19T15:33:00+08:00"
+source_file: world_anchor.png
+generation_attempts: 5
+review_model: mimo-v2.5
+notes: "v2重做。minimax旧版→wan重做5次迭代(88→92→89→84→86)，最终无警告级问题"
+
+implements_philosophy: [rule_3_three_layer_loops, rule_10_narrative_play_unified]
+
+# ↓ 2026-07-04 schema backfill (loop-check 33 warn) ↓
+minimax_attempts: 1
+qwen_attempts: 0
+current_model: wan-image-pro/wan2.7-image-pro
+next_asset_resets_to: minimax-portal/image-01

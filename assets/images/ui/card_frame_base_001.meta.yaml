@@ -1,0 +1,28 @@
+asset_id: card_frame_base_001
+asset_type: ui
+display_name: 卡牌框模板
+element: neutral
+target_size: "1024x1536"
+aspect_ratio: "2:3"
+usage: 卡牌边框模板
+prompt: |
+  Empty card frame for game UI. Ornate golden metallic border with dark fantasy cyberpunk style. Top area for card name is blank, center is dark empty space for portrait, bottom area for stats is blank. Red and gold color scheme. Decorative frame only, no characters inside. Vertical card 2:3 ratio. NO text, NO watermark, NO signature, NO logo, NO letters, NO numbers, NO Chinese characters, NO stamps.
+model: wan-image-pro/wan2.7-image-pro
+version: v001
+review_status: pass
+review_score: 96
+review_date: "2026-06-19"
+created_at: "2026-06-19T15:11:00+08:00"
+source_file: card_frame_base_001.png
+generation_attempts: 5
+review_model: mimo-v2.5
+notes: "minimax 4次均产生文字水印(75/82/76/58分)，切换wan-image-pro后一次通过(96分)"
+
+implements_philosophy: [rule_9_progressive_disclosure]
+avoids_red_lines: [red_6_ui_overload]
+
+# ↓ 2026-07-04 schema backfill (loop-check 33 warn) ↓
+minimax_attempts: 1
+qwen_attempts: 0
+current_model: wan-image-pro/wan2.7-image-pro
+next_asset_resets_to: minimax-portal/image-01

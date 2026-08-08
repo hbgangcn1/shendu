@@ -1,0 +1,31 @@
+asset_id: element_earth_v002
+asset_type: card_bg
+display_name: 土元素卡牌背景
+element: earth
+target_size: "1024x1024"
+aspect_ratio: "1:1"
+usage: card_background
+prompt: |
+  Clean digital art anime cyberpunk card background, Earth element theme for game card. Abstract geometric mountain formations, amber crystal clusters, sedimentary rock layers, golden mineral veins. Soft smoky atmospheric haze, very subtle paper grain texture. Warm amber and golden edge lighting on crystalline rocks. Layered depth background. NO text, NO letters, NO numbers, NO artist signature, NO watermark, NO stamp, NO seal, NO logo, NO writing, NO marks of any kind.
+edit_prompt: |
+  Remove the red seal/stamp in the bottom right corner and the glowing cyan glyph-like symbols on the left mountains. Replace them with matching rocky earth texture, soft atmospheric haze, and subtle amber mineral details. Keep the original composition, color palette, and lighting. NO text, NO stamps, NO signatures, NO glowing runes, NO symbols, NO letters, NO numbers, NO watermarks.
+model: wan-image-pro/wan2.7-image-pro
+version: v003
+review_status: pass
+review_score: 80
+review_date: "2026-06-17"
+review_model: xiaomi-token-plan/mimo-v2.5
+review_notes: |
+  Forbidden issues (red seal, cyan glyphs) resolved in attempt_001. Composite score 80 meets pass threshold. Remaining medium-severity composition note (left-heavy) is acceptable for card_bg.
+created_at: "2026-06-17"
+source_file: element_earth.png
+generation_attempts: 4
+source_version: v002
+
+implements_philosophy: [rule_5_real_agency, rule_9_progressive_disclosure]
+
+# ↓ 2026-07-04 schema backfill (loop-check 33 warn) ↓
+minimax_attempts: 1
+qwen_attempts: 0
+current_model: wan-image-pro/wan2.7-image-pro
+next_asset_resets_to: minimax-portal/image-01

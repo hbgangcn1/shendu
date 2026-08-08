@@ -1,0 +1,20 @@
+asset_id: boss_water_abyssal_dragon_001
+asset_type: boss
+display_name: 深渊蛟
+element: water
+target_size: "1024x1536"
+aspect_ratio: "2:3"
+usage: Boss
+model: wan-image-pro/wan2.7-image-pro
+version: v001
+review_status: pass
+review_score: 92
+review_date: "2026-06-19"
+
+implements_philosophy: [rule_1_core_loop_first, rule_10_narrative_play_unified]
+
+# ↓ 2026-07-04 schema backfill (loop-check 33 warn) ↓
+minimax_attempts: 1
+qwen_attempts: 0
+current_model: wan-image-pro/wan2.7-image-pro
+next_asset_resets_to: minimax-portal/image-01

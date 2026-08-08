@@ -1,0 +1,22 @@
+asset_id: card_char_wood_001
+asset_type: card_portrait
+display_name: 藤蔓术师
+element: wood
+target_size: 1024x1536
+aspect_ratio: "2:3"
+safe_zone: "x:8-92%, y:15-78%"
+usage: card_portrait
+background: neutral_gray_808080
+prompt: Wood element character card portrait for 蜃都. Mystical male sorcerer channeling green vine energy. Flowing robes with leaf patterns, living vines wrapping around arms. Casting pose with glowing green energy between palms.
+model: minimax-portal/image-01
+version: v002
+review_status: pass
+review_score: 82.5
+review_date: 2026-06-17
+created_at: 2026-06-17
+source_file: card_char_wood_001.png
+implements_philosophy: ["rule_1_core_loop_first", "rule_10_narrative_play_unified"]
+minimax_attempts: 1
+qwen_attempts: 0
+current_model: minimax-portal/image-01
+next_asset_resets_to: minimax-portal/image-01

@@ -1,0 +1,25 @@
+asset_id: enemy_metal_iron_golem_001_v001
+asset_type: enemy
+display_name: 铁甲傀儡
+element: metal
+target_size: "1024x1024"
+aspect_ratio: "1:1"
+usage: combat_sprite
+background: neutral_gray_808080
+prompt: "Metal element iron golem, dark silver robot humanoid with gold circuit lines, fighting stance."
+model: minimax-portal/image-01
+version: v003
+review_status: pass
+review_score: 92
+review_date: "2026-06-17"
+created_at: "2026-06-17"
+source_file: enemy_metal_iron_golem_001.png
+notes: "v001文字烤入否决(65分), v002文字烤入+风格偏差否决(65分), v003通过(92分)"
+
+implements_philosophy: [rule_1_core_loop_first]
+
+# ↓ 2026-07-04 schema backfill (loop-check 33 warn) ↓
+minimax_attempts: 1
+qwen_attempts: 0
+current_model: minimax-portal/image-01
+next_asset_resets_to: minimax-portal/image-01

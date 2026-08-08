@@ -1,0 +1,22 @@
+asset_id: bg_battle
+asset_type: background
+display_name: 战斗场景背景
+element: null
+target_size: 1920x1080
+aspect_ratio: 16:9
+safe_zone: full
+usage: battle_scene_background
+background: ink_wash_misty_mountains
+prompt: "Ink-wash cyberpunk battle arena background for Shendu. Misty layered mountains in graded ink-black, indigo and teal washes, traditional East Asian pavilion and broken stone archway silhouettes in midground. Rice-paper texture overlay, subtle ink splatter. Glowing neon cyan and magenta energy veins. No text, no Chinese characters, no seal stamps, no signatures, no watermarks. 1920x1080 landscape, painterly non-photorealistic, atmospheric depth with soft ink gradations, lots of empty space for UI and cards."
+model: minimax-portal/image-01
+version: v002
+review_status: pass
+review_score: 90
+review_date: 2026-07-06
+created_at: 2026-07-06
+source_file: bg_battle.png
+implements_philosophy: ["rule_1_core_loop_first", "rule_10_narrative_play_unified"]
+minimax_attempts: 1
+qwen_attempts: 0
+current_model: minimax-portal/image-01
+next_asset_resets_to: minimax-portal/image-01

@@ -1,0 +1,23 @@
+asset_id: element_fire_v004
+asset_type: element_bg
+display_name: 火元素卡牌背景
+element: fire
+target_size: "1024x1024"
+aspect_ratio: "1:1"
+usage: card_background
+prompt: "Abstract elemental background art for fire element..."
+model: minimax-portal/image-01
+version: v004
+review_status: pass
+review_score: 95
+review_date: "2026-06-17"
+created_at: "2026-06-17"
+source_file: element_fire.png
+
+implements_philosophy: [rule_5_real_agency, rule_9_progressive_disclosure]
+
+# ↓ 2026-07-04 schema backfill (loop-check 33 warn) ↓
+minimax_attempts: 1
+qwen_attempts: 0
+current_model: minimax-portal/image-01
+next_asset_resets_to: minimax-portal/image-01

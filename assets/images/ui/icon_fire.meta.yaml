@@ -1,0 +1,25 @@
+asset_id: icon_fire_v003
+asset_type: ui_icon
+display_name: 火元素图标
+element: fire
+target_size: "512x512"
+aspect_ratio: "1:1"
+usage: element_icon
+prompt: "A single game icon on a plain dark background. A bold flame shape, red and orange, like a logo. Simple solid silhouette. No text anywhere. No Chinese characters. No letters. No words. No writing of any kind. No watermark. No signature. Just a flame icon. Clean edges. High contrast. Minimal detail. Suitable for 64x64 pixel display."
+model: minimax-portal/image-01
+version: v003
+review_status: pass
+review_score: 79.75
+review_date: "2026-06-17"
+created_at: "2026-06-17"
+source_file: icon_fire.png
+notes: "3次迭代。v001/v002文字烤入被否决。v003风格略平但无否决项且≥75分，通过。"
+
+implements_philosophy: [rule_9_progressive_disclosure]
+avoids_red_lines: [red_6_ui_overload]
+
+# ↓ 2026-07-04 schema backfill (loop-check 33 warn) ↓
+minimax_attempts: 1
+qwen_attempts: 0
+current_model: minimax-portal/image-01
+next_asset_resets_to: minimax-portal/image-01
