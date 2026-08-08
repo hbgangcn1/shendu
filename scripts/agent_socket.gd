@@ -91,9 +91,16 @@ func _execute(cmd: Dictionary) -> void:
 		"select_suwan":
 			_do_select_character(1)
 		# 2026-08-08: 战斗胜利后奖励场景 pick reward（绕过 click，跟 select_node 同款）
+		# 同时认 take_card_X / take_relic_Y / skip（reward.txt prompt 里的命名）以保持兼容
 		"pick_reward":
 			_do_pick_reward(int(cmd.get("index", -1)))
 		"skip_reward":
+			_do_skip_reward()
+		"take_card":
+			_do_pick_reward(int(cmd.get("index", -1)))
+		"take_relic":
+			_do_pick_reward(int(cmd.get("index", -1)))  # 简化：都走 pick_card handler（遗物也是 _on_card_pressed）
+		"skip":
 			_do_skip_reward()
 		_:
 			push_error("AgentSocket: unknown action: %s" % action)
