@@ -118,16 +118,40 @@ func _do_select_node(node_id: String) -> void:
 	if state.is_empty():
 		push_warning("AgentSocket: state.json missing/empty, can't select_node")
 		return
-	var reachable: Array = state.get("reachable_nodes", [])
-	for n in reachable:
-		if typeof(n) == TYPE_DICTIONARY and n.get("id") == node_id:
-			var x: int = int(n.get("x", 0))
-			var y: int = int(n.get("y", 0))
-			print("AgentSocket: select_node %s → click (%d, %d)" % [node_id, x, y])
-			_do_click(x, y)
+	# 2026-08-08 fix: Input.parse_input_event() 不触发 Control._gui_input（即使加了 warp_mouse），
+	# LLM click (534,290) 永远不路由到 PanelContainer 的 gui_input，_selected_node 永远不设。
+	# 绕过 click，直接调 scene 的 _show_confirmation + _on_confirm_go。
+	var scene := get_tree().current_scene
+	if scene == null:
+		push_warning("AgentSocket: no current scene for select_node")
+		return
+	# map scene 有 _realm_map
+	var realm_map = scene.get("_realm_map")
+	if realm_map == null:
+		push_warning("AgentSocket: scene has no _realm_map, fall back to click")
+		# fallback: click by coords
+		for n in state.get("reachable_nodes", []):
+			if typeof(n) == TYPE_DICTIONARY and n.get("id") == node_id:
+				_do_click(int(n.get("x", 0)), int(n.get("y", 0)))
+				_exec_count += 1
+				return
+		return
+	# 直接找到 MapNode + 调 _show_confirmation
+	for n in realm_map.nodes:
+		if n == null:
+			continue
+		var nid: String = n.id if "id" in n else ""
+		if nid == node_id:
+			if not (bool(n.is_reachable) if "is_reachable" in n else false):
+				push_warning("AgentSocket: node %s not reachable" % node_id)
+				return
+			print("AgentSocket: select_node %s → bypass click, call _show_confirmation" % node_id)
+			scene.call("_show_confirmation", n)
+			# 2026-08-08 进一步：直接调 _on_confirm_go 跳过确认面板（LLM 决策一次到位）
+			scene.call("_on_confirm_go")
 			_exec_count += 1
 			return
-	push_warning("AgentSocket: node_id %s not in reachable_nodes (count=%d)" % [node_id, reachable.size()])
+	push_warning("AgentSocket: node_id %s not found in _realm_map.nodes" % node_id)
 
 func _do_play_card(index: int) -> void:
 	# 2026-08-08: battle UI coord mapping 还没做（hand_cards 不带屏幕坐标）
