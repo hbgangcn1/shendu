@@ -90,6 +90,11 @@ func _execute(cmd: Dictionary) -> void:
 			_do_select_character(0)
 		"select_suwan":
 			_do_select_character(1)
+		# 2026-08-08: 战斗胜利后奖励场景 pick reward（绕过 click，跟 select_node 同款）
+		"pick_reward":
+			_do_pick_reward(int(cmd.get("index", -1)))
+		"skip_reward":
+			_do_skip_reward()
 		_:
 			push_error("AgentSocket: unknown action: %s" % action)
 
@@ -199,6 +204,36 @@ func _do_select_character(index: int) -> void:
 		_exec_count += 1
 	else:
 		push_warning("AgentSocket: current scene has no _update_focus method")
+
+## 2026-08-08: reward scene actions（绕过 click，直接调 reward_scene 的 _on_card_pressed / _on_skip_pressed）
+## AI Player win battle 后 reward.tscn 加载，3 张卡 + skip 按钮。Input.parse_input_event 不触发 Card Panel 的 _gui_input（跟 map node 同问题），
+## 所以 bypass click，直接调 scene._on_card_pressed(index) 或 scene._on_skip_pressed()。reward_scene.gd:254 (_on_card_pressed)、:317 (_on_skip_pressed)。
+func _do_pick_reward(index: int) -> void:
+	var current := get_tree().current_scene
+	if current == null:
+		push_warning("AgentSocket: pick_reward no current scene")
+		return
+	if not current.has_method("_on_card_pressed"):
+		push_warning("AgentSocket: current scene has no _on_card_pressed method (not reward scene?)")
+		return
+	if index < 0 or index > 2:
+		push_warning("AgentSocket: pick_reward index=%d out of range [0,2]" % index)
+		return
+	print("AgentSocket: pick_reward index=%d → scene._on_card_pressed" % index)
+	current.call("_on_card_pressed", index)
+	_exec_count += 1
+
+func _do_skip_reward() -> void:
+	var current := get_tree().current_scene
+	if current == null:
+		push_warning("AgentSocket: skip_reward no current scene")
+		return
+	if not current.has_method("_on_skip_pressed"):
+		push_warning("AgentSocket: current scene has no _on_skip_pressed method (not reward scene?)")
+		return
+	print("AgentSocket: skip_reward → scene._on_skip_pressed")
+	current.call("_on_skip_pressed")
+	_exec_count += 1
 
 func _do_click(x: int, y: int) -> void:
 	# 2026-08-08 fix: Input.parse_input_event 单独使用不触发 Control._gui_input（mouse_filter=STOP 的 Control 需要先 warp_mouse）
