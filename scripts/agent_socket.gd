@@ -164,6 +164,11 @@ func _do_select_character(index: int) -> void:
 		push_warning("AgentSocket: current scene has no _update_focus method")
 
 func _do_click(x: int, y: int) -> void:
+	# 2026-08-08 fix: Input.parse_input_event 单独使用不触发 Control._gui_input（mouse_filter=STOP 的 Control 需要先 warp_mouse）
+	# 不加 warp_mouse，Control 不知道鼠标在哪个元素上 → click 不会路由到 PanelContainer 的 gui_input
+	# 根因：AI Player session 里 LLM click (534,290) 匹配 R0_L0_N0 的 panel.position，
+	#      但 _selected_node 不更新，visited_node_ids 一直是空。
+	Input.warp_mouse(Vector2(x, y))
 	# 模拟鼠标左键按下+释放
 	var ev_down := InputEventMouseButton.new()
 	ev_down.button_index = MOUSE_BUTTON_LEFT
