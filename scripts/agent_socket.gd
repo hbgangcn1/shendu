@@ -88,6 +88,12 @@ func _execute(cmd: Dictionary) -> void:
 		# client.py 原本走 self.agent.key("space")，但 battle 可能是按钮不是热键，space 不一定起作用
 		"end_turn":
 			_do_end_turn()
+		# 2026-08-09 fix: confirm_node bypass click —— debug log 显示 LLM 在 select_node 之后
+		# 调 confirm_node 但 _do_click 用 Input.parse_input_event() 不触发 ConfirmGo 按钮，
+		# 导致确认面板永远不消失，LLM 陷入 wait 循环（实测 17+ 次连续 wait 都进不了 battle）
+		# 修复：直接调 scene._on_confirm_go()，跟 select_node 同款 bypass
+		"confirm_node":
+			_do_confirm_node()
 		"confirm_select":
 			_do_confirm_select()
 		"select_chenmo":
@@ -168,6 +174,21 @@ func _do_select_node(node_id: String) -> void:
 			_exec_count += 1
 			return
 	push_warning("AgentSocket: node_id %s not found in _realm_map.nodes" % node_id)
+
+func _do_confirm_node() -> void:
+	# 2026-08-09: bypass click, directly call scene._on_confirm_go() (map.gd:118)
+	# 修 LLM 在 select_node 后卡 wait 循环的 bug —— 原来 confirm_node 走 _do_click (Input.parse_input_event)
+	# 不触发 ConfirmGo.pressed 信号
+	var scene := get_tree().current_scene
+	if scene == null:
+		push_warning("AgentSocket: confirm_node no current scene")
+		return
+	if not scene.has_method("_on_confirm_go"):
+		push_warning("AgentSocket: current scene has no _on_confirm_go method (not map scene?)")
+		return
+	print("AgentSocket: confirm_node → scene._on_confirm_go()")
+	scene.call("_on_confirm_go")
+	_exec_count += 1
 
 func _do_play_card(index: int) -> void:
 	# 2026-08-08: 跟 select_node 同款，绕过 click，直接调 BattleManager.player_play_card(index)
