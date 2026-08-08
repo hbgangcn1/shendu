@@ -154,10 +154,23 @@ func _do_select_node(node_id: String) -> void:
 	push_warning("AgentSocket: node_id %s not found in _realm_map.nodes" % node_id)
 
 func _do_play_card(index: int) -> void:
-	# 2026-08-08: battle UI coord mapping 还没做（hand_cards 不带屏幕坐标）
-	# 暂时 log，等 BattleUI 加 screen position 字段后再补 click
-	# TODO: 读 hand_cards[index].screen_pos 后 _do_click
-	print("AgentSocket: play_card index=%d (TODO: 需 BattleUI 提供 card screen_pos)" % index)
+	# 2026-08-08: 跟 select_node 同款，绕过 click，直接调 BattleManager.player_play_card(index)
+	# 根因：Input.parse_input_event() 在 BattleUI Card 控件上同样不触发 _gui_input，
+	# LLM play_card 永远只 log 不真出牌 → AI Player 永远赢不了战斗 → gate_1 永远 FAIL
+	var scene := get_tree().current_scene
+	if scene == null:
+		push_warning("AgentSocket: play_card no current scene")
+		return
+	# 2026-08-08: main_battle scene 用 get_node_or_null("BattleManager")，跟 agent_inspector.gd:148 一致
+	var bm = scene.get_node_or_null("BattleManager")
+	if bm == null:
+		push_warning("AgentSocket: play_card scene has no BattleManager child")
+		return
+	if not bm.has_method("player_play_card"):
+		push_warning("AgentSocket: BattleManager has no player_play_card method")
+		return
+	var result: bool = bm.call("player_play_card", index)
+	print("AgentSocket: play_card index=%d → bm.player_play_card()=%s" % [index, str(result)])
 	_exec_count += 1
 
 func _do_confirm_select() -> void:
