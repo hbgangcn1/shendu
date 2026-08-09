@@ -66,6 +66,7 @@ var _canvas: CanvasLayer = null
 var _tooltip_panel: PanelContainer = null
 var _tooltip_label: RichTextLabel = null
 var _registry: Dictionary = {}  ## panel -> { type, difficulty, metadata }
+var _hud_registry: Dictionary = {}  ## label -> { text } (简单 HUD tooltip)
 
 
 func _ready() -> void:
@@ -159,6 +160,39 @@ func hide() -> void:
 		_tooltip_panel.visible = false
 
 
+## 2026-08-09 P2 #6 (epic-rollup-35e824f6): HUD 数值 tooltip
+## 用于 HP/牌组/道行/魔念/侵蚀/回合数等 HUD 标签
+## 显示在 label 上方，简单文字说明
+func register_hud(target: Control, text: String) -> void:
+	if target == null or not is_instance_valid(target):
+		return
+	_hud_registry[target] = { "text": text }
+	if not target.mouse_entered.is_connected(_on_hud_mouse_entered):
+		target.mouse_entered.connect(_on_hud_mouse_entered.bind(target))
+	if not target.mouse_exited.is_connected(_on_hud_mouse_exited):
+		target.mouse_exited.connect(_on_hud_mouse_exited.bind(target))
+
+
+## 取消 HUD 注册
+func unregister_hud(target: Control) -> void:
+	_hud_registry.erase(target)
+	if target != null and is_instance_valid(target):
+		if target.mouse_entered.is_connected(_on_hud_mouse_entered):
+			target.mouse_entered.disconnect(_on_hud_mouse_entered)
+		if target.mouse_exited.is_connected(_on_hud_mouse_exited):
+			target.mouse_exited.disconnect(_on_hud_mouse_exited)
+
+
+func _on_hud_mouse_entered(target: Control) -> void:
+	if not _hud_registry.has(target):
+		return
+	_show_hud_for(target)
+
+
+func _on_hud_mouse_exited(_target: Control) -> void:
+	hide()
+
+
 # ==================== 信号回调 ====================
 
 func _on_panel_mouse_entered(panel: Control) -> void:
@@ -169,6 +203,42 @@ func _on_panel_mouse_entered(panel: Control) -> void:
 
 func _on_panel_mouse_exited(_panel: Control) -> void:
 	hide()
+
+
+func _show_hud_for(target: Control) -> void:
+	var data: Dictionary = _hud_registry.get(target, {})
+	var text: String = data.get("text", "")
+	if text.is_empty():
+		return
+
+	# BBCode 格式化（白色文字，14px）
+	var bbcode: String = "[color=#%s]%s[/color]" % [
+		UITheme.TEXT_PRIMARY.to_html(true), text,
+	]
+	_tooltip_label.text = bbcode
+	_tooltip_label.add_theme_font_size_override("normal_font_size", 14)
+
+	# 定位到 target 上方
+	var target_pos: Vector2 = target.global_position
+	var target_size: Vector2 = target.size
+	var tooltip_pos: Vector2 = Vector2(
+		target_pos.x + target_size.x / 2.0 - 140.0,  # 居中
+		target_pos.y - 56.0  # 上方
+	)
+
+	# 防止溢出
+	var viewport_size: Vector2 = Vector2(1920, 1080)
+	if get_viewport() != null:
+		viewport_size = get_viewport().get_visible_rect().size
+	if tooltip_pos.y < 16:
+		tooltip_pos.y = target_pos.y + target_size.y + 8  # 改到下方
+	if tooltip_pos.x < 16:
+		tooltip_pos.x = 16
+	if tooltip_pos.x + 280 > viewport_size.x:
+		tooltip_pos.x = viewport_size.x - 296
+
+	_tooltip_panel.position = tooltip_pos
+	_tooltip_panel.visible = true
 
 
 # ==================== 内部实现 ====================

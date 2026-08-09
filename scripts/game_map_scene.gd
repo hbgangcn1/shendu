@@ -120,7 +120,56 @@ func _on_node_gui_input(event: InputEvent, node) -> void:
 		var mouse_event: InputEventMouseButton = event as InputEventMouseButton
 		if mouse_event.pressed and mouse_event.button_index == MOUSE_BUTTON_LEFT:
 			if node.is_reachable and not GameState.visited_node_ids.has(node.id):
+				# 2026-08-09 P1 #3: click 弹跳反馈（scale 1.1 → 1.15 → 1.1）
+				var panel = _node_ui_map.get(node.id)
+				if panel != null:
+					_play_click_bounce(panel)
 				_show_confirmation(node)
+
+
+# ==================== 节点 hover/click 反馈 ====================
+
+## 2026-08-09 P1 #3 (epic-rollup-35e824f6): hover scale + click 弹跳 + 边框脉冲
+var _hover_tweens: Dictionary = {}  ## panel -> tween
+
+func _on_node_panel_hover_entered(panel: PanelContainer) -> void:
+	if panel == null or not is_instance_valid(panel):
+		return
+	# scale 1.0 → 1.1（0.15s ease-out）
+	if _hover_tweens.has(panel):
+		var old_tween = _hover_tweens[panel]
+		if old_tween != null and old_tween.is_valid():
+			old_tween.kill()
+	var tween := create_tween()
+	tween.tween_property(panel, "scale", Vector2(1.1, 1.1), 0.15)\
+		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	_hover_tweens[panel] = tween
+
+
+func _on_node_panel_hover_exited(panel: PanelContainer) -> void:
+	if panel == null or not is_instance_valid(panel):
+		return
+	if _hover_tweens.has(panel):
+		var old_tween = _hover_tweens[panel]
+		if old_tween != null and old_tween.is_valid():
+			old_tween.kill()
+	var tween := create_tween()
+	tween.tween_property(panel, "scale", Vector2(1.0, 1.0), 0.2)\
+		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	_hover_tweens[panel] = tween
+
+
+func _play_click_bounce(panel: PanelContainer) -> void:
+	# 弹跳：scale 1.1 → 1.18 → 1.1（0.25s 总时长）+ 边框白闪
+	var tween := create_tween().set_parallel(true)
+	tween.tween_property(panel, "scale", Vector2(1.18, 1.18), 0.08)\
+		.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tween.tween_property(panel, "scale", Vector2(1.1, 1.1), 0.17)\
+		.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN)
+	# 边框白闪（modulate）
+	var original_modulate: Color = panel.modulate
+	tween.tween_property(panel, "modulate", Color(1.5, 1.5, 1.5, 1.0), 0.08)
+	tween.tween_property(panel, "modulate", original_modulate, 0.17)
 
 func _on_confirm_go() -> void:
 	if _selected_node == null:
@@ -189,8 +238,15 @@ func _update_top_bar() -> void:
 	hp_label.text = "HP: %d/%d" % [GameState.hp, GameState.max_hp]
 	spirit_stones_label.text = "灵石: %d" % GameState.spirit_stones
 	dao_xing_label.text = "道行: %d" % GameState.dao_xing
-	dao_xing_label.tooltip_text = "道行：击败敌人获得，后续版本可用于领悟技能、解锁天赋等。当前版本暂无消耗用途。"
 	_update_hp_color()
+	# 2026-08-09 P2 #6 (epic-rollup-35e824f6): HUD 数值 tooltip
+	# 优先用 NodeTooltip 自定义 tooltip，禁用 Godot 内置 tooltip_text
+	hp_label.tooltip_text = ""
+	spirit_stones_label.tooltip_text = ""
+	dao_xing_label.tooltip_text = ""
+	NodeTooltip.register_hud(hp_label, "HP：你的生命值，归零则失败")
+	NodeTooltip.register_hud(spirit_stones_label, "灵石：货币，用于商店购买卡牌/遗物")
+	NodeTooltip.register_hud(dao_xing_label, "道行：击败敌人获得，后续版本可用于领悟技能。当前版本暂无消耗用途。")
 
 ## 2026-08-05 art_review fix (5069241b): HP<30% 时数字变红 + 1.5s 循环闪烁
 ## 闪烁频率不超过 1.5s/周期，避免癫痫风险（AI Player 建议）
@@ -262,6 +318,9 @@ func _draw_map() -> void:
 
 		panel.add_child(icon_rect)
 		panel.gui_input.connect(_on_node_gui_input.bind(node))
+		# 2026-08-09 P1 #3 (epic-rollup-35e824f6): hover feedback
+		panel.mouse_entered.connect(_on_node_panel_hover_entered.bind(panel))
+		panel.mouse_exited.connect(_on_node_panel_hover_exited.bind(panel))
 		nodes_container.add_child(panel)
 		_node_ui_map[node.id] = panel
 		# 2026-08-09 P0 #2 (epic-rollup-35e824f6): register hover tooltip
