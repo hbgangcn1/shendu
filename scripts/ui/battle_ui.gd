@@ -68,6 +68,15 @@ const CARD_SCENE := preload("res://scenes/card.tscn")
 # ==================== 初始化 ====================
 
 func _ready() -> void:
+	# 2026-08-10 (minimax art review #1): HUD 文字（回合/地点/HP/灵力/魔念/锁）在水墨背景上对比度过低
+	# 加 font_color (TEXT_PRIMARY) + outline_size 4 + outline_color 黑，高对比任何背景
+	for lbl: Label in [turn_label, player_hp_label, player_shield_label, player_energy_label, draw_pile_label, discard_pile_label, mo_nian_label, erosion_label, hand_size_label]:
+		if lbl == null:
+			continue
+		lbl.add_theme_color_override("font_color", UITheme.TEXT_PRIMARY)
+		lbl.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.95))
+		lbl.add_theme_constant_override("outline_size", 4)
+
 	UITheme.apply_button(end_turn_button)
 	# 结束回合按钮特殊样式：深青底+霓虹边框+辉光
 	end_turn_button.add_theme_font_size_override("font_size", 27)
