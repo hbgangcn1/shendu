@@ -98,6 +98,8 @@ func _ready() -> void:
 	confirmation_panel.z_index = 50
 	not_impl_popup.z_index = 50
 	_show_move_hint()
+	# 2026-08-09 P0 #4 (epic-rollup-35e824f6): 新玩家首次进入游戏显示 onboarding overlay
+	_maybe_show_onboarding()
 
 	# 应用主题到确认弹窗
 	UITheme.apply_panel(confirmation_panel)
@@ -367,6 +369,21 @@ func _show_not_implemented(type_name: String) -> void:
 
 func _hide_not_implemented() -> void:
 	not_impl_popup.visible = false
+
+# ==================== Onboarding overlay ====================
+
+## 2026-08-09 P0 #4 (epic-rollup-35e824f6): 新玩家首次进入游戏显示 onboarding overlay
+## 仅当 visited_node_ids 为空 + dao_xing == 0（全新玩家）显示一次
+func _maybe_show_onboarding() -> void:
+	if not GameState.visited_node_ids.is_empty():
+		return
+	if GameState.dao_xing > 0:
+		return  # 已玩过的玩家，不显示
+	var OnboardingOverlay = preload("res://scripts/ui/onboarding_overlay.gd")
+	var overlay = OnboardingOverlay.new()
+	overlay.z_index = 200
+	add_child(overlay)
+
 
 # ==================== 移动教程提示 ====================
 
