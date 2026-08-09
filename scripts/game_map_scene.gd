@@ -56,6 +56,8 @@ const PATH_COLOR_LOCKED := Color(0.3, 0.3, 0.4, 0.5)    ## 暗灰
 @onready var not_impl_popup: PanelContainer = %NotImplPopup
 @onready var not_impl_label: Label = %NotImplLabel
 @onready var not_impl_close_button: Button = %NotImplCloseButton
+@onready var move_hint_panel: PanelContainer = %MoveHintPanel
+@onready var move_hint_label: Label = %MoveHintLabel
 
 # ==================== 休息/事件 UI ====================
 
@@ -63,6 +65,7 @@ var _rest_popup: PanelContainer = null
 var _event_popup: PanelContainer = null
 var _event_logic = null
 var _current_event = null
+var _move_hint_tween: Tween = null
 
 # ==================== 状态 ====================
 
@@ -92,6 +95,7 @@ func _ready() -> void:
 	_add_menu_button()
 	confirmation_panel.z_index = 50
 	not_impl_popup.z_index = 50
+	_show_move_hint()
 
 	# 应用主题到确认弹窗
 	UITheme.apply_panel(confirmation_panel)
@@ -359,6 +363,53 @@ func _show_not_implemented(type_name: String) -> void:
 
 func _hide_not_implemented() -> void:
 	not_impl_popup.visible = false
+
+# ==================== 移动教程提示 ====================
+
+## 2026-08-09 design_concern fix (ff762f56):
+## AI Player 在第一个 tick 完全不知所措（25+ 节点 + 不知道点击是否移动）。
+## 修复：visited_node_ids 为空时显示 3 秒浮动提示"点击相邻节点移动"，
+## 并对首个可达节点做 scale 脉冲引导玩家点击。一旦玩家移动后不再显示。
+func _show_move_hint() -> void:
+	if move_hint_panel == null or move_hint_label == null:
+		return
+
+	# 玩家已经移动过 → 不再显示新手引导
+	if not GameState.visited_node_ids.is_empty():
+		move_hint_panel.visible = false
+		return
+
+	move_hint_panel.visible = true
+	move_hint_label.modulate.a = 1.0
+
+	# 浮动 + 淡出（约 3 秒总时长：保持 2.5s 后 0.6s 淡出）
+	if _move_hint_tween != null and _move_hint_tween.is_valid():
+		_move_hint_tween.kill()
+	_move_hint_tween = create_tween()
+	_move_hint_tween.tween_interval(2.5)
+	_move_hint_tween.tween_property(move_hint_label, "modulate:a", 0.0, 0.6)
+	_move_hint_tween.tween_callback(func():
+		if is_instance_valid(move_hint_panel):
+			move_hint_panel.visible = false
+	)
+
+	# 脉冲首个可达节点，引导玩家点击（scale 1.0→1.25→1.0，循环 2 次）
+	var first_node = null
+	for node in _realm_map.nodes:
+		if node.is_reachable and not GameState.visited_node_ids.has(node.id):
+			first_node = node
+			break
+	if first_node != null:
+		var panel = _node_ui_map.get(first_node.id)
+		if panel != null:
+			_pulse_first_node(panel)
+
+func _pulse_first_node(panel: PanelContainer) -> void:
+	var pulse := create_tween().set_loops(2)
+	pulse.tween_property(panel, "scale", Vector2(1.25, 1.25), 0.4)\
+		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	pulse.tween_property(panel, "scale", Vector2(1.0, 1.0), 0.4)\
+		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
 
 # ==================== 休息节点 UI ====================
 
