@@ -80,7 +80,37 @@ func _update_display() -> void:
 		if not desc.is_empty():
 			desc += "\n"
 		desc += " | ".join(stats)
-	description_label.text = desc
+	# 2026-08-09 P1 #5 (epic-rollup-35e824f6): 8 字简写优先显示
+	var short: String = card_data.short_desc
+	if short.is_empty() and not card_data.description.is_empty():
+		short = _truncate_to_eight(card_data.description)
+	description_label.text = short if not short.is_empty() else desc
+	# 提亮文字颜色 + outline 描边，提升小尺寸卡牌（165x220）下的可读性
+	description_label.add_theme_color_override("font_color", UITheme.TEXT_PRIMARY)
+	description_label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.6))
+	description_label.add_theme_constant_override("outline_size", 2)
+	card_name_label.add_theme_color_override("font_color", UITheme.TEXT_PRIMARY)
+	card_name_label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.8))
+	card_name_label.add_theme_constant_override("outline_size", 3)
+	cost_label.add_theme_color_override("font_color", Color(1.0, 0.85, 0.3))  # 金色费用
+
+
+## 2026-08-09 P1 #5: 截取 description 到 8 字以内（中文字符计数）
+func _truncate_to_eight(text: String) -> String:
+	if text.is_empty():
+		return ""
+	var clean: String = text.replace("\n", "").strip_edges()
+	var count: int = 0
+	var result: String = ""
+	for c in clean:
+		var ch: String = c
+		if ch == " " or (ch.length() == 1 and ch.is_valid_int()):
+			continue
+		result += ch
+		count += 1
+		if count >= 8:
+			break
+	return result
 
 	# 添加卡牌完整提示文本
 	var tooltip_parts: Array = []

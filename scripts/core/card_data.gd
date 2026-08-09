@@ -14,6 +14,7 @@ extends Resource
 var id: String = ""                            ## 格式 MC-{ABBR}-{SEQ}
 var name: String = ""                          ## 显示名（按 spec，不是 card_name）
 var description: String = ""
+var short_desc: String = ""                    ## 8 字内简写（手牌直接显示），可选；为空时从 description 自动截取
 var cost: int = 0
 var element: WuXing.Element = 0 as WuXing.Element  ## 0=金 1=木 2=水 3=火 4=土（JSON 是 string）
 var card_kind: int = 0                         ## 0=攻击 1=防御 2=特殊 3=辅助（JSON 是 string）
@@ -159,6 +160,7 @@ func to_dict() -> Dictionary:
 		"id": id,
 		"name": name,
 		"description": description,
+		"short_desc": short_desc,
 		"cost": cost,
 		"element": element,
 		"card_kind": card_kind,
