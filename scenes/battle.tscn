@@ -177,6 +177,7 @@ custom_minimum_size = Vector2(0, 146)
 size_flags_horizontal = 3
 theme_override_constants/separation = 8
 alignment = 1
+z_index = 10
 
 [node name="EndTurnButton" parent="BattleUI/MainHBox/GameArea/BottomPanel/BottomVBox" type="Button"]
 unique_name_in_owner = true
