@@ -58,6 +58,8 @@ const PATH_COLOR_LOCKED := Color(0.3, 0.3, 0.4, 0.5)    ## 暗灰
 @onready var not_impl_close_button: Button = %NotImplCloseButton
 @onready var move_hint_panel: PanelContainer = %MoveHintPanel
 @onready var move_hint_label: Label = %MoveHintLabel
+@onready var legend_panel: PanelContainer = %LegendPanel
+@onready var legend_toggle_button: Button = %LegendToggleButton
 
 # ==================== 休息/事件 UI ====================
 
@@ -260,6 +262,8 @@ func _draw_map() -> void:
 		panel.gui_input.connect(_on_node_gui_input.bind(node))
 		nodes_container.add_child(panel)
 		_node_ui_map[node.id] = panel
+		# 2026-08-09 P0 #2 (epic-rollup-35e824f6): register hover tooltip
+		NodeTooltip.register(panel, node.type, 0, node.metadata)
 
 func _get_node_position(node) -> Vector2:
 	# 水平居中：所有列宽之和以 MAP_CENTER_X 为中心展开
@@ -634,6 +638,27 @@ func _connect_signals() -> void:
 	confirm_go_button.pressed.connect(_on_confirm_go)
 	confirm_cancel_button.pressed.connect(_hide_confirmation)
 	not_impl_close_button.pressed.connect(_hide_not_implemented)
+	# 2026-08-09 P0 #2: legend toggle button
+	legend_toggle_button.pressed.connect(_on_legend_toggle_pressed)
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	# 2026-08-09 P0 #2: L 键切换 legend panel
+	if event is InputEventKey and event.pressed and not event.echo:
+		var key_event: InputEventKey = event as InputEventKey
+		if key_event.keycode == KEY_L:
+			_toggle_legend()
+			get_viewport().set_input_as_handled()
+
+
+func _on_legend_toggle_pressed() -> void:
+	_toggle_legend()
+
+
+func _toggle_legend() -> void:
+	if legend_panel == null:
+		return
+	legend_panel.visible = not legend_panel.visible
 
 # ==================== 牌组查看 ====================
 

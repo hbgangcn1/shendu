@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" path="res://scripts/game_map_scene.gd" id="1"]
 [ext_resource type="Texture2D" path="res://assets/images/backgrounds/bg_map.png" id="2"]
+[ext_resource type="Script" path="res://scripts/ui/legend_panel.gd" id="3"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_topbar"]
 bg_color = Color(0, 0, 0, 0.4)
@@ -199,4 +200,42 @@ theme_override_font_sizes/font_size = 36
 theme_override_colors/font_color = Color(1.0, 0.85, 0.3, 1.0)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 0.95)
 theme_override_constants/outline_size = 6
+
+[node name="LegendPanel" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -280.0
+offset_top = -440.0
+offset_right = -16.0
+offset_bottom = -16.0
+grow_horizontal = 0
+grow_vertical = 0
+mouse_filter = 0
+script = ExtResource("3")
+z_index = 40
+
+[node name="LegendToggleButton" type="Button" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -72.0
+offset_top = -72.0
+offset_right = -16.0
+offset_bottom = -16.0
+grow_horizontal = 0
+grow_vertical = 0
+custom_minimum_size = Vector2(56, 56)
+theme_override_font_sizes/font_size = 32
+text = "?"
+z_index = 45
 

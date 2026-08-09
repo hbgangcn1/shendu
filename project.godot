@@ -17,6 +17,7 @@ config/features=PackedStringArray("4.7")
 [autoload]
 
 UITheme="*res://scripts/ui/ui_theme.gd"
+NodeTooltip="*res://scripts/ui/node_tooltip.gd"
 GameState="*res://scripts/core/game_state.gd"
 WuXing="*res://scripts/core/wuxing_manager.gd"
 CardPool="*res://scripts/core/card_pool.gd"
