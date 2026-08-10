@@ -167,6 +167,18 @@ func _write_map_state(state: Dictionary, current_scene: Node) -> void:
 	if node_ui_map == null:
 		node_ui_map = {}
 	const MAP_NODE_SIZE = 88.0
+	# 2026-08-10 fix (card 6209bc47): 原 get_type_name() fallback 是 '未知' — LLM 看到误读为 '?'，不知道是 bug 还是实际未知节点类型。
+	# 修复：直接读 MapNode.NODE_TYPE_NAMES const（MapNode extends RefCounted，const 可通过常量路径访问），
+	# fallback 用本地图副本保证总是返回有效字符串，同时加 type_id 数字字段让 LLM 看到 raw int。
+	const MAP_NODE_TYPE_NAMES := {
+		0: "战斗",
+		1: "精英",
+		2: "事件",
+		3: "商店",
+		4: "休息",
+		5: "Boss",
+		6: "秘境",
+	}
 	var reachable: Array = []
 	var all_nodes: Array = []
 	for node in nodes:
@@ -180,9 +192,13 @@ func _write_map_state(state: Dictionary, current_scene: Node) -> void:
 			if panel and "position" in panel:
 				actual_x = panel.position.x + MAP_NODE_SIZE / 2.0
 				actual_y = panel.position.y + MAP_NODE_SIZE / 2.0
+		# 2026-08-10: 用 NODE_TYPE_NAMES 直接 fallback，避免 get_type_name() 返回 '未知' 导致 LLM 误读为 '?'
+		var type_id: int = int(node.type) if "type" in node else -1
+		var type_name: String = MAP_NODE_TYPE_NAMES.get(type_id, "未知(类型=%d)" % type_id)
 		var entry: Dictionary = {
 			"id": node.id if "id" in node else "",
-			"type_name": node.get_type_name() if node.has_method("get_type_name") else "未知",
+			"type_id": type_id,
+			"type_name": type_name,
 			"x": actual_x,
 			"y": actual_y,
 			"column": int(node.column) if "column" in node else 0,
