@@ -238,8 +238,11 @@ func _write_battle_state(state: Dictionary, current_scene: Node) -> void:
 		state["turn"] = bm.turn_number
 		# 2026-07-30 fix (D1): 手牌详情 — LLM 需要知道哪张能出
 		# 之前只有 hand_count (数量)，没有 cards id/cost/damage/block → LLM 不知道出什么
-		if player.hand and player.hand.size() > 0:
-			var hand_cards: Array = []
+		# 2026-08-10 fix (card 0241de69): 原代码 if player.hand.size() > 0 才写 hand_cards key，
+		# 手牌 0 张时 key 缺失，LLM 无法区分「真的 0 张」vs「state 漂移 race」。
+		# 修复：始终写 state["hand_cards"]（空时为 []），加 hand_size_capacity / hand_max_draw_count 让 LLM 知道手牌上限。
+		var hand_cards: Array = []
+		if player.hand:
 			for i in range(player.hand.size()):
 				var c = player.hand[i]
 				if c == null:
@@ -254,7 +257,15 @@ func _write_battle_state(state: Dictionary, current_scene: Node) -> void:
 					"playable": int(c.cost) <= int(player.current_energy) if "cost" in c and "current_energy" in player else false,
 				}
 				hand_cards.append(card_info)
-			state["hand_cards"] = hand_cards
+		state["hand_cards"] = hand_cards
+		# 2026-08-10: 手牌上限（Player.hand_size 默认 4，可能因心魔低语临时降至 3）
+		if "hand_size" in player:
+			state["hand_size_capacity"] = int(player.hand_size)
+		# 玩家当前能量也写到顶层（之前只写到 spirit_stones / max_energy），便于 LLM 一眼看到灵力
+		state["player_current_energy"] = int(player.current_energy) if "current_energy" in player else 0
+		# 当前玩家元素（battle 内 attack 卡的 element 跟玩家元素触发相生）
+		if "element" in player:
+			state["player_element"] = int(player.element)
 	# 敌人状态
 	# 2026-08-10 fix (card 90780893): 原代码只看 enemies[0].is_alive — 第 1 个敌人 HP=0 但 enemies[1] 还活着时
 	# state.enemy 缺失（key 不写），AI Player 看到 stale state.enemy={} 或 missing key 反复 query 死敌。
