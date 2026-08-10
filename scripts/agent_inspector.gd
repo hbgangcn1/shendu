@@ -136,6 +136,8 @@ func _write_state() -> void:
 			_write_map_state(state, current)
 		elif current.name == "CharacterSelect" or (current.scene_file_path and "character_select" in current.scene_file_path):
 			_write_character_select_state(state, current)
+		elif current.name == "RewardScene" or (current.scene_file_path and "reward.tscn" in current.scene_file_path):
+			_write_reward_state(state, current)
 	# 写文件
 	var json: String = JSON.stringify(state, "  ")
 	var f := FileAccess.open(STATE_FILE, FileAccess.WRITE)
@@ -211,6 +213,51 @@ func _write_character_select_state(state: Dictionary, current_scene: Node) -> vo
 	var focused = current_scene.get("_focused_index")
 	if focused != null:
 		state["character_focused_index"] = int(focused)
+
+## 2026-08-10 fix (card f5c7f29e): 写 reward scene 状态
+## 原代码 reward.tscn 不写任何 state 字段，AI Player 看到 reward 场景完全黑屏，只能瞎猜该 pick_reward 还是 skip_reward。
+## 修复：从 GameState.get_meta("last_reward") 读 BattleReward 实例（含 card_choices / spirit_stones / dao_xing）写到 state["reward"]，
+## 含 card_choices 列表每张卡片的 name / cost / element / damage / block / heal / draw_cards，让 LLM 知道 3 张卡的差异决定 pick_reward index。
+func _write_reward_state(state: Dictionary, current_scene: Node) -> void:
+	var gs := get_node_or_null("/root/GameState")
+	if gs == null:
+		return
+	# 2026-08-10 fix: 之前 gs.get("last_reward") 不会读 meta — get() 只读脚本属性，meta 必须用 get_meta()
+	var reward = gs.get_meta("last_reward", null) if gs.has_meta("last_reward") else null
+	if reward == null:
+		state["reward"] = null
+		return
+	var card_choices: Array = reward.get("card_choices", []) if "card_choices" in reward else []
+	var reward_dict: Dictionary = {
+		"spirit_stones": int(reward.get("spirit_stones", 0)) if "spirit_stones" in reward else 0,
+		"dao_xing": int(reward.get("dao_xing", 0)) if "dao_xing" in reward else 0,
+		"is_elite": bool(reward.get("is_elite", false)) if "is_elite" in reward else false,
+		"is_boss": bool(reward.get("is_boss", false)) if "is_boss" in reward else false,
+		"card_choice_count": card_choices.size(),
+		"card_choices": [],
+	}
+	for i in range(card_choices.size()):
+		var c = card_choices[i]
+		if c == null:
+			continue
+		var card_info: Dictionary = {
+			"index": i,
+			"id": c.id if "id" in c else "",
+			"name": c.name if "name" in c else "",
+			"cost": int(c.cost) if "cost" in c else 0,
+			"element": int(c.element) if "element" in c else 0,
+			"damage": int(c.damage) if "damage" in c else 0,
+			"block": int(c.block) if "block" in c else 0,
+			"heal": int(c.heal) if "heal" in c else 0,
+			"draw_cards": int(c.draw_cards) if "draw_cards" in c else 0,
+		}
+		# element / rarity 转字符串便于 LLM 阅读
+		if "element" in c:
+			card_info["element_name"] = WuXing.get_element_name(c.element) if typeof(c.element) == TYPE_INT and WuXing.has_method("get_element_name") else ""
+		if "rarity" in c:
+			card_info["rarity_name"] = c.get_rarity_name() if c.has_method("get_rarity_name") else ""
+		reward_dict["card_choices"].append(card_info)
+	state["reward"] = reward_dict
 
 func _write_battle_state(state: Dictionary, current_scene: Node) -> void:
 	var bm = current_scene.get_node_or_null("BattleManager")
