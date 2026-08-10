@@ -21,6 +21,10 @@ var _frame_count: int = 0
 # 真因：1s 节流 + Godot 切 scene（sub-100ms）→ viewport_capture.png 是新 scene 但 state.json 残留旧 scene
 # → AI Player client 写 vlm_request 时拿 stale state → minimax 返回 click_X_Y 但 client 按旧 scene apply → dead-lock
 var _last_scene_path: String = ""
+# 2026-08-10 fix (card 64d87a07): 场景切换计数器 + 上一场景名 — 让 AI Player / debug 工具能判断是否发生 state drift
+# 场景切换计数从 0 开始，每次 _on_tree_changed 检测到 scene 变化时 +1，previous_scene 记录切换前的 scene。
+var _scene_change_count: int = 0
+var _previous_scene_path: String = ""
 # 2026-07-29 fix: verbose print 风暴 — 只在 _ready 写一次 property 列表，运行时只写 state
 var _verbose_printed: bool = false
 
@@ -60,6 +64,13 @@ func _on_tree_changed() -> void:
 		return
 	var current_path: String = _get_scene_name()
 	if current_path != "" and current_path != _last_scene_path:
+		# 2026-08-10 fix (card 64d87a07): 记录上一场景 + 场景切换计数
+		if _last_scene_path != "":
+			_previous_scene_path = _last_scene_path
+			_scene_change_count += 1
+			print("AgentInspector: scene change #%d: %s → %s" % [_scene_change_count, _previous_scene_path, current_path])
+		else:
+			print("AgentInspector: initial scene: %s" % current_path)
 		_last_scene_path = current_path
 		print("AgentInspector: scene change detected → ", current_path, " → immediate flush (after 2 frames)")
 		_write_state()
@@ -98,6 +109,9 @@ func _write_state() -> void:
 			"frame": Engine.get_process_frames()
 		}
 	}
+	# 2026-08-10 fix (card 64d87a07): 场景切换历史（让 AI Player / debug 工具能判断 state drift）
+	state["previous_scene"] = _previous_scene_path
+	state["scene_change_count"] = _scene_change_count
 	# 从 GameState autoload 拿（如果存在）
 	var gs := get_node_or_null("/root/GameState")
 	if gs:
