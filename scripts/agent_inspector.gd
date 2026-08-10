@@ -256,30 +256,64 @@ func _write_battle_state(state: Dictionary, current_scene: Node) -> void:
 				hand_cards.append(card_info)
 			state["hand_cards"] = hand_cards
 	# 敌人状态
+	# 2026-08-10 fix (card 90780893): 原代码只看 enemies[0].is_alive — 第 1 个敌人 HP=0 但 enemies[1] 还活着时
+	# state.enemy 缺失（key 不写），AI Player 看到 stale state.enemy={} 或 missing key 反复 query 死敌。
+	# 修复：遍历所有 enemies 找第一个 alive 的作为主 enemy，找不到时记录 alive_count=0 + dead_count 让 LLM 知道战况。
 	var enemies = bm.get("enemies")
 	if enemies and enemies.size() > 0:
-		var enemy = enemies[0]
-		if enemy and enemy.is_alive:
+		var primary_enemy = null
+		var primary_idx: int = -1
+		var alive_count: int = 0
+		var dead_count: int = 0
+		var all_enemies: Array = []
+		for i in range(enemies.size()):
+			var e = enemies[i]
+			if e == null:
+				continue
+			var is_alive_e: bool = bool(e.is_alive) if "is_alive" in e else false
+			if is_alive_e:
+				alive_count += 1
+				if primary_enemy == null:
+					primary_enemy = e
+					primary_idx = i
+			else:
+				dead_count += 1
+			all_enemies.append({
+				"index": i,
+				"name": e.actor_name if "actor_name" in e else "",
+				"hp": int(e.current_hp) if "current_hp" in e else 0,
+				"max_hp": int(e.max_hp) if "max_hp" in e else 0,
+				"is_alive": is_alive_e,
+			})
+		state["enemy_count"] = enemies.size()
+		state["enemy_alive_count"] = alive_count
+		state["enemy_dead_count"] = dead_count
+		state["all_enemies"] = all_enemies
+		if primary_enemy != null:
 			state["enemy"] = {
-				"name": enemy.actor_name,
-				"hp": enemy.current_hp,
-				"max_hp": enemy.max_hp,
-				"intent": enemy.get_intent_description() if enemy.has_method("get_intent_description") else "unknown",
-				"intent_detail": enemy.get_intent_detail() if enemy.has_method("get_intent_detail") else "",
+				"index": primary_idx,
+				"name": primary_enemy.actor_name,
+				"hp": primary_enemy.current_hp,
+				"max_hp": primary_enemy.max_hp,
+				"intent": primary_enemy.get_intent_description() if primary_enemy.has_method("get_intent_description") else "unknown",
+				"intent_detail": primary_enemy.get_intent_detail() if primary_enemy.has_method("get_intent_detail") else "",
 			}
-			if enemies.size() > 1:
-				var extra: Array = []
-				for i in range(1, enemies.size()):
-					var e = enemies[i]
-					if e and e.is_alive:
-						extra.append({
-							"name": e.actor_name,
-							"hp": e.current_hp,
-							"max_hp": e.max_hp,
-							"intent": e.get_intent_description() if e.has_method("get_intent_description") else "unknown",
-						})
-				if not extra.is_empty():
-					state["enemy"]["extra_enemies"] = extra
+			# 剩余 alive 敌人（除 primary）写入 extra_enemies，让 LLM 知道有多个目标要选
+			var extra: Array = []
+			for i in range(enemies.size()):
+				if i == primary_idx:
+					continue
+				var e = enemies[i]
+				if e and (bool(e.is_alive) if "is_alive" in e else false):
+					extra.append({
+						"index": i,
+						"name": e.actor_name,
+						"hp": e.current_hp,
+						"max_hp": e.max_hp,
+						"intent": e.get_intent_description() if e.has_method("get_intent_description") else "unknown",
+					})
+			if not extra.is_empty():
+				state["enemy"]["extra_enemies"] = extra
 	# 相生链
 	var chain = bm.get("generation_chain")
 	if chain and chain.size() > 0:
