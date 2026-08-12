@@ -61,7 +61,13 @@ func _execute(cmd: Dictionary) -> void:
 	# 2026-08-08: label-based actions (select_node / play_card / confirm_select / select_chenmo / select_suwan) 也允许
 	if _input_paused:
 		var action: String = cmd.get("action", "")
-		if action in ["change_scene", "quit", "capture", "select_node", "play_card", "confirm_select", "select_chenmo", "select_suwan"]:
+		# 2026-08-12 修复：reward scene actions 也在放行列表（pick_reward/skip_reward/take_card/take_relic/skip），
+		# 不加的话 battle → reward 转换后 _input_paused=true（fade 中设的）会一值 hold 到下一场 battle
+		# 才能 reset，AI Player 在 reward 场景永远卡住。这个 bug 隐藏了2个月。
+		if action in ["change_scene", "quit", "capture", "select_node", "play_card",
+				"confirm_select", "select_chenmo", "select_suwan",
+				"pick_reward", "skip_reward", "take_card", "take_relic", "skip",
+				"confirm_node", "end_turn"]:
 			pass  # 允许
 		else:
 			print("AgentSocket: paused, skip action=%s" % action)
@@ -180,6 +186,13 @@ func _do_confirm_node() -> void:
 	# 修 LLM 在 select_node 后卡 wait 循环的 bug —— 原来 confirm_node 走 _do_click (Input.parse_input_event)
 	# 不触发 ConfirmGo.pressed 信号
 	var scene := get_tree().current_scene
+	# 2026-08-09 debug: 临时写文件，看 _do_confirm_node 到底有没有被调
+	var dbg := FileAccess.open("user://ai_player_debug.log", FileAccess.READ_WRITE)
+	if dbg != null:
+		dbg.seek_end()
+		var has_method := scene != null and scene.has_method("_on_confirm_go")
+		dbg.store_line("[confirm_node] scene=%s has_method=%s" % [str(scene), str(has_method)])
+		dbg.close()
 	if scene == null:
 		push_warning("AgentSocket: confirm_node no current scene")
 		return
