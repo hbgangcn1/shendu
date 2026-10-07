@@ -1,0 +1,37 @@
+{
+  "run_id": "fixture-pass-R01",
+  "verdict": true,
+  "frames": [
+    {
+      "frame": "frame_1.png",
+      "rubric_version": "v1",
+      "model": "deterministic",
+      "results": [
+        {
+          "id": "no_black_screen",
+          "pass": true,
+          "reason": "PASS: mean luminance 64.0; frame is rendering.",
+          "critical": true
+        },
+        {
+          "id": "no_text_overlap",
+          "pass": true,
+          "reason": "PASS: no stacked-text blending.",
+          "critical": true
+        },
+        {
+          "id": "card_art_present",
+          "pass": true,
+          "reason": "PASS: textured regions present.",
+          "critical": false
+        },
+        {
+          "id": "hp_readable",
+          "pass": true,
+          "reason": "PASS: HP readout legible.",
+          "critical": false
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,64 @@
+[
+  {
+    "seq": 1,
+    "run_id": "critic-R01",
+    "scene": "map",
+    "chosen_action": "wait",
+    "confidence": 0.9,
+    "fallback_count": 0,
+    "player_hp": 100,
+    "frame_path": "frame_1.png"
+  },
+  {
+    "seq": 2,
+    "run_id": "critic-R01",
+    "scene": "map",
+    "chosen_action": "wait",
+    "confidence": 0.4,
+    "fallback_count": 2,
+    "player_hp": 100,
+    "frame_path": "frame_2.png"
+  },
+  {
+    "seq": 3,
+    "run_id": "critic-R01",
+    "scene": "map",
+    "chosen_action": "wait",
+    "confidence": 0.5,
+    "fallback_count": 0,
+    "player_hp": 96,
+    "frame_path": "frame_3.png"
+  },
+  {
+    "seq": 4,
+    "run_id": "critic-R01",
+    "scene": "map",
+    "chosen_action": "wait",
+    "confidence": 0.6,
+    "fallback_count": 0,
+    "player_hp": 90,
+    "frame_path": "frame_4.png"
+  },
+  {
+    "seq": 5,
+    "run_id": "critic-R01",
+    "scene": "battle",
+    "battle": "b1",
+    "chosen_action": "attack",
+    "confidence": 0.8,
+    "fallback_count": 0,
+    "player_hp": 100,
+    "frame_path": "frame_5.png"
+  },
+  {
+    "seq": 6,
+    "run_id": "critic-R01",
+    "scene": "battle",
+    "battle": "b1",
+    "chosen_action": "defend",
+    "confidence": 0.7,
+    "fallback_count": 0,
+    "player_hp": 40,
+    "frame_path": "frame_6.png"
+  }
+]
