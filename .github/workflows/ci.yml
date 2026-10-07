@@ -1,0 +1,83 @@
+name: Godot CI/CD
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+env:
+  GODOT_VERSION: 4.6
+  EXPORT_NAME: shendu
+
+jobs:
+  lint:
+    name: Code Quality Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      
+      - name: Install gdtoolkit
+        run: |
+          pip install "gdtoolkit==4.*"
+      
+      - name: Run linter
+        run: |
+          gdlint scripts/
+      
+      - name: Check formatting
+        run: |
+          gdformat --check scripts/
+
+  test:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    container:
+      image: barichello/godot-ci:4.4
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Godot
+        run: |
+          mkdir -p ~/.local/share/godot/export_templates/
+          mv /root/.local/share/godot/export_templates/${GODOT_VERSION}.stable \
+             ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable
+      
+      - name: Run Tests
+        run: |
+          godot --headless --path . -s scripts/main.gd
+        timeout-minutes: 5
+
+  build-windows:
+    name: Windows Build
+    needs: [lint, test]
+    runs-on: ubuntu-latest
+    container:
+      image: barichello/godot-ci:4.4
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: true
+      
+      - name: Setup Godot
+        run: |
+          mkdir -p ~/.local/share/godot/export_templates/
+          mv /root/.local/share/godot/export_templates/${GODOT_VERSION}.stable \
+             ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable
+      
+      - name: Windows Build
+        run: |
+          mkdir -p builds/windows
+          godot --headless --export-release "Windows Desktop" \
+                builds/windows/${{ env.EXPORT_NAME }}.exe
+      
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-build
+          path: builds/windows

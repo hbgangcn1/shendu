@@ -48,6 +48,12 @@ func _start_battle() -> void:
 
 	player = Player.new(char_name, current_hp, WuXing.Element.FIRE, 10)
 	player.max_hp = max_hp
+	# 2026-08-12 修复 (card 2e39a09e): _start_battle() 创建 Player 但从未调 init_deck()
+	# 根因：Player._init() 只设 max_energy/current_energy，draw_pile 仍是空数组；
+	# battle 中永远抽不到牌，hand_cards=[] 导致 AI Player 报 "牌组永远 0 张 / reward 反馈闭环失效"
+	# 验证：Player.init_deck() 实现完整（player.gd L148）从 GameState.deck 加载，
+	# GameState.deck 为空时 fallback 到 CardPool.get_mvp_pool()（9 张测试卡）
+	player.init_deck()
 
 	# 根据节点类型生成敌人
 	var enemies: Array = _generate_enemies()

@@ -1,0 +1,119 @@
+[gd_scene format=3 uid="uid://menu001"]
+
+[ext_resource type="Script" uid="uid://ftatqdnijcx3" path="res://scripts/main_menu.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/images/backgrounds/bg_main_menu.png" id="2"]
+
+[node name="MainMenu" type="Control" unique_id=1879639329]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1")
+
+[node name="Background" type="TextureRect" parent="." unique_id=1225187982]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+stretch_mode = 6
+expand_mode = 1
+texture = ExtResource("2")
+
+[node name="Vignette" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.25)
+
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=1424413855]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -213.0
+offset_top = -240.0
+offset_right = 213.0
+offset_bottom = 160.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="TitleLabel" type="Label" parent="VBoxContainer" unique_id=78219770]
+unique_name_in_owner = true
+layout_mode = 2
+text = "蜃 都"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 140
+theme_override_constants/outline_size = 12
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.9)
+
+[node name="SubtitleLabel" type="Label" parent="VBoxContainer" unique_id=78219771]
+unique_name_in_owner = true
+layout_mode = 2
+text = "在霓虹灯下修仙"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 40
+
+[node name="Spacer" type="Control" parent="VBoxContainer" unique_id=1100164259]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+
+[node name="StartButton" type="Button" parent="VBoxContainer" unique_id=1042967745]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(480, 96)
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "开始游戏"
+
+[node name="NewGameButton" type="Button" parent="VBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(480, 96)
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "新游戏"
+
+[node name="QuitButton" type="Button" parent="VBoxContainer" unique_id=896600310]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(480, 96)
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "退出"
+
+[node name="BottomBar" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -56.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/separation = 0
+alignment = 1
+
+[node name="VersionLabel" type="Label" parent="BottomBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "v0.1.0 Demo"
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.55, 0.55, 0.65, 1)
+vertical_alignment = 1
+
+[node name="CopyrightLabel" type="Label" parent="BottomBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "© 2026 蜃都"
+horizontal_alignment = 2
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.55, 0.55, 0.65, 1)
+vertical_alignment = 1

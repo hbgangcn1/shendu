@@ -41,6 +41,16 @@ func set_run_id(run_id: String) -> void:
 ## 2026-07-14: id 格式改为 exp_<run_id>_<run_seq>，run_seq 在 set_run_id() 时重置为 0
 ## 避免跨 run id 冲突（之前用 _records.size() 全局下标会撞 test_reconnect 类的同名 session）
 func record(type: String, scene: String, description: String, evidence: Dictionary = {}, confidence: float = 0.5) -> Dictionary:
+	return _record_internal(type, scene, description, evidence, confidence, false)
+
+# 2026-08-03: record_quiet — 噪音抑制 B 实现
+# 跟 record() 同效果（写入 experience file），但 entry 带 quiet: true
+# phase_e_consume.mjs 读 quiet: true 的 record 会过滤（不计入 issues.json）
+# 用于"我知道这会发生"的 fallback（比如 _force_skip_battle 找不到 BattleManager 的 fallback）
+func record_quiet(type: String, scene: String, description: String, evidence: Dictionary = {}, confidence: float = 0.5) -> Dictionary:
+	return _record_internal(type, scene, description, evidence, confidence, true)
+
+func _record_internal(type: String, scene: String, description: String, evidence: Dictionary, confidence: float, quiet: bool) -> Dictionary:
 	var id := "exp_%s_%d" % [_run_id, _run_seq]
 	_run_seq += 1
 	var entry := {
@@ -54,6 +64,8 @@ func record(type: String, scene: String, description: String, evidence: Dictiona
 		"uses": 0,
 		"timestamp": Time.get_datetime_string_from_system(),
 	}
+	if quiet:
+		entry["quiet"] = true
 
 	# H1 fail-safe schema 校验（不抛错，只 warning）
 	var schema_errors: Array[String] = ExperienceMemorySchema.validate_record(entry)

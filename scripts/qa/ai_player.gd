@@ -292,13 +292,13 @@ func _detect_state() -> void:
 #   - character_select 卡 > 60s 自动 force-skip（绕过 GUI，直接 set character_id + change scene）
 #   - main_menu 卡 > 30s 自动 force-skip（直接调用 _on_new_game_pressed 或 change scene）
 #   - 类似 script mode 里的 5-stuck 安全网，但在 MODE_MODEL 下也能触发
-var _watchdog_char_select_threshold_ms: int = 60000  # 60s
+var _watchdog_char_select_threshold_ms: int = 120000  # 120s (2026-08-08: 90s→120s, 给 minimax 极简 prompt 充分时间)
 var _watchdog_main_menu_threshold_ms: int = 30000     # 30s
-var _watchdog_map_threshold_ms: int = 60000          # 60s
-var _watchdog_battle_threshold_ms: int = 60000       # 60s (2026-08-06: 从 120s 降到 60s, 跟 map 一致)
-var _watchdog_battle_end_turn_threshold_ms: int = 90000 # 90s (end_turn 阶段, 给 LLM 60s 没出牌, 再 30s 试 end_turn)
-var _watchdog_battle_force_lose_threshold_ms: int = 120000 # 120s (真不行了才 force-lose)
-var _watchdog_post_battle_threshold_ms: int = 30000   # 30s（reward/event/rest）
+var _watchdog_map_threshold_ms: int = 300000         # 300s (2026-08-08: 180s→300s, minimax 极简 prompt 实际 <60s, 5x buffer)
+var _watchdog_battle_threshold_ms: int = 300000      # 300s (2026-08-08: 180s→300s, 极简 prompt 让 minimax 更快)
+var _watchdog_battle_end_turn_threshold_ms: int = 300000 # 300s (end_turn 阶段, 5x buffer)
+var _watchdog_battle_force_lose_threshold_ms: int = 360000 # 360s (force_lose 兜底, 比 end_turn 再加 60s)
+var _watchdog_post_battle_threshold_ms: int = 90000   # 90s (2026-08-08: 60s→90s, reward/event/rest 决策也慢)
 var _watchdog_check_interval_s: float = 5.0
 var _watchdog_char_select_entered_at_ms: int = 0
 var _watchdog_main_menu_entered_at_ms: int = 0

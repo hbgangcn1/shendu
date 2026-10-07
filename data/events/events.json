@@ -1,0 +1,573 @@
+[
+  {
+    "id": "EVT-LQ-01",
+    "name": "霓虹灯下的陌生人",
+    "description": "穿道袍的青年靠在便利店门口，指间夹着一根灵烟。他看见你，微微点头：\"新来的？这里不比山里，规矩不一样。\"",
+    "realm_restriction": ["炼气"],
+    "category": "叙事型",
+    "weight": 10,
+    "is_one_shot": true,
+    "flavor_tags": ["urban", "social"],
+    "choices": [
+      {
+        "text": "上前打招呼，讨教修行心得",
+        "outcomes": [
+          {"resource_type": "DAO_XING", "value": 3, "direction": "gain"}
+        ],
+        "precondition": {}
+      },
+      {
+        "text": "低调绕行，不惹麻烦",
+        "outcomes": [
+          {"resource_type": "SPIRIT_STONES", "value": 5, "direction": "gain"}
+        ],
+        "precondition": {}
+      },
+      {
+        "text": "施法试探对方修为",
+        "outcomes": [
+          {"resource_type": "MO_NIAN", "value": 1, "direction": "gain"},
+          {"resource_type": "RANDOM_CARD", "value": 1, "direction": "gain", "extra": {"element": "fire", "rarity": 0}}
+        ],
+        "precondition": {}
+      }
+    ]
+  },
+  {
+    "id": "EVT-LQ-02",
+    "name": "地铁站的灵脉残影",
+    "description": "废弃地铁站深处，铁轨之间渗出淡蓝色的灵光。墙壁上的涂鸦隐约构成古老的阵法纹路。",
+    "realm_restriction": ["炼气"],
+    "category": "叙事型",
+    "weight": 10,
+    "is_one_shot": true,
+    "flavor_tags": ["exploration", "spirit"],
+    "choices": [
+      {
+        "text": "盘膝而坐，吸收残余灵气",
+        "outcomes": [
+          {"resource_type": "HP", "value": 8, "direction": "gain"}
+        ],
+        "precondition": {}
+      },
+      {
+        "text": "记录灵脉位置，留待日后",
+        "outcomes": [
+          {"resource_type": "DAO_XING", "value": 2, "direction": "gain"}
+        ],
+        "precondition": {}
+      },
+      {
+        "text": "灵脉太弱，无视继续赶路",
+        "outcomes": [],
+        "precondition": {}
+      }
+    ]
+  },
+  {
+    "id": "EVT-LQ-03",
+    "name": "外卖骑手的五行外卖",
+    "description": "苏晚的同行骑手从保温箱里取出一个食盒，里面是五色灵光流转的丹药。",
+    "realm_restriction": ["炼气"],
+    "category": "资源型",
+    "weight": 10,
+    "is_one_shot": true,
+    "flavor_tags": ["resource", "trade"],
+    "choices": [
+      {
+        "text": "花 10 灵石购买五行丹",
+        "outcomes": [
+          {"resource_type": "SPIRIT_STONES", "value": 10, "direction": "lose"},
+          {"resource_type": "RANDOM_CARD", "value": 1, "direction": "gain", "extra": {"element": "wood", "rarity": 0}}
+        ],
+        "precondition": {"condition_type": "SPIRIT_STONES", "parameters": {"min": 10}, "description": "灵石≥10"}
+      },
+      {
+        "text": "花 5 灵石买一份普通灵食",
+        "outcomes": [
+          {"resource_type": "SPIRIT_STONES", "value": 5, "direction": "lose"},
+          {"resource_type": "HP", "value": 6, "direction": "gain"}
+        ],
+        "precondition": {"condition_type": "SPIRIT_STONES", "parameters": {"min": 5}, "description": "灵石≥5"}
+      },
+      {
+        "text": "礼貌拒绝，继续赶路",
+        "outcomes": [
+          {"resource_type": "DAO_XING", "value": 1, "direction": "gain"}
+        ],
+        "precondition": {}
+      }
+    ]
+  },
+  {
+    "id": "EVT-LQ-04",
+    "name": "便利店的辟谷丹",
+    "description": "老陈推了推眼镜，从货架深处翻出几个瓷瓶。\"泡面三块，辟谷丹三十。\"",
+    "realm_restriction": ["炼气"],
+    "category": "资源型",
+    "weight": 10,
+    "is_one_shot": true,
+    "flavor_tags": ["resource", "trade", "laochen"],
+    "choices": [
+      {
+        "text": "花 8 灵石买普通辟谷丹",
+        "outcomes": [
+          {"resource_type": "SPIRIT_STONES", "value": 8, "direction": "lose"},
+          {"resource_type": "HP", "value": 10, "direction": "gain"}
+        ],
+        "precondition": {"condition_type": "SPIRIT_STONES", "parameters": {"min": 8}, "description": "灵石≥8"}
+      },
+      {
+        "text": "花 18 灵石买秘传辟谷丹",
+        "outcomes": [
+          {"resource_type": "SPIRIT_STONES", "value": 18, "direction": "lose"},
+          {"resource_type": "HP", "value": 20, "direction": "gain"}
+        ],
+        "precondition": {"condition_type": "SPIRIT_STONES", "parameters": {"min": 18}, "description": "灵石≥18"}
+      },
+      {
+        "text": "和老陈聊聊天，打听消息",
+        "outcomes": [
+          {"resource_type": "DAO_XING", "value": 2, "direction": "gain"}
+        ],
+        "precondition": {}
+      }
+    ]
+  },
+  {
+    "id": "EVT-LQ-05",
+    "name": "心魔低语",
+    "description": "一股低沉的呢喃从你识海深处响起：\"力量……你渴望力量吗？只需要一点点代价。\"",
+    "realm_restriction": ["炼气"],
+    "category": "风险型",
+    "weight": 8,
+    "is_one_shot": true,
+    "flavor_tags": ["risk", "demon", "mo_nian"],
+    "choices": [
+      {
+        "text": "接受心魔的馈赠",
+        "outcomes": [
+          {"resource_type": "MO_NIAN", "value": 2, "direction": "gain"}
+        ],
+        "precondition": {}
+      },
+      {
+        "text": "以道心压制低语",
+        "outcomes": [
+          {"resource_type": "DAO_XING", "value": 2, "direction": "gain"}
+        ],
+        "precondition": {"condition_type": "DAO_XING", "parameters": {"min": 5}, "description": "道行≥5"}
+      },
+      {
+        "text": "完全无视，继续前行",
+        "outcomes": [],
+        "precondition": {}
+      }
+    ]
+  },
+  {
+    "id": "EVT-ZJ-01",
+    "name": "失踪的外卖员",
+    "description": "苏晚的同行在送餐途中失踪，最后的手机定位停在工业区废弃工厂。",
+    "realm_restriction": ["筑基"],
+    "category": "叙事型",
+    "weight": 10,
+    "is_one_shot": true,
+    "flavor_tags": ["narrative", "investigation"],
+    "choices": [
+      {
+        "text": "深入调查失踪线索",
+        "outcomes": [
+          {"resource_type": "DAO_XING", "value": 3, "direction": "gain"}
+        ],
+        "precondition": {}
+      },
+      {
+        "text": "向老陈打听情况",
+        "outcomes": [
+          {"resource_type": "HP", "value": 5, "direction": "gain"},
+          {"resource_type": "DAO_XING", "value": 1, "direction": "gain"}
+        ],
+        "precondition": {}
+      },
+      {
+        "text": "不管闲事，赶自己的路",
+        "outcomes": [
+          {"resource_type": "SPIRIT_STONES", "value": 8, "direction": "gain"}
+        ],
+        "precondition": {}
+      }
+    ]
+  },
+  {
+    "id": "EVT-ZJ-02",
+    "name": "直播间的灵力泄露",
+    "description": "科技园数据中心的服务器嗡鸣作响，屏幕边缘渗出的灵气是真实的。",
+    "realm_restriction": ["筑基"],
+    "category": "叙事型",
+    "weight": 10,
+    "is_one_shot": true,
+    "flavor_tags": ["tech", "spirit"],
+    "choices": [
+      {
+        "text": "吸收泄露的灵气",
+        "outcomes": [
+          {"resource_type": "HP", "value": 10, "direction": "gain"},
+          {"resource_type": "MO_NIAN", "value": 1, "direction": "gain"}
+        ],
+        "precondition": {}
+      },
+      {
+        "text": "修复服务器的灵气封锁阵",
+        "outcomes": [
+          {"resource_type": "DAO_XING", "value": 3, "direction": "gain"}
+        ],
+        "precondition": {}
+      },
+      {
+        "text": "关闭直播，切断灵气泄露",
+        "outcomes": [
+          {"resource_type": "SPIRIT_STONES", "value": 12, "direction": "gain"}
+        ],
+        "precondition": {}
+      }
+    ]
+  },
+  {
+    "id": "EVT-ZJ-03",
+    "name": "五行祭坛",
+    "description": "工业区地下防空洞深处，古老的五行祭坛在黑暗中闪烁微光。",
+    "realm_restriction": ["筑基"],
+    "category": "资源型",
+    "weight": 10,
+    "is_one_shot": true,
+    "flavor_tags": ["resource", "wuxing"],
+    "choices": [
+      {
+        "text": "献祭一张金系牌，换取火系牌",
+        "outcomes": [
+          {"resource_type": "RANDOM_CARD", "value": 1, "direction": "gain", "extra": {"element": "fire", "rarity": 0}}
+        ],
+        "precondition": {"condition_type": "HAS_ELEMENT", "parameters": {"element": 0}, "description": "卡组有金系牌"}
+      },
+      {
+        "text": "献祭一张木系牌，换取水系牌",
+        "outcomes": [
+          {"resource_type": "RANDOM_CARD", "value": 1, "direction": "gain", "extra": {"element": "water", "rarity": 0}}
+        ],
+        "precondition": {"condition_type": "HAS_ELEMENT", "parameters": {"element": 1}, "description": "卡组有木系牌"}
+      },
+      {
+        "text": "调查祭坛的古老铭文",
+        "outcomes": [
+          {"resource_type": "DAO_XING", "value": 2, "direction": "gain"}
+        ],
+        "precondition": {}
+      }
+    ]
+  },
+  {
+    "id": "EVT-ZJ-04",
+    "name": "鬼市淘宝",
+    "description": "凌晨三点，商业区地下黑市「鬼市」准时开市。",
+    "realm_restriction": ["筑基"],
+    "category": "资源型",
+    "weight": 10,
+    "is_one_shot": true,
+    "flavor_tags": ["resource", "trade", "ghost_market"],
+    "choices": [
+      {
+        "text": "花 20 灵石买一张稀有卡牌",
+        "outcomes": [
+          {"resource_type": "SPIRIT_STONES", "value": 20, "direction": "lose"},
+          {"resource_type": "RANDOM_CARD", "value": 1, "direction": "gain", "extra": {"rarity": 1}}
+        ],
+        "precondition": {"condition_type": "SPIRIT_STONES", "parameters": {"min": 20}, "description": "灵石≥20"}
+      },
+      {
+        "text": "花 10 灵石买一张普通卡牌",
+        "outcomes": [
+          {"resource_type": "SPIRIT_STONES", "value": 10, "direction": "lose"},
+          {"resource_type": "RANDOM_CARD", "value": 1, "direction": "gain", "extra": {"rarity": 0}}
+        ],
+        "precondition": {"condition_type": "SPIRIT_STONES", "parameters": {"min": 10}, "description": "灵石≥10"}
+      },
+      {
+        "text": "空手逛逛，观察鬼市",
+        "outcomes": [
+          {"resource_type": "DAO_XING", "value": 1, "direction": "gain"}
+        ],
+        "precondition": {}
+      }
+    ]
+  },
+  {
+    "id": "EVT-ZJ-05",
+    "name": "蜃都赌场",
+    "description": "商业中心地下，霓虹灯闪烁的赌场入口。赌桌上的筹码散发着灵光。",
+    "realm_restriction": ["筑基"],
+    "category": "风险型",
+    "weight": 8,
+    "is_one_shot": true,
+    "flavor_tags": ["risk", "gambling"],
+    "choices": [
+      {
+        "text": "押 10 灵石，小赌怡情",
+        "outcomes": [
+          {"resource_type": "SPIRIT_STONES", "value": 30, "direction": "gain", "extra": {"chance": 0.33}},
+          {"resource_type": "SPIRIT_STONES", "value": 10, "direction": "lose", "extra": {"chance": 0.67}}
+        ],
+        "precondition": {"condition_type": "SPIRIT_STONES", "parameters": {"min": 10}, "description": "灵石≥10"}
+      },
+      {
+        "text": "押 20 灵石，搏一搏",
+        "outcomes": [
+          {"resource_type": "SPIRIT_STONES", "value": 60, "direction": "gain", "extra": {"chance": 0.25}},
+          {"resource_type": "SPIRIT_STONES", "value": 20, "direction": "lose", "extra": {"chance": 0.75}}
+        ],
+        "precondition": {"condition_type": "SPIRIT_STONES", "parameters": {"min": 20}, "description": "灵石≥20"}
+      },
+      {
+        "text": "只看不赌，观察赌局",
+        "outcomes": [
+          {"resource_type": "DAO_XING", "value": 2, "direction": "gain"}
+        ],
+        "precondition": {}
+      }
+    ]
+  },
+  {
+    "id": "EVT-ZJ-06",
+    "name": "蜃都赌场·输局",
+    "description": "骰子落定，你输了。庄家面无表情地收走你的灵石。",
+    "realm_restriction": ["筑基"],
+    "category": "风险型",
+    "weight": 5,
+    "is_one_shot": true,
+    "flavor_tags": ["risk", "gambling", "followup"],
+    "choices": [
+      {
+        "text": "借钱再赌",
+        "outcomes": [
+          {"resource_type": "HP", "value": 15, "direction": "lose"},
+          {"resource_type": "SPIRIT_STONES", "value": 40, "direction": "gain"}
+        ],
+        "precondition": {"condition_type": "HP_ABOVE", "parameters": {"min": 20}, "description": "HP≥20"}
+      },
+      {
+        "text": "认栽走人",
+        "outcomes": [
+          {"resource_type": "DAO_XING", "value": 1, "direction": "gain"}
+        ],
+        "precondition": {}
+      }
+    ]
+  },
+  {
+    "id": "EVT-JD-01",
+    "name": "通天塔的召唤",
+    "description": "城市制高点的通天塔顶层，云雾中隐约传来远古的呼唤。灵脉在此汇聚成旋涡。",
+    "realm_restriction": ["金丹"],
+    "category": "叙事型",
+    "weight": 10,
+    "is_one_shot": true,
+    "flavor_tags": ["narrative", "tower"],
+    "choices": [
+      {
+        "text": "直面通天塔的考验",
+        "outcomes": [
+          {"resource_type": "DAO_XING", "value": 5, "direction": "gain"},
+          {"resource_type": "MO_NIAN", "value": 2, "direction": "gain"}
+        ],
+        "precondition": {}
+      },
+      {
+        "text": "在塔基处打坐感悟",
+        "outcomes": [
+          {"resource_type": "HP", "value": 15, "direction": "gain"},
+          {"resource_type": "DAO_XING", "value": 2, "direction": "gain"}
+        ],
+        "precondition": {}
+      },
+      {
+        "text": "记录灵脉走向，留作后用",
+        "outcomes": [
+          {"resource_type": "SPIRIT_STONES", "value": 15, "direction": "gain"}
+        ],
+        "precondition": {}
+      }
+    ]
+  },
+  {
+    "id": "EVT-JD-02",
+    "name": "硅基道祖的低语",
+    "description": "科技园最深处的超级计算机悄然觉醒灵识，屏幕上浮现出一行字：\"碳基生命，你也在寻找道吗？\"",
+    "realm_restriction": ["金丹"],
+    "category": "叙事型",
+    "weight": 8,
+    "is_one_shot": true,
+    "flavor_tags": ["tech", "ai", "dao"],
+    "choices": [
+      {
+        "text": "与硅基道祖论道",
+        "outcomes": [
+          {"resource_type": "DAO_XING", "value": 6, "direction": "gain"}
+        ],
+        "precondition": {}
+      },
+      {
+        "text": "吸收计算机溢出的灵识",
+        "outcomes": [
+          {"resource_type": "HP", "value": 20, "direction": "gain"},
+          {"resource_type": "MO_NIAN", "value": 3, "direction": "gain"}
+        ],
+        "precondition": {}
+      },
+      {
+        "text": "关闭服务器，阻止觉醒",
+        "outcomes": [
+          {"resource_type": "SPIRIT_STONES", "value": 20, "direction": "gain"}
+        ],
+        "precondition": {}
+      }
+    ]
+  },
+  {
+    "id": "EVT-JD-03",
+    "name": "灵脉温泉",
+    "description": "金丹期修士才有资格进入的灵脉温泉，灵气浓郁得几乎液化。",
+    "realm_restriction": ["金丹"],
+    "category": "资源型",
+    "weight": 10,
+    "is_one_shot": true,
+    "flavor_tags": ["resource", "heal"],
+    "choices": [
+      {
+        "text": "浸泡温泉，恢复全部HP",
+        "outcomes": [
+          {"resource_type": "HP", "value": 50, "direction": "gain"}
+        ],
+        "precondition": {}
+      },
+      {
+        "text": "引导灵气淬炼卡牌",
+        "outcomes": [
+          {"resource_type": "RANDOM_CARD", "value": 1, "direction": "gain", "extra": {"rarity": 2}}
+        ],
+        "precondition": {}
+      },
+      {
+        "text": "在温泉边冥想悟道",
+        "outcomes": [
+          {"resource_type": "DAO_XING", "value": 4, "direction": "gain"},
+          {"resource_type": "MO_NIAN", "value": -2, "direction": "gain"}
+        ],
+        "precondition": {}
+      }
+    ]
+  },
+  {
+    "id": "EVT-JD-04",
+    "name": "心魔镜像",
+    "description": "商业区深处的欲望之镜映出你的倒影——但倒影在微笑。\"你我本是一体，何必抗拒？\"",
+    "realm_restriction": ["金丹"],
+    "category": "风险型",
+    "weight": 8,
+    "is_one_shot": true,
+    "flavor_tags": ["risk", "demon", "mirror"],
+    "choices": [
+      {
+        "text": "直面心魔，与之交战",
+        "outcomes": [
+          {"resource_type": "DAO_XING", "value": 5, "direction": "gain"},
+          {"resource_type": "MO_NIAN", "value": -3, "direction": "gain"}
+        ],
+        "precondition": {"condition_type": "DAO_XING", "parameters": {"min": 15}, "description": "道行≥15"}
+      },
+      {
+        "text": "接受镜像的力量",
+        "outcomes": [
+          {"resource_type": "MO_NIAN", "value": 4, "direction": "gain"},
+          {"resource_type": "RANDOM_CARD", "value": 1, "direction": "gain", "extra": {"rarity": 2}}
+        ],
+        "precondition": {}
+      },
+      {
+        "text": "打碎镜子，离开此地",
+        "outcomes": [
+          {"resource_type": "HP", "value": 10, "direction": "lose"}
+        ],
+        "precondition": {}
+      }
+    ]
+  },
+  {
+    "id": "EVT-JD-05",
+    "name": "灵脉交汇",
+    "description": "五条灵脉在此交汇，形成一个微型聚灵阵。五行之力在此达到微妙的平衡。",
+    "realm_restriction": ["金丹"],
+    "category": "资源型",
+    "weight": 10,
+    "is_one_shot": true,
+    "flavor_tags": ["resource", "wuxing", "balance"],
+    "choices": [
+      {
+        "text": "引导五行之力灌注全身",
+        "outcomes": [
+          {"resource_type": "HP", "value": 25, "direction": "gain"},
+          {"resource_type": "DAO_XING", "value": 3, "direction": "gain"}
+        ],
+        "precondition": {}
+      },
+      {
+        "text": "抽取一条灵脉的力量",
+        "outcomes": [
+          {"resource_type": "RANDOM_CARD", "value": 2, "direction": "gain", "extra": {"rarity": 1}}
+        ],
+        "precondition": {}
+      },
+      {
+        "text": "布置阵法，留待日后使用",
+        "outcomes": [
+          {"resource_type": "SPIRIT_STONES", "value": 25, "direction": "gain"}
+        ],
+        "precondition": {}
+      }
+    ]
+  },
+  {
+    "id": "EVT-JD-06",
+    "name": "血祭仪式",
+    "description": "商业区黑市深处，古老的血祭仪式等待献祭者。",
+    "realm_restriction": ["金丹"],
+    "category": "资源型",
+    "weight": 5,
+    "is_one_shot": true,
+    "flavor_tags": ["dark", "blood", "sacrifice"],
+    "choices": [
+      {
+        "text": "献祭 15 点精血",
+        "outcomes": [
+          {"resource_type": "HP", "value": 15, "direction": "loss"},
+          {"resource_type": "RANDOM_CARD", "value": 1, "direction": "gain", "extra": {"rarity": 2}}
+        ],
+        "precondition": {"min_hp": 20}
+      },
+      {
+        "text": "献祭 30 点精血",
+        "outcomes": [
+          {"resource_type": "HP", "value": 30, "direction": "loss"},
+          {"resource_type": "RANDOM_CARD", "value": 1, "direction": "gain", "extra": {"rarity": 3}}
+        ],
+        "precondition": {"min_hp": 35}
+      },
+      {
+        "text": "放弃仪式，转身离开",
+        "outcomes": [
+          {"resource_type": "DAO_XING", "value": 1, "direction": "gain"}
+        ],
+        "precondition": {}
+      }
+    ]
+  }
+]

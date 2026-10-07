@@ -59,15 +59,20 @@ func _clear_file() -> void:
 func _execute(cmd: Dictionary) -> void:
 	# 2026-07-22: input_paused 时跳过 click/key，但保留 change_scene / quit / capture
 	# 2026-08-08: label-based actions (select_node / play_card / confirm_select / select_chenmo / select_suwan) 也允许
+	# 2026-08-12 修复：reward scene actions (pick_reward/skip_reward/take_card/take_relic/skip) 也在放行列表
 	if _input_paused:
 		var action: String = cmd.get("action", "")
-		# 2026-08-12 修复：reward scene actions 也在放行列表（pick_reward/skip_reward/take_card/take_relic/skip），
-		# 不加的话 battle → reward 转换后 _input_paused=true（fade 中设的）会一值 hold 到下一场 battle
-		# 才能 reset，AI Player 在 reward 场景永远卡住。这个 bug 隐藏了2个月。
-		if action in ["change_scene", "quit", "capture", "select_node", "play_card",
+		# 2026-08-12 20:10 修复（card b2347e04）：把 play_card / end_turn 从放行列表移除
+		# 根因：battle victory 后 _disable_battle_input() 触发 _input_paused=true，但 AI Player client
+		# tick interval 7-8s（minimax latency），在这期间持续发 play_card / end_turn（基于 stale state），
+		# BattleManager.process_mode=DISABLED → no-op → AI Player 浪费 21s 才发现 scene 已切到 reward。
+		# 修复：play_card / end_turn 是 battle-only action，pause 期间一定是 stale → 拒。
+		# 例外：reward 场景的 actions (pick_reward / skip_reward / take_card / take_relic / skip) 必须放行，
+		# 否则 _input_paused 会 hold 到下一场 battle 才 reset，AI Player 在 reward 卡死（隐藏 2 月的 bug）。
+		if action in ["change_scene", "quit", "capture", "select_node",
 				"confirm_select", "select_chenmo", "select_suwan",
 				"pick_reward", "skip_reward", "take_card", "take_relic", "skip",
-				"confirm_node", "end_turn"]:
+				"confirm_node"]:
 			pass  # 允许
 		else:
 			print("AgentSocket: paused, skip action=%s" % action)

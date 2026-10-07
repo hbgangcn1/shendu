@@ -1,0 +1,32 @@
+contract_version: 1
+revision: 1
+goal: "Boss HP 满血时 HP 条变红色（#C53030），半血时橙色（#E25822），低血时黄色闪烁"
+scope:
+  in_scope:
+    - "修改 scripts/ui/boss_hp_bar.gd 颜色映射逻辑"
+    - "添加 HP 阈值常量到 scripts/constants/battle_constants.gd"
+    - "新增 HP < 30% 时黄色闪烁动画"
+  out_of_scope:
+    - "不改 player HP 条"
+    - "不重做战斗 UI 布局"
+    - "不增加新场景或 Prefab"
+hard_gates_required:
+  - gate_2_gdscript_clean
+  - gate_3_entry_scene_valid
+  - gate_5_no_placeholders
+  - gate_8_real_preview_evidence
+evidence_required:
+  - type: screenshot
+    path: "memory/screenshots/boss_hp_full_r1.png"
+  - type: lint_output
+    path: "scripts/Lint-ShenduGDScript.ps1 output"
+  - type: godot_log
+    path: "shendu/qa-logs/battle-r1.log"
+acceptance_criteria:
+  functional:
+    - "HP >= 70% 时 HP 条 #C53030 红色"
+    - "30% < HP < 70% 时 HP 条 #E25822 橙色"
+    - "HP <= 30% 时 HP 条 #FFB347 黄色 + 1Hz 闪烁"
+priority: normal
+labels: [ui, battle, boss]
+freshness_hours: 24

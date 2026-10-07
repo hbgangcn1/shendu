@@ -85,14 +85,18 @@ func _capture() -> void:
 	#   修复：非 headless 模式下，先 await process_frame 让 viewport 渲染，然后强制 get_image()，失败才写 placeholder + warning
 	var img: Image = null
 	if _is_headless_mode():
-		# headless 模式：先尝试真实捕获 viewport texture
+		# headless 模式：尝试真实捕获 viewport texture
+		# 2026-08-08 architectural reality: Godot 4.7 --headless 强制 dummy renderer，
+		# texture_2d_get 内部 handle 永远 null → get_image() 必返回 null
+		# force_draw() / frame_post_draw 在 dummy 下都是 no-op，无法绕过
+		# 唯一可行路径：把 scene + UI 信息写进 state.json（不再依赖视觉）
 		var texture := get_viewport().get_texture()
 		if texture:
 			img = texture.get_image()
 		if img:
 			print("ViewportCapture: headless → captured real viewport (%dx%d)" % [img.get_width(), img.get_height()])
 		else:
-			print("ViewportCapture: headless → get_image() returned null, fallback to black fallback image")
+			print("ViewportCapture: headless → dummy renderer returns null, fallback to black placeholder")
 	else:
 		# 非 headless（2026-07-31）：Godot 4.7 GUI 模式 viewport texture 可用 — 必须拿真实画面给 minimax
 		# 7/31 验证：5:36 force-run non-headless session 后，agent_state.json viewport=1920x1218 但

@@ -36,3 +36,24 @@ Thumbs.db
 .verify_markers/
 .gdlint.cfg
 .vlm_responses/
+
+# Root clutter junk (debug outputs, logs, dash file)
+output.txt
+output2.txt
+output3.txt
+output4.txt
+output5.txt
+output6.txt
+output7.txt
+output8.txt
+output9.txt
+output*.txt
+debug_out.txt
+godot_f5.log
+/-
+
+# QA / review temp (keep on disk, ignore in git)
+qa-logs/
+qa-captures/
+qa-report.json
+review_temp/

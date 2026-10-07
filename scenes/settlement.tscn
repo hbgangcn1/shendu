@@ -1,0 +1,129 @@
+[gd_scene format=3 uid="uid://settle001"]
+
+[ext_resource type="Texture2D" path="res://assets/images/backgrounds/bg_map.png" id="2"]
+[ext_resource type="Script" path="res://scripts/settlement.gd" id="1"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_backdrop"]
+bg_color = Color(0.05, 0.05, 0.1, 0.85)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.3, 0.3, 0.5, 0.6)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+content_margin_left = 30
+content_margin_top = 30
+content_margin_right = 30
+content_margin_bottom = 30
+
+[node name="SettlementScene" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1")
+
+[node name="Background" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+stretch_mode = 6
+expand_mode = 1
+texture = ExtResource("2")
+
+[node name="Backdrop" type="PanelContainer" parent="."]
+theme_override_styles/panel = SubResource("StyleBoxFlat_backdrop")
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -360.0
+offset_top = -280.0
+offset_right = 360.0
+offset_bottom = 280.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBox" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -266.0
+offset_top = -200.0
+offset_right = 266.0
+offset_bottom = 200.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 25
+alignment = 1
+
+[node name="ResultLabel" type="Label" parent="VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 72
+text = "本局结束"
+horizontal_alignment = 1
+
+[node name="ReasonLabel" type="Label" parent="VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = ""
+horizontal_alignment = 1
+
+[node name="RealmLabel" type="Label" parent="VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "境界: 炼气期"
+horizontal_alignment = 1
+
+[node name="DaoxingLabel" type="Label" parent="VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "本局道行: +0"
+horizontal_alignment = 1
+
+[node name="TotalLabel" type="Label" parent="VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "累计道行: 0"
+horizontal_alignment = 1
+
+[node name="Spacer" type="Control" parent="VBox"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+
+[node name="ButtonHBox" type="HBoxContainer" parent="VBox"]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 30
+
+[node name="ReplayButton" type="Button" parent="VBox/ButtonHBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(260, 80)
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "再来一局"
+
+[node name="QuitButton" type="Button" parent="VBox/ButtonHBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(260, 80)
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "退出游戏"

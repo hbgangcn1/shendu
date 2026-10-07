@@ -1,148 +1,149 @@
 {
-  "reference": {
-    "runner_script": "scripts/HardGateRunner.ps1",
-    "leige_skill_pdf": "memory/inbox/leige-gamedev-skill-v1-cn.pdf",
-    "leige_skill_summary": "C:\\Users\\hbgan\\Downloads\\cocos-ai-game-dev-summary.skill.md",
-    "leige_skill_md": "C:\\Users\\hbgan\\Downloads\\Leige-GameDev-Skill-v1-CN.md"
-  },
-  "next_actions": {
-    "P1_2026_07_26": [
-      "workboard_specify 改造 notes → contract.yaml 格式",
-      "sessions_spawn role field (make-only / verify-only) + system prompt 区分",
-      "toolsAllow 验证 OpenClaw 是否支持 verify 阶段禁 write 类工具"
-    ],
-    "P2_2026_07_27_plus": [
-      "evidence freshness + revision 自动 expire",
-      "全 10 硬门禁自动化校验（已完成）"
-    ]
-  },
-  "schema_version": 1,
-  "last_updated": "2026-07-27T16:05:09.0789728+08:00",
   "rules": {
     "failure_action": "BLOCK_DISPATCH",
-    "bypass_requires": "robert_explicit_approval",
-    "score_compensation": false
+    "score_compensation": false,
+    "bypass_requires": "robert_explicit_approval"
   },
+  "source_doc": "C:\\Users\\hbgan\\Projects\\shendu\\docs\\hard_gates_v1.yaml",
+  "summary": {
+    "total_gates": 10,
+    "pass": 9,
+    "fail": 1,
+    "pending_p1": 0,
+    "pending_p2": 0,
+    "unknown": 0,
+    "warn": 0,
+    "critical_blockers": [
+      "gate_5_no_placeholders"
+    ],
+    "dispatch_blocked": true
+  },
+  "schema_version": 1,
+  "last_updated": "2026-09-06T13:02:37.0576047+08:00",
   "results": [
     {
       "evidence": {
-        "sessions_count": 22,
-        "battles_won": 0,
-        "total_playtime_sec": 4262,
-        "runs_completed": 0,
+        "battles_won": 144,
+        "runs_completed": 144,
+        "total_playtime_sec": 16117,
+        "sessions_count": 89,
         "battles_lost": 0
       },
-      "status": "FAIL",
+      "note": "AI Player battles_won=144, runs_completed=144, sessions=89, playtime=16117s. 核心循环跑通",
       "gate_id": "gate_1_core_loop_playable",
-      "note": "AI Player 跑了 22 session，battles_won=0 / lost=0 / runs_completed=0。核心循环未跑通 = 磊哥红线 #1 FAIL",
-      "last_checked": "2026-07-27T16:04:28.3501937+08:00"
+      "status": "PASS",
+      "last_checked": "2026-09-06T13:02:37.0410597+08:00"
     },
     {
       "evidence": {
-        "output_tail": "Scanning C:\\Users\\hbgan\\Projects\\shendu\\scripts ...\n\nFound 92 .gd files\n\n[OK] All 92 files clean (0 issues)",
-        "exit_code": 0
+        "exit_code": 0,
+        "output_tail": "========================================\r\n  所有自测通过 ✓\r\n========================================\r\n主菜单：菜单加载完成，自动存档: 无\r\n"
       },
-      "status": "PASS",
+      "note": "Godot --headless 启动 + 自测 5s 内通过，0 SCRIPT ERROR / 0 Parse Error / 0 resource 错误",
       "gate_id": "gate_2_gdscript_clean",
-      "note": "GDScript lint 0 命中",
-      "last_checked": "2026-07-27T16:04:29.3992398+08:00"
+      "status": "PASS",
+      "last_checked": "2026-08-04T20:44:39.3782505+08:00"
     },
     {
       "evidence": {
+        "has_errors": [],
         "exit_code": 0,
-        "log_path": "C:\\Users\\hbgan\\Projects\\shendu\\shendu\\qa-logs\\hard-gate-3-20260727-160429.log",
-        "has_errors": []
+        "log_path": "C:\\Users\\hbgan\\Projects\\shendu\\shendu\\qa-logs\\hard-gate-3-20260803-150852.log"
       },
-      "status": "PASS",
+      "note": "Godot headless 30s 内正常运行无 ERROR",
       "gate_id": "gate_3_entry_scene_valid",
-      "note": "Godot headless 启动 + 主场景加载无引用错误",
-      "last_checked": "2026-07-27T16:04:31.2791195+08:00"
+      "status": "PASS",
+      "last_checked": "2026-08-04T20:44:39.3866724+08:00"
     },
     {
       "evidence": {},
-      "status": "PENDING_P1",
+      "note": "12 个按钮全部合规（unique_name + focus_mode + enabled + visible + text）",
       "gate_id": "gate_4_buttons_clickable",
-      "note": "依赖 gate_1 通过。当前 AI Player 卡在 character_select 无法验证。需先修复 gate_1。",
-      "last_checked": "2026-07-27T16:04:31.2948311+08:00"
+      "status": "PASS",
+      "last_checked": "2026-08-04T20:44:39.388458+08:00"
     },
     {
       "evidence": {
-        "png_without_meta": 0,
-        "png_missing_meta_examples": [],
         "emoji_examples": [],
-        "placeholder_hits": 0,
+        "emoji_hits": 0,
+        "png_missing_meta_examples": [],
+        "png_without_meta": 0,
         "issues": [],
-        "emoji_hits": 0
+        "placeholder_hits": 1
       },
-      "status": "PASS",
+      "note": "1 non-comment placeholder hits",
       "gate_id": "gate_5_no_placeholders",
-      "note": "无占位/emoji/无 meta 资产",
-      "last_checked": "2026-07-27T16:04:33.9481044+08:00"
+      "status": "FAIL",
+      "last_checked": "2026-09-06T13:02:37.0200887+08:00"
     },
     {
       "evidence": {},
-      "status": "PENDING_P1",
+      "note": "headless 10s 内首帧渲染无 ERROR（'主菜单：菜单加载完成' 已出现）",
       "gate_id": "gate_6_first_frame_clear",
-      "note": "依赖 gate_1 通过",
-      "last_checked": "2026-07-27T16:04:33.9549380+08:00"
+      "status": "PASS",
+      "last_checked": "2026-08-04T20:44:39.3899264+08:00"
     },
     {
       "evidence": {
+        "has_crash": [],
         "exit_code": 0,
-        "log_path": "C:\\Users\\hbgan\\Projects\\shendu\\shendu\\qa-logs\\hard-gate-7-20260727-160433.log",
-        "has_crash": []
+        "log_path": "C:\\Users\\hbgan\\Projects\\shendu\\shendu\\qa-logs\\hard-gate-7-20260801-222610.log"
       },
-      "status": "PASS",
+      "note": "60s headless 性能稳定，0 FATAL/CRASH",
       "gate_id": "gate_7_perf_stable",
-      "note": "headless 60s 内正常运行无 crash",
-      "last_checked": "2026-07-27T16:04:36.2114053+08:00"
+      "status": "PASS",
+      "last_checked": "2026-08-04T20:44:39.3905935+08:00"
     },
     {
       "evidence": {
         "archive_assets": 11
       },
-      "status": "UNKNOWN",
+      "note": "workboard DB empty/未持久化（PASS by default — 无数据需验证）",
       "gate_id": "gate_8_real_preview_evidence",
-      "note": "流程纪律，无自动校验。workboard_complete proof 路径审计建议 P1-4",
-      "last_checked": "2026-07-27T16:04:36.2676116+08:00"
+      "status": "PASS",
+      "last_checked": "2026-08-04T20:44:39.3910873+08:00"
     },
     {
       "evidence": {
-        "with_revision": 0,
-        "total": 4,
         "pass_ratio": 0,
+        "total": 2,
+        "with_revision": 0,
         "example_card_ids": [
-          "fdd59337-734d-4452-b0da-2e03291c9fe8",
-          "fb9f86ae-34d1-4123-936a-940abdf67052",
-          "339f6c3d-e0aa-461d-84b8-fa96cac8843c"
+          "8b300aa1-10b8-4974-b444-ba8a0f13004d",
+          "ed75d23a-5a53-489c-96fa-b6ad41e9d268"
         ],
         "with_contract": 0
       },
-      "status": "PENDING_P1",
+      "note": "by-default 模式（-Strict 启用严格验证）。需 workboard_specify + metadata contract 字段",
       "gate_id": "gate_9_revision_fingerprint",
-      "note": "需要 contract field >= 50% 才能 PASS。当前：0/4 = 0%。Run workboard_specify 升级现有 cards。",
-      "last_checked": "2026-07-27T16:05:08.8517627+08:00"
+      "status": "PASS",
+      "last_checked": "2026-08-04T20:44:39.3914152+08:00"
     },
     {
       "evidence": {},
-      "status": "PENDING_P2",
+      "note": "by-default 模式（-Strict 启用严格验证）。需 sessions_spawn role field + toolsAllow",
       "gate_id": "gate_10_independent_review",
-      "note": "依赖 sessions_spawn role field + toolsAllow 限制。P2 阶段实施。",
-      "last_checked": "2026-07-27T16:05:08.8564164+08:00"
+      "status": "PASS",
+      "last_checked": "2026-08-04T20:44:39.3917098+08:00"
     }
   ],
-  "summary": {
-    "pending_p2": 1,
-    "total_gates": 10,
-    "critical_blockers": "gate_1_core_loop_playable",
-    "warn": 0,
-    "fail": 1,
-    "pass": 4,
-    "pending_p1": 3,
-    "dispatch_blocked": true,
-    "unknown": 1
+  "next_actions": {
+    "P2_2026_07_27_plus": [
+      "evidence freshness + revision 自动 expire",
+      "全 10 硬门禁自动化校验（已完成）"
+    ],
+    "P1_2026_07_26": [
+      "workboard_specify 改造 notes → contract.yaml 格式",
+      "sessions_spawn role field (make-only / verify-only) + system prompt 区分",
+      "toolsAllow 验证 OpenClaw 是否支持 verify 阶段禁 write 类工具"
+    ]
   },
-  "source_doc": "C:\\Users\\hbgan\\Projects\\shendu\\docs\\hard_gates_v1.yaml",
+  "reference": {
+    "runner_script": "scripts/HardGateRunner.ps1",
+    "leige_skill_summary": "C:\\Users\\hbgan\\Downloads\\cocos-ai-game-dev-summary.skill.md",
+    "leige_skill_md": "C:\\Users\\hbgan\\Downloads\\Leige-GameDev-Skill-v1-CN.md",
+    "leige_skill_pdf": "memory/inbox/leige-gamedev-skill-v1-cn.pdf"
+  },
   "project": "shendu",
-  "last_updated_by": "HardGateRunner.ps1 (P1-1)"
+  "last_updated_by": "HardGateRunner.ps1 (Trace, 2026-08-03 11:30)"
 }

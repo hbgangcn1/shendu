@@ -1,0 +1,120 @@
+## BattleManager 集成测试
+## 测试战斗状态机和流程控制
+
+extends Node
+
+const CardDataResource := preload("res://scripts/core/card_data.gd")
+
+func run_all_tests() -> void:
+	print("\n=== BattleManager 测试 ===")
+	test_battle_start()
+	test_turn_flow()
+	test_generation_chain()
+	test_battle_end_conditions()
+	test_signal_management()
+	print("=== BattleManager 测试完成 ===\n")
+
+func test_battle_start() -> void:
+	print("\n--- 测试战斗开始 ---")
+	var battle_manager := BattleManager.new()
+	add_child(battle_manager)
+	
+	var player := Player.new("主角", 80, WuXing.Element.FIRE, 10)
+	var enemies := [Enemy.create_lane_spirit()]
+	
+	battle_manager.start_battle(player, enemies)
+	assert(battle_manager.current_state == BattleStateEnum.PLAYER_TURN, "应进入玩家回合")
+	assert(battle_manager.turn_number == 1, "应为第 1 回合")
+	assert(battle_manager.can_play_card() == true, "应可出牌")
+	
+	battle_manager.queue_free()
+	print("  ✓ 战斗开始正确")
+
+func test_turn_flow() -> void:
+	print("\n--- 测试回合流程 ---")
+	var battle_manager := BattleManager.new()
+	add_child(battle_manager)
+	
+	var player := Player.new("主角", 80, WuXing.Element.FIRE, 10)
+	var enemies := [Enemy.create_lane_spirit()]
+	
+	battle_manager.start_battle(player, enemies)
+	
+	# 玩家回合：抽牌
+	player.draw_cards(5)
+	assert(player.hand.size() == 5, "手牌应为 5 张")
+	
+	# 结束回合
+	battle_manager.player_end_turn()
+	
+	# 应进入敌人回合，然后回合结束，然后下一回合
+	await get_tree().create_timer(0.2).timeout
+	assert(battle_manager.turn_number >= 1, "回合数应增加")
+	
+	battle_manager.queue_free()
+	print("  ✓ 回合流程正确")
+
+func test_generation_chain() -> void:
+	print("\n--- 测试五行相生链 ---")
+	var battle_manager := BattleManager.new()
+	add_child(battle_manager)
+	
+	var player := Player.new("主角", 80, WuXing.Element.FIRE, 10)
+	var enemies := [Enemy.create_lane_spirit()]
+	
+	battle_manager.start_battle(player, enemies)
+	
+	# 手动设置相生链（木生火）
+	battle_manager.last_played_element = WuXing.Element.WOOD
+	
+	# 模拟打出火属性卡牌
+	var card: CardDataResource = CardDataResource.new()
+	card.element = WuXing.Element.FIRE
+	card.damage = 10
+	card.card_name = "测试卡牌"
+	
+	battle_manager._check_generation_chain(card)
+	assert(battle_manager.generation_chain.size() == 2, "相生链应有 2 个元素")
+	
+	battle_manager.queue_free()
+	print("  ✓ 五行相生链正确")
+
+func test_battle_end_conditions() -> void:
+	print("\n--- 测试战斗结束条件 ---")
+	var battle_manager := BattleManager.new()
+	add_child(battle_manager)
+	
+	# 测试玩家死亡
+	var player := Player.new("主角", 1, WuXing.Element.FIRE, 10)
+	var enemies := [Enemy.create_stove_fire()]
+	
+	battle_manager.start_battle(player, enemies)
+	player.take_damage(10, WuXing.Element.FIRE, false)
+	
+	await get_tree().create_timer(0.2).timeout
+	# 玩家已死，战斗应结束
+	assert(not player.is_alive, "玩家应死亡")
+	
+	battle_manager.queue_free()
+	print("  ✓ 战斗结束条件正确")
+
+func test_signal_management() -> void:
+	print("\n--- 测试信号管理 ---")
+	var battle_manager := BattleManager.new()
+	add_child(battle_manager)
+	
+	var player := Player.new("主角", 80, WuXing.Element.FIRE, 10)
+	var enemies := [Enemy.create_lane_spirit()]
+	
+	battle_manager.start_battle(player, enemies)
+	
+	# 验证信号已连接
+	assert(player.died.is_connected(battle_manager._on_player_died), "玩家死亡信号应已连接")
+	assert(enemies[0].died.is_connected(battle_manager._on_enemy_died), "敌人死亡信号应已连接")
+	
+	# 清理时断开信号
+	battle_manager.queue_free()
+	
+	# 验证信号已断开
+	# 注意：由于节点已被释放，不能访问 is_connected
+	print("  ✓ 信号管理正确")

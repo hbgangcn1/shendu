@@ -56,17 +56,23 @@ func _ready() -> void:
 	call_deferred("_deferred_setup_styling")
 
 	# 连接自动选择计时器（场景内定义的 AutoSelectTimer 节点）
-	auto_select_timer.timeout.connect(_on_auto_select_timeout)
-	# 2026-07-25 gate_1 fix A: 缩短 auto-select 时间，AI Player click miss 时能快速恢复
-	# 磊哥 skill v1 借鉴：hard gate #1 要求核心循环可玩通，10s 太长会导致 AI Player 卡在 character_select
-	auto_select_timer.wait_time = 2.0
-	auto_select_timer.one_shot = true
-	auto_select_timer.start()
+	if auto_select_timer != null:
+		auto_select_timer.timeout.connect(_on_auto_select_timeout)
+		# 2026-07-25 gate_1 fix A: 缩短 auto-select 时间，AI Player click miss 时能快速恢复
+		# 磊哥 skill v1 借鉴：hard gate #1 要求核心循环可玩通，10s 太长会导致 AI Player 卡在 character_select
+		auto_select_timer.wait_time = 2.0
+		auto_select_timer.one_shot = true
+		auto_select_timer.start()
+	else:
+		push_warning("角色选择：@onready auto_select_timer 为 null（场景缺 AutoSelectTimer 节点），跳过")
 
 	# 确认按钮
 	confirm_button.pressed.connect(_confirm_selection)
 
-	_update_focus()
+	# 2026-08-09 fix: 不在这里调 _update_focus()。原因：focus_style / normal_style 要等
+	# _deferred_setup_styling() 才设（@onready 节点依赖）。这里同步调会报
+	# "Required object \"rp_style\" is null" at character_select.gd:168。
+	# 修复：_deferred_setup_styling() 末尾调 _update_focus()。
 
 	# 2026-07-25 gate_1 fix B: 全屏透明 QuickConfirm Button
 	# 背景：AI Player 经常 click 在 ChenmoCard (190-610) / SuwanCard (670-1090) 中间 60px gap
@@ -91,7 +97,10 @@ func _ready() -> void:
 	_failsafe_timer.one_shot = true
 	_failsafe_timer.timeout.connect(_on_failsafe_timeout)
 	add_child(_failsafe_timer)
-	_failsafe_timer.start()
+	# 2026-08-09 fix: null-safe start（之前 add_child 后立刻 start() 在 headless 模式下报
+	# "Unable to start the timer because it's not inside the scene tree"）
+	if _failsafe_timer != null and _failsafe_timer.is_inside_tree():
+		_failsafe_timer.start()
 
 	print("角色选择：场景加载完成（failsafe timer 5s 已启动）")
 
