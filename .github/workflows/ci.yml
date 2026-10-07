@@ -53,6 +53,24 @@ jobs:
           godot --headless --path . -s scripts/test_runner.gd
         timeout-minutes: 5
 
+  vision-batch-static-only:
+    name: Vision batch static checks only (never pixels)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Vision batch static checks only (lint plus probe plus static checks ONLY, never pixels)
+        run: |
+          echo "vision-batch static checks only: never pixels"
+          python -m py_compile tools/vision/batch.py tools/vision/isolate.py tools/vision/test_isolation.py
+          python tools/vision/test_isolation.py
+          python tools/vision/batch.py --dry-run --n 2
+
   build-windows:
     name: Windows Build
     needs: [lint, test]

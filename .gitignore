@@ -58,6 +58,7 @@ godot_f5.log
 qa-logs/
 qa-captures/
 qa-reports/
+qa-clones/
 qa-report.json
 review_temp/
 qa-artifacts/
