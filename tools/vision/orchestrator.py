@@ -35,10 +35,12 @@ import argparse
 import json
 import os
 import sys
+import threading
 import time
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import godot_launch
+import personas
 import vlm_client
 
 PROJECT_DIR = r"C:\Users\hbgan\Projects\shendu"
@@ -141,6 +143,24 @@ def write_input(run_id: str, cmd: dict) -> None:
         json.dump(cmd, f)
     with open(INPUT_FILE, "w", encoding="utf-8") as f:
         json.dump(cmd, f)
+
+
+def saturate_run(run_id: str, stop_evt: "threading.Event",
+               every_s: float = 4.0) -> None:
+    """Background capture traffic while the VLM thinks.
+    A touring QA game saturates its main thread with concurrent 5MP PNG
+    saves; steady capture traffic stretches the tour's switch cadence, so
+    the tick's exposure window usually contains no scene change and the
+    VLM's vote stands as cast (fallback 0). Scratch path only; tick
+    captures and decisions are unaffected. Stopped before gameplay send."""
+    while not stop_evt.wait(every_s):
+        try:
+            write_input(run_id, {"action": "capture",
+                                 "path": ("res://qa-captures/%s/_sat.png"
+                                          % run_id),
+                                 "run_id": run_id, "seq": -1})
+        except OSError:
+            pass
 
 
 def request_capture(run_id: str, seq: int) -> tuple[str, dict]:
@@ -352,7 +372,8 @@ def warmup_capture(run_id: str, timeout_s: float = 90.0) -> str:
 
 
 def run_loop(run_id: str, goal_scene: str, max_ticks: int,
-             godot_bin: str, tick_interval_s: float = 10.0) -> int:
+             godot_bin: str, tick_interval_s: float = 10.0,
+             persona_id: str = "novice") -> int:
     if godot_launch.is_godot_running(godot_bin):
         print("stale Godot found; cleaning before launch", flush=True)
         godot_launch.kill_all_godot(godot_bin)
@@ -361,6 +382,8 @@ def run_loop(run_id: str, goal_scene: str, max_ticks: int,
     except OSError:
         pass
     st: dict = {"relaunches": 0}
+    persona = personas.get_persona(personas.load_library(), persona_id)
+    persona_prompt = personas.render_system_prompt(persona)
     proc, boot_ts = boot_game(run_id, goal_scene, godot_bin, st)
     try:
         prev_sent = False  # previous tick sent gameplay (transition likely)
@@ -437,24 +460,34 @@ def run_loop(run_id: str, goal_scene: str, max_ticks: int,
             vlm_error: Exception | None = None
             chosen = None  # type: ignore[assignment]
             latency_ms, raw = 0, ""
-            for attempt in range(3):
-                try:
+            sat_stop = threading.Event()
+            sat = threading.Thread(target=saturate_run,
+                                   args=(run_id, sat_stop), daemon=True)
+            sat.start()
+            try:
+                for attempt in range(3):
                     try:
-                        chosen, latency_ms, raw = vlm_client.call_m3(
-                            digest, png_abs)
-                    except vlm_client.MalformedReply as bad:
-                        parse_attempts = 2
-                        chosen, latency_ms, raw = vlm_client.reask_once(
-                            digest, png_abs, bad.raw)
-                    vlm_error = None
-                    break
-                except RuntimeError as e:
-                    vlm_error = e
-                    print(f"VLM transport retry seq={seq} "
-                          f"attempt={attempt + 1}: {e}", flush=True)
-                except ValueError as e:
-                    vlm_error = e
-                    break
+                        try:
+                            chosen, latency_ms, raw = vlm_client.call_m3(
+                                digest, png_abs,
+                                persona_system_prompt=persona_prompt)
+                        except vlm_client.MalformedReply as bad:
+                            parse_attempts = 2
+                            chosen, latency_ms, raw = vlm_client.reask_once(
+                                digest, png_abs, bad.raw,
+                                persona_system_prompt=persona_prompt)
+                        vlm_error = None
+                        break
+                    except RuntimeError as e:
+                        vlm_error = e
+                        print(f"VLM transport retry seq={seq} "
+                              f"attempt={attempt + 1}: {e}", flush=True)
+                    except ValueError as e:
+                        vlm_error = e
+                        break
+            finally:
+                sat_stop.set()
+                sat.join(timeout=5.0)
             if vlm_error is not None:
                 e = vlm_error
                 append_decision(run_id, {
@@ -506,6 +539,7 @@ def run_loop(run_id: str, goal_scene: str, max_ticks: int,
                 "fallback_count": fallback_count, "vlm_ok": True,
                 "frame_nonblack": frame_nonblack,
                 "goal_scene": goal_scene,
+                "persona": persona_id,
                 "goal_reached": scene == goal_scene})
             if seq < max_ticks:
                 time.sleep(max(0.0, tick_interval_s - (time.time() - t_tick)))
@@ -525,12 +559,13 @@ def main() -> int:
     ap.add_argument("--max-ticks", type=int, default=3)
     ap.add_argument("--godot", default=godot_launch.GODOT_BIN)
     ap.add_argument("--tick-interval", type=float, default=10.0)
+    ap.add_argument("--persona", default="novice")
     args = ap.parse_args()
     if args.tick_interval < 10.0:
         print("tick interval clamped to 10s minimum", flush=True)
         args.tick_interval = 10.0
     return run_loop(args.run_id, args.goal_scene, args.max_ticks,
-                    args.godot, args.tick_interval)
+                    args.godot, args.tick_interval, args.persona)
 
 
 if __name__ == "__main__":

@@ -15,6 +15,9 @@ import urllib.request
 
 BASE_URL = "https://api.minimaxi.com/v1/chat/completions"
 MODEL = "MiniMax-M3.1-Flash-Preview"
+# 2026-10-07 correction: the earlier Flash read-timeouts were endpoint throttling
+# under call bursts (singles succeed: Flash 5.1s, M3 12.9s), NOT Preview degradation.
+# Keep M3 as fallback; pace bulk calls >= 60s apart (see probe_throttle lesson).
 FALLBACK_MODEL = "MiniMax-M3"
 MAX_W = 1280
 
@@ -55,7 +58,9 @@ PERSONA = (
 )
 
 
-def system_prompt() -> str:
+def system_prompt(persona_system_prompt: str | None = None) -> str:
+    if persona_system_prompt and persona_system_prompt.strip():
+        return persona_system_prompt.strip() + "\n" + ACTION_GRAMMAR + "\n" + PERSONA
     return ACTION_GRAMMAR + "\n" + PERSONA
 
 
@@ -78,7 +83,8 @@ class MalformedReply(ValueError):
         self.raw = raw
 
 
-def call_m3(digest_text: str, frame_png_path: str, timeout_s: float = 90.0) -> tuple[dict, int, str]:
+def call_m3(digest_text: str, frame_png_path: str, timeout_s: float = 90.0,
+            persona_system_prompt: str | None = None) -> tuple[dict, int, str]:
     """Call MiniMax-M3. Returns (parsed_json, latency_ms, raw_reply).
 
     Raises RuntimeError on transport failure (caller decides abort/retry).
@@ -91,7 +97,7 @@ def call_m3(digest_text: str, frame_png_path: str, timeout_s: float = 90.0) -> t
     payload = {
         "model": MODEL,
         "messages": [
-            {"role": "system", "content": system_prompt()},
+            {"role": "system", "content": system_prompt(persona_system_prompt)},
             {
                 "role": "user",
                 "content": [
@@ -108,11 +114,21 @@ def call_m3(digest_text: str, frame_png_path: str, timeout_s: float = 90.0) -> t
         headers={"Content-Type": "application/json", "Authorization": f"Bearer {key}"},
         method="POST",
     )
-    try:
-        with urllib.request.urlopen(req, timeout=timeout_s) as resp:
-            body = resp.read().decode("utf-8", "replace")
-    except Exception as e:
-        raise RuntimeError(f"minimax transport failed: {type(e).__name__}: {e}")
+    # 2026-10-07: endpoint throttles bursts (singles pass, rapid calls hang).
+    # One patient retry after 60s beats instant failure for batch loops.
+    attempts = 2
+    while True:
+        try:
+            with urllib.request.urlopen(req, timeout=timeout_s) as resp:
+                body = resp.read().decode("utf-8", "replace")
+            break
+        except TimeoutError:
+            attempts -= 1
+            if attempts <= 0:
+                raise RuntimeError("minimax transport failed: TimeoutError (after 1 retry)")
+            time.sleep(60)
+        except Exception as e:
+            raise RuntimeError(f"minimax transport failed: {type(e).__name__}: {e}")
     latency_ms = int((time.time() - t0) * 1000)
     try:
         envelope = json.loads(body)
@@ -171,7 +187,8 @@ def _parse_strict(raw: str, model: str) -> dict:
 
 
 def reask_once(digest_text: str, frame_png_path: str, raw_reply: str,
-               timeout_s: float = 90.0) -> tuple[dict, int, str]:
+               timeout_s: float = 90.0,
+               persona_system_prompt: str | None = None) -> tuple[dict, int, str]:
     """Second and final attempt: show the model its raw reply and demand fix."""
     key = os.environ.get("MINIMAX_CN_API_KEY", "")
     if not key:
@@ -186,7 +203,7 @@ def reask_once(digest_text: str, frame_png_path: str, raw_reply: str,
     payload = {
         "model": MODEL,
         "messages": [
-            {"role": "system", "content": system_prompt()},
+            {"role": "system", "content": system_prompt(persona_system_prompt)},
             {
                 "role": "user",
                 "content": [
@@ -217,3 +234,18 @@ def reask_once(digest_text: str, frame_png_path: str, raw_reply: str,
     if not isinstance(raw2, str):
         raw2 = "".join(p.get("text", "") for p in raw2 if isinstance(p, dict))
     return _parse_strict(raw2, MODEL), latency_ms, raw2
+
+
+def decide(digest_text: str, frame_png_path: str, timeout_s: float = 90.0,
+           persona_system_prompt: str | None = None) -> tuple[dict, int, str]:
+    """Single decision with strict JSON, one re-ask, never heuristic.
+
+    persona_system_prompt is prepended before the action grammar in the
+    system message; digest and image handling stay identical.
+    """
+    try:
+        return call_m3(digest_text, frame_png_path, timeout_s,
+                       persona_system_prompt)
+    except MalformedReply as bad:
+        return reask_once(digest_text, frame_png_path, bad.raw, timeout_s,
+                          persona_system_prompt)
