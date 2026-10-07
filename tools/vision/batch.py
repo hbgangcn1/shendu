@@ -72,8 +72,32 @@ def run_batch(batch_id: str, plan: list, timeout_s: float) -> list:
         results.append({"run_id": item["run_id"],
                         "scorecard_path": item["scorecard_path"],
                         "exit_code": rc})
-        _write_scorecard(item)
+        if rc == 0:
+            _write_scorecard(item)
+        else:
+            _retry_serially(item, timeout_s, results)
+    results.sort(key=lambda r: r["run_id"])
     return results
+
+
+def _retry_serially(item: dict, timeout_s: float, results: list) -> None:
+    """Rerun one failed item strictly serially, then score it.
+    2026-10-08: the second concurrent windowed instance intermittently
+    dies on this single-GPU box (rc=1, zero frames); the serial retry
+    never contends for the GPU."""
+    print("retry serially: %s" % item["run_id"], flush=True)
+    p = subprocess.Popen(item["cmd"], cwd=item["clone_dir"])
+    try:
+        rc = p.wait(timeout=timeout_s)
+    except subprocess.TimeoutExpired:
+        p.kill()
+        rc = p.wait()
+    for r in results:
+        if r["run_id"] == item["run_id"]:
+            r["exit_code"] = rc
+            break
+    if rc == 0:
+        _write_scorecard(item)
 
 
 def _write_scorecard(item: dict) -> str:
