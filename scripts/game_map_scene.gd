@@ -75,6 +75,7 @@ var _realm_map: Variant = null
 var _node_ui_map: Dictionary = {}  ## id -> PanelContainer
 var _selected_node: Variant = null
 var _deck_view_open: bool = false  ## 牌组界面是否已打开
+var _deck_button: Button = null  ## 顶栏牌组按钮（容器布局，见 _add_deck_button）
 
 # ==================== 生命周期 ====================
 
@@ -236,6 +237,8 @@ func _update_top_bar() -> void:
 
 	realm_label.text = "境界: %s" % GameState.get_realm_name()
 	hp_label.text = "HP: %d/%d" % [GameState.hp, GameState.max_hp]
+	if _deck_button != null:
+		_deck_button.text = _deck_button_text()
 	spirit_stones_label.text = "灵石: %d" % GameState.spirit_stones
 	dao_xing_label.text = "道行: %d" % GameState.dao_xing
 	_update_hp_color()
@@ -742,15 +745,22 @@ const DeckViewScene := preload("res://scripts/ui/deck_view.gd")
 const ConfirmDialogScene := preload("res://scenes/confirm_dialog.tscn")
 
 func _add_deck_button() -> void:
-	var deck_btn := Button.new()
-	deck_btn.name = "DeckButton"
-	deck_btn.text = "牌组 %d/%d" % [GameState.deck.size(), GameState.deck_max_size]
-	deck_btn.add_theme_font_size_override("font_size", 19)
-	deck_btn.custom_minimum_size = Vector2(160, 48)
-	deck_btn.position = Vector2(1080 - 140, 10)
-	deck_btn.z_index = 100
-	deck_btn.pressed.connect(_on_deck_button_pressed)
-	add_child(deck_btn)
+	# 2026-10-08 fix: 牌组按钮曾用绝对坐标 (1080-140=940) 直接 add 到场景根，
+	# 正好压在居中 TopBarHBox 的标签上，导致“牌组”与“灵石”文字重叠。
+	# 改为挂进 TopBar HBox 容器，由容器布局，任何分辨率都不重叠。
+	_deck_button = Button.new()
+	_deck_button.name = "DeckButton"
+	_deck_button.text = _deck_button_text()
+	_deck_button.add_theme_font_size_override("font_size", 19)
+	_deck_button.custom_minimum_size = Vector2(160, 48)
+	_deck_button.pressed.connect(_on_deck_button_pressed)
+	var top_bar: HBoxContainer = get_node("TopBarPanel/TopBar")
+	top_bar.add_child(_deck_button)
+	top_bar.move_child(_deck_button, 2)  # realm, HP, 牌组, 灵石, 道行
+
+
+func _deck_button_text() -> String:
+	return "牌组 %d/%d" % [GameState.deck.size(), GameState.deck_max_size]
 
 ## 右上角菜单按钮（Robert 反馈 地图无退出入口）
 func _add_menu_button() -> void:
