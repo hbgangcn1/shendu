@@ -11,6 +11,7 @@ import io
 import json
 import os
 import time
+import urllib.error
 import urllib.request
 
 BASE_URL = "https://api.minimaxi.com/v1/chat/completions"
@@ -122,10 +123,10 @@ def call_m3(digest_text: str, frame_png_path: str, timeout_s: float = 90.0,
             with urllib.request.urlopen(req, timeout=timeout_s) as resp:
                 body = resp.read().decode("utf-8", "replace")
             break
-        except TimeoutError:
+        except (TimeoutError, urllib.error.URLError):
             attempts -= 1
             if attempts <= 0:
-                raise RuntimeError("minimax transport failed: TimeoutError (after 1 retry)")
+                raise RuntimeError("minimax transport failed: TimeoutError/URLError (after 1 retry)")
             time.sleep(60)
         except Exception as e:
             raise RuntimeError(f"minimax transport failed: {type(e).__name__}: {e}")
