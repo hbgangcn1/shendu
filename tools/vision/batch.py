@@ -14,6 +14,7 @@ import uuid
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import isolate
+import rubric_scorer
 
 PROJECT_DIR = isolate.PROJECT_DIR
 ORCHESTRATOR = os.path.join(PROJECT_DIR, "tools", "vision", "orchestrator.py")
@@ -71,7 +72,26 @@ def run_batch(batch_id: str, plan: list, timeout_s: float) -> list:
         results.append({"run_id": item["run_id"],
                         "scorecard_path": item["scorecard_path"],
                         "exit_code": rc})
+        _write_scorecard(item)
     return results
+
+
+def _write_scorecard(item: dict) -> str:
+    """Deterministic offline scoring over the run's decision frames.
+    No model calls: safe under endpoint throttling."""
+    paths = isolate.paths_for(item["run_id"])
+    frames = sorted(f for f in os.listdir(paths["captures_dir"])
+                    if f.startswith("frame_") and f.endswith(".png"))
+    scored = [rubric_scorer.score_frame(
+        os.path.join(paths["captures_dir"], f), None) for f in frames]
+    crit = [c for fr in scored for c in fr["results"] if c["critical"]]
+    verdict = bool(crit) and all(c["pass"] for c in crit)
+    card = {"run_id": item["run_id"], "frames": scored,
+            "verdict": verdict}
+    os.makedirs(os.path.dirname(item["scorecard_path"]), exist_ok=True)
+    with open(item["scorecard_path"], "w", encoding="utf-8") as f:
+        json.dump(card, f, indent=2)
+    return item["scorecard_path"]
 
 
 def write_report(batch_id: str, results: list) -> str:

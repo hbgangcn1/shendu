@@ -40,11 +40,21 @@ import time
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import godot_launch
+import isolate
 import personas
 import vlm_client
 
 PROJECT_DIR = r"C:\Users\hbgan\Projects\shendu"
-INPUT_FILE = os.path.join(PROJECT_DIR, ".agent_input.json")
+
+
+def proj_root(run_id: str) -> str:
+    """Clone dir when this run was isolated, else the main project."""
+    c = isolate.clone_dir(run_id)
+    return c if os.path.isdir(c) else PROJECT_DIR
+
+
+def legacy_input_file(run_id: str) -> str:
+    return os.path.join(proj_root(run_id), ".agent_input.json")
 MIN_PNG_BYTES = 1024
 CAPTURE_TIMEOUT_S = 30.0
 GAMEPLAY_ACTIONS = frozenset({
@@ -61,7 +71,7 @@ def user_artifacts_dir(run_id: str) -> str:
 
 
 def local_artifacts_dir(run_id: str) -> str:
-    d = os.path.join(PROJECT_DIR, "qa-artifacts", run_id)
+    d = os.path.join(proj_root(run_id), "qa-artifacts", run_id)
     os.makedirs(d, exist_ok=True)
     return d
 
@@ -71,7 +81,7 @@ def state_file(run_id: str) -> str:
     The canonical res://.agent_state.json is default-run only; a
     --run-id game writes .agent_state.<R>.json, so freshness and reads
     must target the namespaced file."""
-    return os.path.join(PROJECT_DIR, f".agent_state.{run_id}.json")
+    return os.path.join(proj_root(run_id), f".agent_state.{run_id}.json")
 
 
 def read_state_snapshot(run_id: str) -> dict:
@@ -138,10 +148,12 @@ def capture_only_reason(state_then: dict, state_now: dict) -> str:
 
 def write_input(run_id: str, cmd: dict) -> None:
     """Write .agent_input.<R>.json and mirror to the canonical socket file."""
-    with open(os.path.join(PROJECT_DIR, f".agent_input.{run_id}.json"),
+    root = proj_root(run_id)
+    with open(os.path.join(root, f".agent_input.{run_id}.json"),
               "w", encoding="utf-8") as f:
         json.dump(cmd, f)
-    with open(INPUT_FILE, "w", encoding="utf-8") as f:
+    with open(os.path.join(root, ".agent_input.json"),
+              "w", encoding="utf-8") as f:
         json.dump(cmd, f)
 
 
@@ -165,8 +177,8 @@ def saturate_run(run_id: str, stop_evt: "threading.Event",
 
 def request_capture(run_id: str, seq: int) -> tuple[str, dict]:
     rel = f"qa-captures/{run_id}/frame_{seq}.png"
-    os.makedirs(os.path.join(PROJECT_DIR, "qa-captures", run_id), exist_ok=True)
-    png_abs = os.path.join(PROJECT_DIR, rel)
+    os.makedirs(os.path.join(proj_root(run_id), "qa-captures", run_id), exist_ok=True)
+    png_abs = os.path.join(proj_root(run_id), rel)
     for stale in (png_abs, png_abs + ".black"):
         try:
             os.remove(stale)
@@ -324,7 +336,8 @@ def boot_game(run_id: str, goal_scene: str, godot_bin: str, st: dict):
     godot_launch.kill_all_godot(godot_bin)
     boot_ts = time.time()
     proc = godot_launch.launch_windowed(run_id, godot_bin,
-                                         goal_scene=goal_scene)
+                                         goal_scene=goal_scene,
+                                         project_dir=proj_root(run_id))
     wait_fresh_state(boot_ts, run_id)
     warmup_capture(run_id)
     return proc, boot_ts
@@ -347,7 +360,7 @@ def warmup_capture(run_id: str, timeout_s: float = 90.0) -> str:
     """Pre-tick readiness probe (NOT a tick): send capture to a warmup path
     and poll generously until AgentSocket proves alive. Raises on timeout."""
     rel = f"qa-captures/{run_id}/warmup.png"
-    png_abs = os.path.join(PROJECT_DIR, rel)
+    png_abs = os.path.join(proj_root(run_id), rel)
     for stale in (png_abs, png_abs + ".black"):
         try:
             os.remove(stale)
@@ -378,7 +391,7 @@ def run_loop(run_id: str, goal_scene: str, max_ticks: int,
         print("stale Godot found; cleaning before launch", flush=True)
         godot_launch.kill_all_godot(godot_bin)
     try:
-        os.remove(INPUT_FILE)
+        os.remove(legacy_input_file(run_id))
     except OSError:
         pass
     st: dict = {"relaunches": 0}
@@ -545,9 +558,10 @@ def run_loop(run_id: str, goal_scene: str, max_ticks: int,
                 time.sleep(max(0.0, tick_interval_s - (time.time() - t_tick)))
         return 0
     finally:
-        godot_launch.request_quit(proc, run_id)
+        godot_launch.request_quit(proc, run_id,
+                                  project_dir=proj_root(run_id))
         try:
-            os.remove(INPUT_FILE)
+            os.remove(legacy_input_file(run_id))
         except OSError:
             pass
 

@@ -17,11 +17,13 @@ GODOT_BIN = r"C:\Tools\Godot\Godot_v4.7-stable_win64.exe"
 
 def launch_windowed(run_id: str, godot_bin: str = GODOT_BIN,
                     boot_wait_s: float = 10.0, goal_scene: str = "",
-                    extra_args: list[str] | None = None) -> subprocess.Popen:
+                    extra_args: list[str] | None = None,
+                    project_dir: str | None = None) -> subprocess.Popen:
     """Launch the game windowed as a normal boot (NO -s). Returns Popen.
 
     Godot stdout/stderr go to tools/vision/godot_boot.log for diagnosis."""
-    args = [godot_bin, "--path", PROJECT_DIR]
+    root = project_dir or PROJECT_DIR
+    args = [godot_bin, "--path", root]
     if extra_args:
         args += list(extra_args)
     args += ["--", "--qa-auto-run", f"--run-id={run_id}",
@@ -30,9 +32,9 @@ def launch_windowed(run_id: str, godot_bin: str = GODOT_BIN,
         args += [f"--goal-scene={goal_scene}"]
     print(f"launch: {' '.join(args)}", flush=True)
     log_path = os.path.join(PROJECT_DIR, "tools", "vision",
-                            "godot_boot.log")
+                            f"godot_boot.{run_id}.log")
     log_fh = open(log_path, "w", encoding="utf-8", errors="replace")
-    proc = subprocess.Popen(args, cwd=PROJECT_DIR,
+    proc = subprocess.Popen(args, cwd=root,
                             stdout=log_fh, stderr=subprocess.STDOUT)
     proc._qa_log_fh = log_fh  # kept open for the game lifetime
     time.sleep(boot_wait_s)
@@ -42,20 +44,22 @@ def launch_windowed(run_id: str, godot_bin: str = GODOT_BIN,
 
 
 def request_quit(proc: subprocess.Popen | None = None,
-               run_id: str = "") -> None:
+               run_id: str = "",
+               project_dir: str | None = None) -> None:
     """Ask a polite quit via the socket file, then kill; never orphan.
     Quit goes to the run-namespaced input (what AgentSocket polls) plus
     the canonical mirror."""
+    root = project_dir or PROJECT_DIR
     if run_id:
         try:
             with open(os.path.join(
-                    PROJECT_DIR, f".agent_input.{run_id}.json"),
+                    root, f".agent_input.{run_id}.json"),
                     "w", encoding="utf-8") as f:
                 f.write('{"action":"quit"}')
         except OSError:
             pass
     try:
-        with open(os.path.join(PROJECT_DIR, ".agent_input.json"), "w", encoding="utf-8") as f:
+        with open(os.path.join(root, ".agent_input.json"), "w", encoding="utf-8") as f:
             f.write('{"action":"quit"}')
         time.sleep(1.5)
     except OSError:
