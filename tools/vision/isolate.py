@@ -58,6 +58,9 @@ def _ignore(src: str, names: list) -> set:
     return out
 
 
+GODOT_BIN = os.environ.get("GODOT_BIN", r"C:\Tools\Godot\Godot_v4.7-stable_win64.exe")
+
+
 def build_clone(run_id: str) -> dict:
     """Copy project into a per-run clone; symlink (or copy) assets."""
     paths = paths_for(run_id)
@@ -77,4 +80,12 @@ def build_clone(run_id: str) -> dict:
     os.makedirs(paths["captures_dir"], exist_ok=True)
     os.makedirs(paths["artifacts_dir"], exist_ok=True)
     os.makedirs(paths["user_data_dir"], exist_ok=True)
+    # 2026-10-08: clones skip .godot, so global class cache + imports are
+    # missing and the game boot fails (MapNode unresolvable, rc=1).
+    # Regenerate with one headless --import before any gameplay launch.
+    import subprocess
+    imp = subprocess.run([GODOT_BIN, "--headless", "--path", cdir, "--import"],
+                         capture_output=True, text=True, timeout=300)
+    if imp.returncode != 0:
+        raise RuntimeError(f"clone import failed rc={imp.returncode}: {imp.stderr[-500:]}")
     return paths
