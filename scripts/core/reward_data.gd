@@ -80,7 +80,7 @@ var is_boss: bool = false
 
 ## 生成战斗奖励（按 spec §1.3）
 static func generate(elite: bool = false, boss: bool = false, realm: int = 0):
-	var reward: GDScript = load("res://scripts/core/reward_data.gd").new()
+	var reward = load("res://scripts/core/reward_data.gd").new()
 	reward.is_elite = elite
 	reward.is_boss = boss
 
@@ -143,8 +143,11 @@ static func _generate_card_choices(count: int, elite: bool, boss: bool, realm: i
 		# §2.1 降级兜底
 		if candidates.is_empty():
 			candidates = _downgrade_rarity(all_pool, rarity)
-		# §4.1 元素加权
-		candidates = _filter_by_element(candidates, dominant)
+		# §4.1 元素加权（加权后为空时回退到加权前，避免 filtered 为空导致取模零崩溃）
+		var weighted: Array = _filter_by_element(candidates, dominant)
+		if weighted.is_empty():
+			weighted = candidates
+		candidates = weighted
 		# 去重（本场 3 选）
 		var filtered: Array = []
 		for c in candidates:

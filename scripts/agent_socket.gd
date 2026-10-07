@@ -11,7 +11,6 @@ extends Node
 #   {"action":"change_scene","path":"res://scenes/main_menu.tscn"}
 # 设计：文件式 (非 socket)，简单可靠，方便调试（cat 一下就知道发了什么）
 
-const INPUT_FILE := "res://.agent_input.json"
 const POLL_INTERVAL := 0.1  # 100ms 轮询
 # 与 qa_capture.gd / scene_walker.gd / agent_inspector.gd 同款，4 处保持同步
 const AGENT_FLAG := "--qa-auto-run"
@@ -30,14 +29,15 @@ func set_input_paused(paused: bool) -> void:
 func _ready() -> void:
 	if AGENT_FLAG not in OS.get_cmdline_user_args():
 		return  # 手动启动游戏时不轮询 agent input
-	print("AgentSocket: watching %s" % INPUT_FILE)
+	print("AgentSocket: watching %s (run_id=%s)" % [QaPaths.input_file(), QaPaths.run_id()])
 	# 启动时清空旧文件
 	_clear_file()
 
 func _process(_delta: float) -> void:
-	if not FileAccess.file_exists(INPUT_FILE):
+	var input_file: String = QaPaths.input_file()
+	if not FileAccess.file_exists(input_file):
 		return
-	var f := FileAccess.open(INPUT_FILE, FileAccess.READ)
+	var f := FileAccess.open(input_file, FileAccess.READ)
 	if f == null:
 		return
 	var content := f.get_as_text()
@@ -53,8 +53,9 @@ func _process(_delta: float) -> void:
 	_execute(json as Dictionary)
 
 func _clear_file() -> void:
-	if FileAccess.file_exists(INPUT_FILE):
-		DirAccess.remove_absolute(ProjectSettings.globalize_path(INPUT_FILE))
+	var input_file: String = QaPaths.input_file()
+	if FileAccess.file_exists(input_file):
+		DirAccess.remove_absolute(ProjectSettings.globalize_path(input_file))
 
 func _execute(cmd: Dictionary) -> void:
 	# 2026-07-22: input_paused 时跳过 click/key，但保留 change_scene / quit / capture
@@ -129,7 +130,7 @@ func _execute(cmd: Dictionary) -> void:
 ## 2026-08-08: 读 agent_state.json 给 label-based action 用
 ## state.json 由 agent_inspector.gd 每秒写一次，含 reachable_nodes / hand_cards / selected_node_id 等
 func _read_state_file() -> Dictionary:
-	var state_path := "res://.agent_state.json"
+	var state_path := QaPaths.state_file()
 	if not FileAccess.file_exists(state_path):
 		return {}
 	var f := FileAccess.open(state_path, FileAccess.READ)
@@ -319,7 +320,7 @@ func _do_click(x: int, y: int) -> void:
 	ev_up.pressed = false
 	Input.parse_input_event(ev_up)
 	_exec_count += 1
-	print("AgentSocket[%d]: click (%d, %d)" % [_exec_count, x, y])
+	print("AgentSocket[%s#%d]: click (%d, %d)" % [QaPaths.run_id(), _exec_count, x, y])
 
 func _do_key(key_name: String) -> void:
 	var keycode: int = OS.find_keycode_from_string(key_name) if key_name != "" else KEY_NONE
@@ -335,7 +336,7 @@ func _do_key(key_name: String) -> void:
 	ev_up.pressed = false
 	Input.parse_input_event(ev_up)
 	_exec_count += 1
-	print("AgentSocket[%d]: key %s (code %d)" % [_exec_count, key_name, keycode])
+	print("AgentSocket[%s#%d]: key %s (code %d)" % [QaPaths.run_id(), _exec_count, key_name, keycode])
 
 func _do_capture(path: String) -> void:
 	# 2026-07-28 headless 守护：headless 模式无 viewport texture
@@ -349,7 +350,7 @@ func _do_capture(path: String) -> void:
 	var err: int = img.save_png(path)
 	if err == OK:
 		_exec_count += 1
-		print("AgentSocket[%d]: capture -> %s (%dx%d)" % [_exec_count, path, img.get_width(), img.get_height()])
+		print("AgentSocket[%s#%d]: capture -> %s (%dx%d)" % [QaPaths.run_id(), _exec_count, path, img.get_width(), img.get_height()])
 	else:
 		push_error("AgentSocket: save_png failed: %d" % err)
 
@@ -359,4 +360,4 @@ func _do_change_scene(scene_path: String) -> void:
 		return
 	get_tree().change_scene_to_file.call_deferred(scene_path)
 	_exec_count += 1
-	print("AgentSocket[%d]: change_scene -> %s" % [_exec_count, scene_path])
+	print("AgentSocket[%s#%d]: change_scene -> %s" % [QaPaths.run_id(), _exec_count, scene_path])

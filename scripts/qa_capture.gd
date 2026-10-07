@@ -11,7 +11,6 @@ extends Node
 # ⚠️ 手动启动（编辑器 F5）时不跑，避免在用户玩的时候偷偷写文件。
 #    Agent 跑测试时启动 godot ... -- --qa-auto-run 才会触发。
 
-const CAPTURE_DIR := "res://qa-captures"
 const CAPTURE_NAME := "viewport_capture.png"
 const WAIT_SECONDS := 2.0  # 给主场景时间加载/渲染
 # headless mode 下的超时兜底：2026-07-26 修复 headless hang — 30s 后主动 quit
@@ -122,14 +121,15 @@ func _capture() -> void:
 		is_black = true
 		print("ViewportCapture: headless → fallback black fill (%dx%d)" % [w, h])
 
-	# 确保输出目录存在
-	if not DirAccess.dir_exists_absolute(CAPTURE_DIR):
-		var mk_err := DirAccess.make_dir_recursive_absolute(CAPTURE_DIR)
+	# 输出目录按 run-id 隔离（默认 run 与旧路径完全一致）
+	var capture_dir: String = QaPaths.capture_dir()
+	if not DirAccess.dir_exists_absolute(capture_dir):
+		var mk_err := DirAccess.make_dir_recursive_absolute(capture_dir)
 		if mk_err != OK:
 			push_error("ViewportCapture: make_dir failed: %d" % mk_err)
 			return
 
-	var path := "%s/%s" % [CAPTURE_DIR, CAPTURE_NAME]
+	var path := capture_dir + CAPTURE_NAME
 	var err := img.save_png(path)
 	if err == OK:
 		var abs_path := ProjectSettings.globalize_path(path)

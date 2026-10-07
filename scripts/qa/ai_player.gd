@@ -105,9 +105,13 @@ func _ready() -> void:
 	#   所以 character_select 卡住的安全网永远不触发。这里加一个 watchdog：
 	#   在 character_select 停留超过 60s 时，自动 force-skip（设置 chenmo + 跳到 map.tscn），
 	#   跟 _handle_character_select 里的 5-stuck 安全网逻辑一致。
-	_run_scene_watchdog()
+	if not _is_vision_run():
+		_run_scene_watchdog()
 	# model 模式只跑 _observe_loop（只检测状态 + 报告 stats），不调 _run_loop（不决策）
 	_observe_loop()
+
+func _is_vision_run() -> bool:
+	return OS.get_cmdline_user_args().has("--vision-run")
 
 func _is_qa_mode() -> bool:
 	return OS.get_cmdline_user_args().has("--qa-auto-run")

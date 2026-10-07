@@ -9,6 +9,10 @@
 extends Node
 
 const OUTPUT_DIR := "user://qa-captures/"
+const OUTPUT_DIR_PREFIX := "user://qa-captures/"
+const DEFAULT_RUN_ID := "default"
+const RUN_ID_FLAG := "--run-id"
+const MANIFEST_NAME := "manifest.json"
 const SCENES_TO_CAPTURE: Array[String] = [
 	"MainMenu",
 	"CharacterSelect",
@@ -93,15 +97,82 @@ func _capture_scene(scene_name: String) -> void:
 	if dir == null:
 		push_warning("VisualChecker: 无法打开 user://")
 		return
-	dir.make_dir_recursive(OUTPUT_DIR)
+	var output_dir: String = _output_dir()
+	dir.make_dir_recursive(output_dir)
 
 	var timestamp := Time.get_datetime_string_from_system().replace(":", "-")
 	var file_name := "%s_%s.png" % [scene_name, timestamp]
-	var path := OUTPUT_DIR + file_name
+	var path := output_dir + file_name
 
 	var err := img.save_png(path)
 	if err == OK:
 		_captured_scenes.append(scene_name)
 		print("VisualChecker: 已截图 %s" % path)
+		_append_manifest(output_dir, path, scene_name, timestamp)
 	else:
 		push_warning("VisualChecker: 保存截图失败 err=%d" % err)
+
+## 与 QaPaths.run_id() 同规则读取 run id：--run-id <id> 或 --run-id=<id>，缺省为 "default"
+func _run_id() -> String:
+	var user_args: PackedStringArray = OS.get_cmdline_user_args()
+	var idx: int = 0
+	while idx < user_args.size():
+		var arg: String = user_args[idx]
+		if arg == RUN_ID_FLAG and idx + 1 < user_args.size():
+			var val: String = _sanitize_run_id(user_args[idx + 1])
+			if val != "":
+				return val
+			return DEFAULT_RUN_ID
+		if arg.begins_with(RUN_ID_FLAG + "="):
+			var val2: String = _sanitize_run_id(arg.get_slice("=", 1))
+			if val2 != "":
+				return val2
+			return DEFAULT_RUN_ID
+		idx += 1
+	return DEFAULT_RUN_ID
+
+func _sanitize_run_id(raw: String) -> String:
+	var val: String = raw.strip_edges()
+	if val == "" or val.begins_with("-"):
+		return ""
+	val = val.replace("/", "_").replace("\\", "_").replace("..", "_")
+	return val
+
+## run-scoped 截图目录：default 沿用旧路径，其余为 user://qa-captures/<R>/
+func _output_dir() -> String:
+	var r: String = _run_id()
+	if r == DEFAULT_RUN_ID:
+		return OUTPUT_DIR
+	return OUTPUT_DIR_PREFIX + r + "/"
+
+## 每次截图后向该 run 目录的 manifest.json 追加一行（path/scene/turn/ts）
+func _append_manifest(output_dir: String, path: String, scene_name: String, timestamp: String) -> void:
+	var turn: int = _capture_turn(scene_name)
+	var entry := {
+		"path": path,
+		"scene": scene_name,
+		"turn": turn,
+		"ts": Time.get_unix_time_from_system(),
+		"timestamp": timestamp,
+	}
+	var manifest_path: String = output_dir + MANIFEST_NAME
+	var mf: FileAccess
+	if FileAccess.file_exists(manifest_path):
+		mf = FileAccess.open(manifest_path, FileAccess.READ_WRITE)
+	else:
+		mf = FileAccess.open(manifest_path, FileAccess.WRITE)
+	if mf == null:
+		push_warning("VisualChecker: 无法写入 manifest")
+		return
+	mf.seek_end()
+	mf.store_string(JSON.stringify(entry) + "\n")
+	mf.close()
+
+func _capture_turn(scene_name: String) -> int:
+	if scene_name.begins_with("BattleScene_Turn"):
+		var suffix: String = scene_name.trim_prefix("BattleScene_Turn")
+		if suffix.is_valid_int():
+			return suffix.to_int()
+	if _last_turn_number >= 0:
+		return _last_turn_number
+	return 0

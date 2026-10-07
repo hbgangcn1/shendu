@@ -28,7 +28,9 @@ Thumbs.db
 # AI Player runtime files (2026-07-22 添加)
 # 防止 .agent_state.json / .agent_input.json 等污染 git status
 .agent_state.json
+.agent_state.*.json
 .agent_input.json
+.agent_input.*.json
 .output.txt
 .output*.txt
 .omo/
@@ -55,5 +57,9 @@ godot_f5.log
 # QA / review temp (keep on disk, ignore in git)
 qa-logs/
 qa-captures/
+qa-reports/
 qa-report.json
 review_temp/
+qa-artifacts/
+tools/vision/__pycache__/
+tools/vision/*.log

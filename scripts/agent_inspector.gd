@@ -7,7 +7,6 @@ extends Node
 # agent 读这个文件就知道游戏里发生了什么（比 VLM 可靠 100 倍 — 像素易错，结构化数据不易错）
 # 数据源：GameState autoload + 当前 scene + viewport size + engine info
 
-const STATE_FILE := "res://.agent_state.json"
 # 2026-07-28 节流：原 0.5s + or 帧门控 → headless 模式时间门控先触发，节流无效
 # 改为 1.0s（每 1s dump 一次）+ 帧门控只作为 headless 限 FPS 时的兜底（一般触发不到）
 const POLL_INTERVAL := 1.0  # 1s
@@ -31,7 +30,7 @@ var _verbose_printed: bool = false
 func _ready() -> void:
 	if AGENT_FLAG not in OS.get_cmdline_user_args():
 		return  # 手动启动游戏时不写 agent state
-	print("AgentInspector: writing to %s every %.1fs (frame throttle as fallback)" % [STATE_FILE, POLL_INTERVAL])
+	print("AgentInspector: writing to %s every %.1fs (frame throttle as fallback)" % [QaPaths.state_file(), POLL_INTERVAL])
 	# Hook scene change 立即 flush（解决 1s 节流 race condition）
 	if get_tree():
 		get_tree().connect("tree_changed", Callable(self, "_on_tree_changed"))
@@ -154,12 +153,12 @@ func _write_state() -> void:
 			_write_reward_state(state, current)
 	# 写文件
 	var json: String = JSON.stringify(state, "  ")
-	var f := FileAccess.open(STATE_FILE, FileAccess.WRITE)
+	var f := FileAccess.open(QaPaths.state_file(), FileAccess.WRITE)
 	if f:
 		f.store_string(json)
 		f.close()
 	else:
-		push_error("AgentInspector: failed to open %s for writing" % STATE_FILE)
+		push_error("AgentInspector: failed to open %s for writing" % QaPaths.state_file())
 
 ## 2026-07-30 fix (D1): 写 map scene 状态
 ## 让 LLM 在 headless 模式下能基于 state.json 选节点（不再依赖 viewport_capture.png 黑截图）
