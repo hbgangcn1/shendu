@@ -1,0 +1,719 @@
+Godot Engine v4.7.stable.official.5b4e0cb0f - https://godotengine.org
+OpenGL API 3.3.0 - Build 32.0.101.6737 - Compatibility - Using Device: Intel - Intel(R) Iris(R) Xe Graphics
+
+godot_launch helper: _initialize
+UITheme: 墨韵赛博主题已加载
+ERROR: Parent node is busy setting up children, `add_child()` failed. Consider using `add_child.call_deferred(child)` instead.
+   at: add_child (scene/main/node.cpp:1721)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:58)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+ERROR: Parent node is busy setting up children, `add_child()` failed. Consider using `add_child.call_deferred(child)` instead.
+   at: add_child (scene/main/node.cpp:1721)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:58)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+ERROR: Parent node is busy setting up children, `add_child()` failed. Consider using `add_child.call_deferred(child)` instead.
+   at: add_child (scene/main/node.cpp:1721)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:58)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+ERROR: Parent node is busy setting up children, `add_child()` failed. Consider using `add_child.call_deferred(child)` instead.
+   at: add_child (scene/main/node.cpp:1721)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:58)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+ERROR: Parent node is busy setting up children, `add_child()` failed. Consider using `add_child.call_deferred(child)` instead.
+   at: add_child (scene/main/node.cpp:1721)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:58)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+ERROR: Parent node is busy setting up children, `add_child()` failed. Consider using `add_child.call_deferred(child)` instead.
+   at: add_child (scene/main/node.cpp:1721)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:58)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "ExperienceMemory" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/run_goals.gd:112)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+ERROR: Failed to load script "res://scripts/qa/run_goals.gd" with error "Parse error".
+   at: load (modules/gdscript/gdscript_resource_format.cpp:46)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+WARNING: QA bootstrap: cannot instantiate res://scripts/qa/run_goals.gd
+   at: push_warning (core/variant/variant_utility.cpp:1033)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:51)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+ERROR: Parent node is busy setting up children, `add_child()` failed. Consider using `add_child.call_deferred(child)` instead.
+   at: add_child (scene/main/node.cpp:1721)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:58)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+ERROR: Parent node is busy setting up children, `add_child()` failed. Consider using `add_child.call_deferred(child)` instead.
+   at: add_child (scene/main/node.cpp:1721)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:58)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "ExperienceMemory" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:75)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "RunGoals" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:76)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "RunGoals" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:79)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "RunGoals" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:93)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "RunGoals" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:94)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "RunGoals" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:102)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "RunGoals" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:103)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "RunGoals" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:156)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "RunGoals" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:157)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "RunGoals" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:159)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "RunGoals" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:161)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "ExperienceMemory" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:170)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "RunGoals" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:187)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "RunGoals" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:188)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "RunGoals" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:191)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "RunGoals" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:193)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "ExperienceMemory" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:203)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "RunGoals" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:236)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "ExperienceMemory" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:424)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "ExperienceMemory" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:435)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "ExperienceMemory" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:448)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "ExperienceMemory" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:452)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "ExperienceMemory" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:460)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "ExperienceMemory" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:467)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "ExperienceMemory" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:498)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "ExperienceMemory" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:510)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "ExperienceMemory" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:515)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "ExperienceMemory" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:525)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "ExperienceMemory" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:535)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "ExperienceMemory" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:539)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "ExperienceMemory" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:549)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "AgentActions" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:561)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "AgentActions" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:566)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "AgentInput" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:573)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "AgentActions" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:604)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "AgentInput" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:612)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "AgentActions" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:614)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "AgentActions" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:744)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "ExperienceMemory" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:850)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "RunGoals" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:857)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "RunGoals" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:859)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "ExperienceMemory" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:862)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "RunGoals" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:941)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "AgentActions" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:943)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "AgentInput" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:950)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "AgentInput" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:953)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "RunGoals" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:958)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "AgentActions" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:959)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "RunGoals" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:966)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "AgentActions" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:974)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "AgentInput" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:977)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "RunGoals" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:982)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "AgentActions" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:990)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "AgentInput" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:993)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "AgentActions" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:1007)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "AgentActions" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:1010)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "AgentActions" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:1017)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "ExperienceMemory" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:1085)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "RunGoals" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:1109)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "RunGoals" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:1112)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "RunGoals" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:1171)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "ExperienceMemory" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:1189)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "ExperienceMemory" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:1197)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "ExperienceMemory" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:1205)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "ExperienceMemory" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:1215)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "ExperienceMemory" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:1223)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "ExperienceMemory" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:1231)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "RunGoals" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:1281)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Cannot infer the type of "goals" variable because the value doesn't have a set type.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:1281)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "RunGoals" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:1285)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "DeckAnalyzer" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:1296)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Cannot infer the type of "analysis" variable because the value doesn't have a set type.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:1296)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "ExperienceMemory" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:1297)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "AgentActions" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:1349)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "AgentInput" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:1361)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "AgentInput" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:1363)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+ERROR: Failed to load script "res://scripts/qa/ai_player.gd" with error "Parse error".
+   at: load (modules/gdscript/gdscript_resource_format.cpp:46)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+WARNING: QA bootstrap: cannot instantiate res://scripts/qa/ai_player.gd
+   at: push_warning (core/variant/variant_utility.cpp:1033)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:51)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+ERROR: Parent node is busy setting up children, `add_child()` failed. Consider using `add_child.call_deferred(child)` instead.
+   at: add_child (scene/main/node.cpp:1721)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:58)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+ERROR: Parent node is busy setting up children, `add_child()` failed. Consider using `add_child.call_deferred(child)` instead.
+   at: add_child (scene/main/node.cpp:1721)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:58)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+QA bootstrap: --qa-auto-run present → mounted 10 QA nodes
+CardPool: 加载 mvp=17 + zhuji=15 + jindan=13 = 总 45 张卡
+godot_launch helper: loading res://scenes/main.tscn
+========================================
+  蜃都 — 项目启动
+========================================
+
+--- 五行系统自测 ---
+  ✓ 相生判定正确
+  ✓ 相克判定正确
+  ✓ 伤害计算正确
+
+--- 卡池自测 ---
+SCRIPT ERROR: Trying to assign value of type 'Object' to a variable of type 'Dictionary'.
+   at: _test_card_pool (res://scripts/main.gd:63)
+   GDScript backtrace (most recent call first):
+       [0] _test_card_pool (res://scripts/main.gd:63)
+       [1] _ready (res://scripts/main.gd:15)
+========================================
+  所有自测通过 ✓
+========================================
+主菜单：菜单加载完成，自动存档: 存在
+主菜单：headless 模式自动开始游戏 (跳过 start_button click)
+Save: 存档 auto_save 已加载（2026-08-13T18:21:59）
+主菜单：加载自动存档成功
+地图场景：生成地图 liqi
+地图场景：加载完成，当前境界 炼气期
+SceneWalker: starting, 5 scenes to visit
+AgentSocket: watching res://.agent_input.json
+AgentInspector: writing to res://.agent_state.json every 1.0s (frame throttle as fallback)
+AgentInspector: GameState property count = 40
+  prop: Node usage=128 type=0 has_script_var=false
+  prop: name usage=0 type=21 has_script_var=false
+  prop: unique_name_in_owner usage=2 type=1 has_script_var=false
+  prop: scene_file_path usage=0 type=4 has_script_var=false
+  prop: owner usage=0 type=24 has_script_var=false
+  prop: multiplayer usage=0 type=24 has_script_var=false
+  prop: Process usage=64 type=0 has_script_var=false
+  prop: process_mode usage=6 type=2 has_script_var=false
+  prop: process_priority usage=6 type=2 has_script_var=false
+  prop: process_physics_priority usage=6 type=2 has_script_var=false
+  prop: Thread Group usage=256 type=0 has_script_var=false
+  prop: process_thread_group usage=6 type=2 has_script_var=false
+  prop: process_thread_group_order usage=0 type=2 has_script_var=false
+  prop: process_thread_messages usage=0 type=2 has_script_var=false
+  prop: Physics Interpolation usage=64 type=0 has_script_var=false
+  prop: physics_interpolation_mode usage=6 type=2 has_script_var=false
+  prop: Auto Translate usage=64 type=0 has_script_var=false
+  prop: auto_translate_mode usage=6 type=2 has_script_var=false
+  prop: Editor Description usage=64 type=0 has_script_var=false
+  prop: editor_description usage=6 type=4 has_script_var=false
+  prop: script usage=1048590 type=24 has_script_var=false
+  prop: game_state.gd usage=128 type=0 has_script_var=false
+  prop: player_name usage=4096 type=4 has_script_var=true
+    -> val= type=4 is_null=false is_object=false
+  prop: character_id usage=4096 type=4 has_script_var=true
+    -> val=chenmo type=4 is_null=false is_object=false
+  prop: hp usage=4096 type=2 has_script_var=true
+    -> val=80 type=2 is_null=false is_object=false
+  prop: max_hp usage=4096 type=2 has_script_var=true
+    -> val=80 type=2 is_null=false is_object=false
+  prop: spirit_stones usage=4096 type=2 has_script_var=true
+    -> val=274 type=2 is_null=false is_object=false
+  prop: dao_xing usage=4096 type=2 has_script_var=true
+    -> val=66 type=2 is_null=false is_object=false
+  prop: mo_nian usage=4096 type=2 has_script_var=true
+    -> val=0 type=2 is_null=false is_object=false
+  prop: current_realm usage=4096 type=2 has_script_var=true
+    -> val=0 type=2 is_null=false is_object=false
+  prop: current_node_id usage=4096 type=4 has_script_var=true
+    -> val=R0_L1_N0 type=4 is_null=false is_object=false
+  prop: visited_node_ids usage=4096 type=28 has_script_var=true
+    -> val=["R0_L0_N0", "R0_L1_N0", "R0_L2_N3", "R0_L3_N0", "R0_L2_N2"] type=28 is_null=false is_object=false
+  prop: game_map usage=135168 type=0 has_script_var=true
+    -> val=<RefCounted#-9223371970718988580> type=24 is_null=false is_object=true
+  prop: is_boss_defeated usage=4096 type=28 has_script_var=true
+    -> val=[] type=28 is_null=false is_object=false
+  prop: collection usage=4096 type=28 has_script_var=true
+    -> val=[{ "art_path": "res://assets/images/cards/card_char_metal_001.png", "block": 0.0, "card_kind": 0.0, "character_lock": "", "cost": 2.0, "damage": 8.0, "description": "锋利如金，斩断一切。", "draw_cards": 0.0, "effects": [{ "action": { "element": "metal", "target": "enemy", "type": "Damage", "value": 8.0 }, "description": "对敌方造成 8 点金属性伤害", "trigger": "on_attack" }], "element": 0.0, "engraving_slot_count": 2.0, "erosion_tolerance": 3.0, "heal": 0.0, "id": "MC-ME-001", "name": "金刚斩", "name_core": "刚", "name_prefix": "金", "name_suffix": "斩", "rarity": 0.0, "short_desc": "", "tags": [], "upgrade_id": "MC-ME-001U" }, { "art_path": "res://assets/images/cards/card_char_metal_002.png", "block": 6.0, "card_kind": 1.0, "character_lock": "", "cost": 1.0, "damage": 0.0, "description": "以金气凝结护盾。", "draw_cards": 0.0, "effects": [{ "action": { "target": "self", "type": "Block", "value": 6.0 }, "description": "获得 6 点格挡", "trigger": "on_play" }], "element": 0.0, "engraving_slot_count": 2.0, "erosion_tolerance": 3.0, "heal": 0.0, "id": "MC-ME-002", "name": "铁壁", "name_core": "壁", "name_prefix": "铁", "name_suffix": "", "rarity": 0.0, "short_desc": "", "tags": [], "upgrade_id": "MC-ME-002U" }, { "art_path": "res://assets/images/cards/card_char_wood_001.png", "block": 0.0, "card_kind": 0.0, "character_lock": "", "cost": 1.0, "damage": 6.0, "description": "灵藤抽击，生生不息。", "draw_cards": 0.0, "effects": [{ "action": { "element": "wood", "target": "enemy", "type": "Damage", "value": 6.0 }, "description": "对敌方造成 6 点木属性伤害", "trigger": "on_attack" }], "element": 1.0, "engraving_slot_count": 2.0, "erosion_tolerance": 3.0, "heal": 0.0, "id": "MC-WO-001", "name": "藤鞭", "name_core": "鞭", "name_prefix": "藤", "name_suffix": "", "rarity": 0.0, "short_desc": "", "tags": [], "upgrade_id": "MC-WO-001U" }, { "art_path": "res://assets/images/cards/card_char_wood_002.png", "block": 0.0, "card_kind": 3.0, "character_lock": "", "cost": 1.0, "damage": 0.0, "description": "木气滋养，回复生命。", "draw_cards": 0.0, "effects": [{ "action": { "target": "self", "type": "Heal", "value": 5.0 }, "description": "回复 5 点生命", "trigger": "on_play" }], "element": 1.0, "engraving_slot_count": 2.0, "erosion_tolerance": 3.0, "heal": 5.0, "id": "MC-WO-002", "name": "回春术", "name_core": "春", "name_prefix": "回", "name_suffix": "术", "rarity": 0.0, "short_desc": "", "tags": [], "upgrade_id": "MC-WO-002U" }, { "art_path": "res://assets/images/cards/card_char_water_001.png", "block": 0.0, "card_kind": 0.0, "character_lock": "", "cost": 1.0, "damage": 5.0, "description": "水流如刀，灵活渗透。", "draw_cards": 1.0, "effects": [{ "action": { "element": "water", "target": "enemy", "type": "Damage", "value": 5.0 }, "description": "对敌方造成 5 点水属性伤害", "trigger": "on_attack" }, { "action": { "target": "self", "type": "Draw", "value": 1.0 }, "description": "抽 1 张牌", "trigger": "on_play" }], "element": 2.0, "engraving_slot_count": 2.0, "erosion_tolerance": 3.0, "heal": 0.0, "id": "MC-WA-001", "name": "水弹", "name_core": "弹", "name_prefix": "水", "name_suffix": "", "rarity": 0.0, "short_desc": "", "tags": [], "upgrade_id": "MC-WA-001U" }, { "art_path": "res://assets/images/cards/card_char_water_002.png", "block": 5.0, "card_kind": 1.0, "character_lock": "", "cost": 1.0, "damage": 0.0, "description": "水流护盾，柔中带刚。", "draw_cards": 0.0, "effects": [{ "action": { "target": "self", "type": "Block", "value": 5.0 }, "description": "获得 5 点格挡", "trigger": "on_play" }], "element": 2.0, "engraving_slot_count": 2.0, "erosion_tolerance": 3.0, "heal": 0.0, "id": "MC-WA-002", "name": "水幕", "name_core": "幕", "name_prefix": "水", "name_suffix": "", "rarity": 0.0, "short_desc": "", "tags": [], "upgrade_id": "MC-WA-002U" }, { "art_path": "res://assets/images/cards/card_char_fire_001.png", "block": 0.0, "card_kind": 0.0, "character_lock": "", "cost": 3.0, "damage": 10.0, "description": "以火焚尽一切阻碍。", "draw_cards": 0.0, "effects": [{ "action": { "element": "fire", "target": "enemy", "type": "Damage", "value": 10.0 }, "description": "对敌方造成 10 点火属性伤害", "trigger": "on_attack" }], "element": 3.0, "engraving_slot_count": 2.0, "erosion_tolerance": 3.0, "heal": 0.0, "id": "MC-FI-001", "name": "烈焰弹", "name_core": "焰", "name_prefix": "烈", "name_suffix": "弹", "rarity": 0.0, "short_desc": "", "tags": [], "upgrade_id": "MC-FI-001U" }, { "art_path": "res://assets/images/cards/card_char_fire_002.png", "block": 0.0, "card_kind": 0.0, "character_lock": "", "cost": 2.0, "damage": 14.0, "description": "火焰爆发，灼烧敌人。", "draw_cards": 0.0, "effects": [{ "action": { "element": "fire", "target": "enemy", "type": "Damage", "value": 14.0 }, "description": "对敌方造成 14 点火属性伤害", "trigger": "on_attack" }], "element": 3.0, "engraving_slot_count": 3.0, "erosion_tolerance": 4.0, "heal": 0.0, "id": "MC-FI-002", "name": "爆燃", "name_core": "燃", "name_prefix": "爆", "name_suffix": "", "rarity": 1.0, "short_desc": "", "tags": [], "upgrade_id": "MC-FI-002U" }, { "art_path": "res://assets/images/cards/card_char_earth_001.png", "block": 8.0, "card_kind": 1.0, "character_lock": "", "cost": 2.0, "damage": 0.0, "description": "大地之力，稳如磐石。", "draw_cards": 0.0, "effects": [{ "action": { "target": "self", "type": "Block", "value": 8.0 }, "description": "获得 8 点格挡", "trigger": "on_play" }], "element": 4.0, "engraving_slot_count": 2.0, "erosion_tolerance": 3.0, "heal": 0.0, "id": "MC-EA-001", "name": "岩盾", "name_core": "盾", "name_prefix": "岩", "name_suffix": "", "rarity": 0.0, "short_desc": "", "tags": [], "upgrade_id": "MC-EA-001U" }, { "art_path": "res://assets/images/cards/card_char_metal_001.png", "block": 0.0, "card_kind": 0.0, "character_lock": "", "cost": 2.0, "damage": 8.0, "description": "锋利如金，斩断一切。", "draw_cards": 0.0, "effects": [{ "action": { "element": "metal", "target": "enemy", "type": "Damage", "value": 8.0 }, "description": "对敌方造成 8 点金属性伤害", "trigger": "on_attack" }], "element": 0.0, "engraving_slot_count": 2.0, "erosion_tolerance": 3.0, "heal": 0.0, "id": "MC-ME-001", "name": "金刚斩", "name_core": "刚", "name_prefix": "金", "name_suffix": "斩", "rarity": 0.0, "short_desc": "", "tags": [], "upgrade_id": "MC-ME-001U" }, { "block": 0.0, "card_kind": 2.0, "cost": 2.0, "damage": 0.0, "description": "灵泉涌动，滋养万物。", "draw_cards": 3.0, "effects": [{ "action": { "target": "self", "type": "Draw", "value": 3.0 }, "description": "抽3张牌", "trigger": "on_play" }, { "action": { "target": "self", "type": "Heal", "value": 4.0 }, "description": "回复4点生命", "trigger": "on_play" }], "element": 2.0, "heal": 4.0, "id": "MC-WA-006", "name": "灵泉涌", "rarity": 2.0 }, { "block": 0.0, "card_kind": 0.0, "cost": 2.0, "damage": 8.0, "description": "锋利如金，斩断一切。", "draw_cards": 0.0, "effects": [{ "action": { "element": "metal", "target": "enemy", "type": "Damage", "value": 8.0 }, "description": "对敌方造成 8 点金属性伤害", "trigger": "on_attack" }], "element": 0.0, "heal": 0.0, "id": "MC-ME-001", "name": "金刚斩", "rarity": 0.0 }, { "block": 0.0, "card_kind": 0.0, "cost": 2.0, "damage": 14.0, "description": "火焰爆发，灼烧敌人。", "draw_cards": 0.0, "effects": [{ "action": { "element": "fire", "target": "enemy", "type": "Damage", "value": 14.0 }, "description": "对敌方造成 14 点火属性伤害", "trigger": "on_attack" }], "element": 3.0, "heal": 0.0, "id": "MC-FI-002", "name": "爆燃", "rarity": 1.0 }, { "block": 0.0, "card_kind": 0.0, "cost": 4.0, "damage": 40.0, "description": "金丹之力撕裂虚空，造成毁灭性伤害。", "draw_cards": 0.0, "effects": [{ "action": { "element": 0.0, "target": "enemy", "type": "Damage", "value": 40.0 }, "description": "对敌方造成40点金属性伤害", "trigger": "on_play" }], "element": 0.0, "heal": 0.0, "id": "MC-JD-006", "name": "虚空破碎", "rarity": 2.0 }, { "block": 0.0, "card_kind": 0.0, "cost": 2.0, "damage": 8.0, "description": "锋利如金，斩断一切。", "draw_cards": 0.0, "effects": [{ "action": { "element": "metal", "target": "enemy", "type": "Damage", "value": 8.0 }, "description": "对敌方造成 8 点金属性伤害", "trigger": "on_attack" }], "element": 0.0, "heal": 0.0, "id": "MC-ME-001", "name": "金刚斩", "rarity": 0.0 }, { "block": 6.0, "card_kind": 1.0, "cost": 1.0, "damage": 0.0, "description": "以金气凝结护盾。", "draw_cards": 0.0, "effects": [{ "action": { "target": "self", "type": "Block", "value": 6.0 }, "description": "获得 6 点格挡", "trigger": "on_play" }], "element": 0.0, "heal": 0.0, "id": "MC-ME-002", "name": "铁壁", "rarity": 0.0 }, { "block": 0.0, "card_kind": 0.0, "cost": 2.0, "damage": 8.0, "description": "锋利如金，斩断一切。", "draw_cards": 0.0, "effects": [{ "action": { "element": "metal", "target": "enemy", "type": "Damage", "value": 8.0 }, "description": "对敌方造成 8 点金属性伤害", "trigger": "on_attack" }], "element": 0.0, "heal": 0.0, "id": "MC-ME-001", "name": "金刚斩", "rarity": 0.0 }, { "block": 0.0, "card_kind": 3.0, "cost": 0.0, "damage": 0.0, "description": "金精凝聚，思绪如剑。", "draw_cards": 2.0, "effects": [{ "action": { "target": "self", "type": "Draw", "value": 2.0 }, "description": "抽 2 张牌", "trigger": "on_play" }], "element": 0.0, "heal": 0.0, "id": "MC-ME-003", "name": "金精聚", "rarity": 0.0 }, { "block": 0.0, "card_kind": 0.0, "cost": 2.0, "damage": 8.0, "description": "锋利如金，斩断一切。", "draw_cards": 0.0, "effects": [{ "action": { "element": "metal", "target": "enemy", "type": "Damage", "value": 8.0 }, "description": "对敌方造成 8 点金属性伤害", "trigger": "on_attack" }], "element": 0.0, "heal": 0.0, "id": "MC-ME-001", "name": "金刚斩", "rarity": 0.0 }, { "block": 9.0, "card_kind": 1.0, "cost": 2.0, "damage": 0.0, "description": "潮汐之力，坚不可摧。", "draw_cards": 0.0, "effects": [{ "action": { "target": "self", "type": "Block", "value": 9.0 }, "description": "获得 9 点格挡", "trigger": "on_play" }], "element": 2.0, "heal": 0.0, "id": "MC-WA-004", "name": "潮汐壁垒", "rarity": 0.0 }, { "block": 6.0, "card_kind": 1.0, "cost": 1.0, "damage": 0.0, "description": "以金气凝结护盾。", "draw_cards": 0.0, "effects": [{ "action": { "target": "self", "type": "Block", "value": 6.0 }, "description": "获得 6 点格挡", "trigger": "on_play" }], "element": 0.0, "heal": 0.0, "id": "MC-ME-002", "name": "铁壁", "rarity": 0.0 }, { "block": 0.0, "card_kind": 3.0, "cost": 0.0, "damage": 0.0, "description": "金精凝聚，思绪如剑。", "draw_cards": 2.0, "effects": [{ "action": { "target": "self", "type": "Draw", "value": 2.0 }, "description": "抽 2 张牌", "trigger": "on_play" }], "element": 0.0, "heal": 0.0, "id": "MC-ME-003", "name": "金精聚", "rarity": 0.0 }, { "block": 6.0, "card_kind": 1.0, "cost": 1.0, "damage": 0.0, "description": "以金气凝结护盾。", "draw_cards": 0.0, "effects": [{ "action": { "target": "self", "type": "Block", "value": 6.0 }, "description": "获得 6 点格挡", "trigger": "on_play" }], "element": 0.0, "heal": 0.0, "id": "MC-ME-002", "name": "铁壁", "rarity": 0.0 }, { "block": 0.0, "card_kind": 0.0, "cost": 2.0, "damage": 14.0, "description": "火焰爆发，灼烧敌人。", "draw_cards": 0.0, "effects": [{ "action": { "element": "fire", "target": "enemy", "type": "Damage", "value": 14.0 }, "description": "对敌方造成 14 点火属性伤害", "trigger": "on_attack" }], "element": 3.0, "heal": 0.0, "id": "MC-FI-002", "name": "爆燃", "rarity": 1.0 }, { "block": 0.0, "card_kind": 0.0, "cost": 4.0, "damage": 40.0, "description": "金丹之力撕裂虚空，造成毁灭性伤害。", "draw_cards": 0.0, "effects": [{ "action": { "element": 0.0, "target": "enemy", "type": "Damage", "value": 40.0 }, "description": "对敌方造成40点金属性伤害", "trigger": "on_play" }], "element": 0.0, "heal": 0.0, "id": "MC-JD-006", "name": "虚空破碎", "rarity": 2.0 }, { "block": 0.0, "card_kind": 0.0, "cost": 2.0, "damage": 8.0, "description": "锋利如金，斩断一切。", "draw_cards": 0.0, "effects": [{ "action": { "element": "metal", "target": "enemy", "type": "Damage", "value": 8.0 }, "description": "对敌方造成 8 点金属性伤害", "trigger": "on_attack" }], "element": 0.0, "heal": 0.0, "id": "MC-ME-001", "name": "金刚斩", "rarity": 0.0 }] type=28 is_null=false is_object=false
+  prop: deck usage=4096 type=28 has_script_var=true
+    -> val=[0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 12.0, 13.0, 15.0, 17.0, 19.0, 21.0, 24.0] type=28 is_null=false is_object=false
+  prop: deck_max_size usage=4096 type=2 has_script_var=true
+    -> val=25 type=2 is_null=false is_object=false
+  prop: deck_removal_count usage=4096 type=2 has_script_var=true
+    -> val=0 type=2 is_null=false is_object=false
+  prop: total_dao_xing usage=4096 type=2 has_script_var=true
+    -> val=0 type=2 is_null=false is_object=false
+  prop: first_battle_done usage=4096 type=1 has_script_var=true
+    -> val=false type=1 is_null=false is_object=false
+WARNING: QA bootstrap: cannot instantiate res://scripts/qa/run_goals.gd
+   at: push_warning (core/variant/variant_utility.cpp:1033)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:51)
+       [1] _process (res://tools/vision/godot_launch.gd:31)
+WARNING: QA bootstrap: cannot instantiate res://scripts/qa/ai_player.gd
+   at: push_warning (core/variant/variant_utility.cpp:1033)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:51)
+       [1] _process (res://tools/vision/godot_launch.gd:31)
+VisualChecker: 画面审核触发器已启动
+ExperienceMemory: 已加载 1276 条经验
+QA bootstrap: --qa-auto-run present → mounted 10 QA nodes
+godot_launch helper: mounted 10 QA nodes
+AgentInspector: initial scene: res://scenes/map.tscn
+AgentInspector: scene change detected → res://scenes/map.tscn → immediate flush (after 2 frames)
+ViewportCapture: non-headless → captured real viewport (2880x1779)
+ViewportCapture: saved res://qa-captures/viewport_capture.png (2880x1779) -> C:/Users/hbgan/Projects/shendu/qa-captures/viewport_capture.png
+SceneWalker: captured main_menu (2880x1779) -> C:/Users/hbgan/Projects/shendu/qa-captures/main_menu.png
+SceneWalker: switching to res://scenes/character_select.tscn
+角色选择：_ready() 开始
+角色选择：headless 模式检测成功，立即自动确认
+角色选择：设置 GameState.character_id = chenmo
+GameState: 角色 chenmo 初始卡组 10 张
+角色选择：HP 设置完成 80/80
+GameState: 角色 chenmo 初始卡组 10 张
+角色选择：starter_deck 大小 = 10
+GameState: 卡牌「金刚斩」加入卡牌池，当前 27 张
+GameState: 同名卡「金刚斩」已达上限2张
+GameState: 卡牌「铁壁」加入卡牌池，当前 28 张
+GameState: 同名卡「铁壁」已达上限2张
+GameState: 卡牌「藤鞭」加入卡牌池，当前 29 张
+GameState:「藤鞭」加入牌库，牌库 19/25
+GameState: 卡牌「回春术」加入卡牌池，当前 30 张
+GameState:「回春术」加入牌库，牌库 20/25
+GameState: 卡牌「水弹」加入卡牌池，当前 31 张
+GameState:「水弹」加入牌库，牌库 21/25
+GameState: 卡牌「水幕」加入卡牌池，当前 32 张
+GameState:「水幕」加入牌库，牌库 22/25
+GameState: 卡牌「烈焰弹」加入卡牌池，当前 33 张
+GameState:「烈焰弹」加入牌库，牌库 23/25
+GameState: 卡牌「爆燃」加入卡牌池，当前 34 张
+GameState: 同名卡「爆燃」已达上限2张
+GameState: 卡牌「岩盾」加入卡牌池，当前 35 张
+GameState:「岩盾」加入牌库，牌库 24/25
+GameState: 卡牌「金刚斩」加入卡牌池，当前 36 张
+GameState: 同名卡「金刚斩」已达上限2张
+角色选择：确认选择 陈默（card_count=24）
+角色选择：场景切换成功 → map.tscn
+ERROR: Unable to start the timer because it's not inside the scene tree. Either add it or set autostart to true.
+   at: start (scene/main/timer.cpp:120)
+   GDScript backtrace (most recent call first):
+       [0] _ready (res://scripts/character_select.gd:65)
+角色选择：场景加载完成（failsafe timer 5s 已启动）
+角色选择：样式初始化完成（deferred）
+地图场景：生成地图 liqi
+地图场景：加载完成，当前境界 炼气期
+VisualChecker: 已截图 user://qa-captures/CharacterSelect_2026-10-07T13-41-04.png
+VisualChecker: 已截图 user://qa-captures/GameMapScene_2026-10-07T13-41-06.png
+AgentSocket[1]: capture -> res://tools/vision/probe_windowed-helper.png (2880x1779)
+SceneWalker: captured character_select (2880x1779) -> C:/Users/hbgan/Projects/shendu/qa-captures/character_select.png
+SceneWalker: switching to res://scenes/map.tscn
+地图场景：生成地图 liqi
+地图场景：加载完成，当前境界 炼气期
+SceneWalker: captured map (2880x1779) -> C:/Users/hbgan/Projects/shendu/qa-captures/map.png
+SceneWalker: switching to res://scenes/battle.tscn
+========================================
+  蜃都 — 战斗
+========================================
+AgentSocket: input_paused = false
+GameState: 角色 chenmo 初始卡组 10 张
+Player: 初始化牌堆 24 张卡牌（来源: GameState牌库）
+Player: 初始化牌堆 24 张卡牌（来源: GameState牌库）
+Player: 回合开始，灵力 10，手牌 4 张
+BattleManager: 第 1 回合，玩家回合
+BattleManager: 战斗开始！
+战斗：初始化完成，敌人数量=2
+=== 战斗状态 ===
+状态: 选牌中 | 回合: 1
+玩家: 陈默 HP:80/80 盾:0 能量:10/10 手牌:4 魔念:0 [火]
+敌人1: 灵气游魂 HP:35/35 盾:0 [火] 意图:攻击+增益(4伤害)
+敌人2: 电路精灵 HP:35/35 盾:0 [金] 意图:攻击+增益(4伤害)
+
+战斗：首战，启动新手引导
+AgentInspector: scene change #1: res://scenes/map.tscn → res://scenes/battle.tscn
+AgentInspector: scene change detected → res://scenes/battle.tscn → immediate flush (after 2 frames)
+SceneWalker: captured battle (2880x1779) -> C:/Users/hbgan/Projects/shendu/qa-captures/battle.png
+SceneWalker: switching to res://scenes/reward.tscn
+ERROR: The object does not have any 'meta' values with the key 'last_reward'.
+   at: get_meta (core/object/object.cpp:1052)
+   GDScript backtrace (most recent call first):
+       [0] _ready (res://scripts/reward_scene.gd:61)
+SCRIPT ERROR: Trying to assign value of type 'RefCounted' to a variable of type 'GDScript'.
+   at: generate (res://scripts/core/reward_data.gd:83)
+   GDScript backtrace (most recent call first):
+       [0] generate (res://scripts/core/reward_data.gd:83)
+       [1] _ready (res://scripts/reward_scene.gd:63)
+SCRIPT ERROR: Invalid access to property or key 'spirit_stones' on a base object of type 'Nil'.
+   at: _ready (res://scripts/reward_scene.gd:73)
+   GDScript backtrace (most recent call first):
+       [0] _ready (res://scripts/reward_scene.gd:73)
+AgentInspector: scene change #2: res://scenes/battle.tscn → res://scenes/reward.tscn
+AgentInspector: scene change detected → res://scenes/reward.tscn → immediate flush (after 2 frames)
+VisualChecker: 已截图 user://qa-captures/RewardScene_2026-10-07T13-41-25.png
+SceneWalker: captured reward (2880x1779) -> C:/Users/hbgan/Projects/shendu/qa-captures/reward.png
+SceneWalker: done. captured=5 failed=0
+ERROR: Parameter "data.tree" is null.
+   at: get_tree (scene/main/node.h:559)
+   GDScript backtrace (most recent call first):
+       [0] _on_tree_changed (res://scripts/agent_inspector.gd:54)
+ERROR: Parameter "data.tree" is null.
+   at: get_tree (scene/main/node.h:559)
+   GDScript backtrace (most recent call first):
+       [0] _on_tree_changed (res://scripts/agent_inspector.gd:54)
+ERROR: Parameter "data.tree" is null.
+   at: get_tree (scene/main/node.h:559)
+   GDScript backtrace (most recent call first):
+       [0] _on_tree_changed (res://scripts/agent_inspector.gd:54)
+ERROR: Parameter "data.tree" is null.
+   at: get_tree (scene/main/node.h:559)
+   GDScript backtrace (most recent call first):
+       [0] _on_tree_changed (res://scripts/agent_inspector.gd:54)
+ERROR: Parameter "data.tree" is null.
+   at: get_tree (scene/main/node.h:559)
+   GDScript backtrace (most recent call first):
+       [0] _on_tree_changed (res://scripts/agent_inspector.gd:54)
+ERROR: Parameter "data.tree" is null.
+   at: get_tree (scene/main/node.h:559)
+   GDScript backtrace (most recent call first):
+       [0] _on_tree_changed (res://scripts/agent_inspector.gd:54)
+ERROR: Parameter "data.tree" is null.
+   at: get_tree (scene/main/node.h:559)
+   GDScript backtrace (most recent call first):
+       [0] _on_tree_changed (res://scripts/agent_inspector.gd:54)
+ERROR: Parameter "data.tree" is null.
+   at: get_tree (scene/main/node.h:559)
+   GDScript backtrace (most recent call first):
+       [0] _on_tree_changed (res://scripts/agent_inspector.gd:54)
+ERROR: Parameter "data.tree" is null.
+   at: get_tree (scene/main/node.h:559)
+   GDScript backtrace (most recent call first):
+       [0] _on_tree_changed (res://scripts/agent_inspector.gd:54)
+ERROR: Parameter "data.tree" is null.
+   at: get_tree (scene/main/node.h:559)
+   GDScript backtrace (most recent call first):
+       [0] _on_tree_changed (res://scripts/agent_inspector.gd:54)
+ERROR: Parameter "data.tree" is null.
+   at: get_tree (scene/main/node.h:559)
+   GDScript backtrace (most recent call first):
+       [0] _on_tree_changed (res://scripts/agent_inspector.gd:54)
+ERROR: Parameter "data.tree" is null.
+   at: get_tree (scene/main/node.h:559)
+   GDScript backtrace (most recent call first):
+       [0] _on_tree_changed (res://scripts/agent_inspector.gd:54)
+ERROR: Parameter "data.tree" is null.
+   at: get_tree (scene/main/node.h:559)
+   GDScript backtrace (most recent call first):
+       [0] _on_tree_changed (res://scripts/agent_inspector.gd:54)
+ERROR: Parameter "data.tree" is null.
+   at: get_tree (scene/main/node.h:559)
+   GDScript backtrace (most recent call first):
+       [0] _on_tree_changed (res://scripts/agent_inspector.gd:54)
+ERROR: Parameter "data.tree" is null.
+   at: get_tree (scene/main/node.h:559)
+   GDScript backtrace (most recent call first):
+       [0] _on_tree_changed (res://scripts/agent_inspector.gd:54)
+WARNING: 53 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2535)
+ERROR: 14 resources still in use at exit (run with --verbose for details).
+   at: clear (core/io/resource.cpp:822)

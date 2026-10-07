@@ -339,7 +339,7 @@ func _do_key(key_name: String) -> void:
 
 func _do_capture(path: String) -> void:
 	# 2026-07-28 headless 守护：headless 模式无 viewport texture
-	if OS.has_feature("headless"):
+	if OS.has_feature("headless") or DisplayServer.get_name() == "headless" or "--headless" in OS.get_cmdline_args():
 		print("AgentSocket: headless mode → skip capture")
 		return
 	var img: Image = get_viewport().get_texture().get_image()

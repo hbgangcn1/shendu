@@ -14,9 +14,9 @@ func run_all_tests() -> void:
 ## 空 session（无 goals）
 func test_summarize_empty_session() -> void:
 	print("\n--- 空 session 画像 ---")
-	RunGoals.clear_goals()
-	RunGoals.set_run_id("profile-empty")
-	var profile := RunGoals.summarize_session()
+	Qa.run_goals.clear_goals()
+	Qa.run_goals.set_run_id("profile-empty")
+	var profile = Qa.run_goals.summarize_session()
 	assert(profile["total_goals"] == 0, "空 session total_goals 应 0")
 	assert(profile["completed_goals"] == 0, "空 session completed 应 0")
 	assert(profile["completion_rate"] == 0.0, "空 session completion_rate 应 0.0")
@@ -27,14 +27,14 @@ func test_summarize_empty_session() -> void:
 ## 部分完成
 func test_summarize_partial_completion() -> void:
 	print("\n--- 部分完成 (1/3) ---")
-	RunGoals.clear_goals()
-	RunGoals.set_run_id("profile-partial")
-	RunGoals.add_goal("survive_n_battles", 3, "high")
-	RunGoals.add_goal("max_runtime_seconds", 120, "normal")
-	RunGoals.add_goal("collect_n_cards", 15, "normal")
+	Qa.run_goals.clear_goals()
+	Qa.run_goals.set_run_id("profile-partial")
+	Qa.run_goals.add_goal("survive_n_battles", 3, "high")
+	Qa.run_goals.add_goal("max_runtime_seconds", 120, "normal")
+	Qa.run_goals.add_goal("collect_n_cards", 15, "normal")
 	# 只触发 survive_n_battles 完成
-	RunGoals.report("battles_won", 3)
-	var profile := RunGoals.summarize_session()
+	Qa.run_goals.report("battles_won", 3)
+	var profile = Qa.run_goals.summarize_session()
 	assert(profile["total_goals"] == 3, "total 应 3")
 	assert(profile["completed_goals"] == 1, "completed 应 1")
 	assert(abs(profile["completion_rate"] - 0.333) < 0.01, "completion_rate 应 ≈ 0.333，实际 %f" % profile["completion_rate"])
@@ -49,15 +49,15 @@ func test_summarize_partial_completion() -> void:
 ## 全部完成 + 优先级分布
 func test_summarize_full_completion_with_priority() -> void:
 	print("\n--- 全完成 + 3 priority ---")
-	RunGoals.clear_goals()
-	RunGoals.set_run_id("profile-full")
-	RunGoals.add_goal("survive_n_battles", 5, "high")
-	RunGoals.add_goal("max_runtime_seconds", 60, "normal")
-	RunGoals.add_goal("collect_n_cards", 10, "low")
-	RunGoals.report("battles_won", 5)
-	RunGoals.report("elapsed_seconds", 60)
-	RunGoals.report("cards_collected", 10)
-	var profile := RunGoals.summarize_session()
+	Qa.run_goals.clear_goals()
+	Qa.run_goals.set_run_id("profile-full")
+	Qa.run_goals.add_goal("survive_n_battles", 5, "high")
+	Qa.run_goals.add_goal("max_runtime_seconds", 60, "normal")
+	Qa.run_goals.add_goal("collect_n_cards", 10, "low")
+	Qa.run_goals.report("battles_won", 5)
+	Qa.run_goals.report("elapsed_seconds", 60)
+	Qa.run_goals.report("cards_collected", 10)
+	var profile = Qa.run_goals.summarize_session()
 	assert(profile["total_goals"] == 3, "total 应 3")
 	assert(profile["completed_goals"] == 3, "completed 应 3")
 	assert(profile["completion_rate"] == 1.0, "completion_rate 应 1.0")
@@ -71,14 +71,14 @@ func test_summarize_full_completion_with_priority() -> void:
 ## ExperienceMemory 记录
 func test_record_strategy_profile_to_experience_memory() -> void:
 	print("\n--- ExperienceMemory 写入测试 ---")
-	RunGoals.clear_goals()
-	RunGoals.set_run_id("profile-mem")
-	RunGoals.add_goal("survive_n_battles", 2, "high")
-	RunGoals.add_goal("max_runtime_seconds", 100, "normal")
-	RunGoals.report("battles_won", 2)
-	RunGoals.report("elapsed_seconds", 100)
-	var profile := RunGoals.summarize_session()
-	var record: Dictionary = ExperienceMemory.record_strategy_profile("test_scenario", profile)
+	Qa.run_goals.clear_goals()
+	Qa.run_goals.set_run_id("profile-mem")
+	Qa.run_goals.add_goal("survive_n_battles", 2, "high")
+	Qa.run_goals.add_goal("max_runtime_seconds", 100, "normal")
+	Qa.run_goals.report("battles_won", 2)
+	Qa.run_goals.report("elapsed_seconds", 100)
+	var profile = Qa.run_goals.summarize_session()
+	var record: Dictionary = Qa.experience_memory.record_strategy_profile("test_scenario", profile)
 	assert(record.get("type") == "strategy_profile", "记录 type 应 strategy_profile")
 	assert(record.get("evidence", {}).get("summary_kind") == "strategy_profile", "evidence 含 summary_kind")
 	assert(record.get("evidence", {}).get("run_id") == "profile-mem", "evidence 含 run_id")
@@ -87,17 +87,17 @@ func test_record_strategy_profile_to_experience_memory() -> void:
 ## 真实数据聚合
 func test_profile_aggregation_with_realistic_data() -> void:
 	print("\n--- 真实数据聚合 ---")
-	RunGoals.clear_goals()
-	RunGoals.set_run_id("profile-realistic")
+	Qa.run_goals.clear_goals()
+	Qa.run_goals.set_run_id("profile-realistic")
 	# 模拟 AI Player default 3 goals
-	RunGoals.add_goal("survive_n_battles", 3, "high")
-	RunGoals.add_goal("max_runtime_seconds", 120, "normal")
-	RunGoals.add_goal("collect_n_cards", 15, "normal")
+	Qa.run_goals.add_goal("survive_n_battles", 3, "high")
+	Qa.run_goals.add_goal("max_runtime_seconds", 120, "normal")
+	Qa.run_goals.add_goal("collect_n_cards", 15, "normal")
 	# 模拟 AI Player 真实 gameplay: 打 3 场 + 收集 12 张 + 跑到 90s
-	RunGoals.report("battles_won", 3)        # survive_n_battles 完成
-	RunGoals.report("cards_collected", 12)   # 未达 15, 未完成
-	RunGoals.report("elapsed_seconds", 90)   # 未达 120, 未完成
-	var profile := RunGoals.summarize_session()
+	Qa.run_goals.report("battles_won", 3)        # survive_n_battles 完成
+	Qa.run_goals.report("cards_collected", 12)   # 未达 15, 未完成
+	Qa.run_goals.report("elapsed_seconds", 90)   # 未达 120, 未完成
+	var profile = Qa.run_goals.summarize_session()
 	assert(profile["completed_goals"] == 1, "仅 survive 完成，应 1/3")
 	assert(profile["completion_rate"] < 1.0, "completion_rate < 1.0")
 	# 验证 elapsed_seconds 已记录

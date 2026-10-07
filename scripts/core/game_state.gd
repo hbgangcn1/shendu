@@ -35,7 +35,9 @@ signal state_changed()
 const DEBUG_RUNNER := preload("res://scripts/qa/debug_runner.gd")
 
 func _ready() -> void:
-	DEBUG_RUNNER.ensure_qa_nodes(get_tree())
+	# QA bootstrap 必须 deferred: _ready 时 tree 正忙于 setup children，
+	# 直接 add_child 会报错，defer 到 tree 空闲后 ensure_qa_nodes 再挂载。
+	DEBUG_RUNNER.ensure_qa_nodes.call_deferred(get_tree())
 
 func reset_run() -> void:
 	hp = 80

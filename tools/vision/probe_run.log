@@ -1,0 +1,486 @@
+launching
+Godot Engine v4.7.stable.official.5b4e0cb0f - https://godotengine.org
+OpenGL API 3.3.0 - Build 32.0.101.6737 - Compatibility - Using Device: Intel - Intel(R) Iris(R) Xe Graphics
+
+UITheme: 墨韵赛博主题已加载
+ERROR: Parent node is busy setting up children, `add_child()` failed. Consider using `add_child.call_deferred(child)` instead.
+   at: add_child (scene/main/node.cpp:1721)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:58)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+ERROR: Parent node is busy setting up children, `add_child()` failed. Consider using `add_child.call_deferred(child)` instead.
+   at: add_child (scene/main/node.cpp:1721)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:58)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+ERROR: Parent node is busy setting up children, `add_child()` failed. Consider using `add_child.call_deferred(child)` instead.
+   at: add_child (scene/main/node.cpp:1721)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:58)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+ERROR: Parent node is busy setting up children, `add_child()` failed. Consider using `add_child.call_deferred(child)` instead.
+   at: add_child (scene/main/node.cpp:1721)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:58)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+ERROR: Parent node is busy setting up children, `add_child()` failed. Consider using `add_child.call_deferred(child)` instead.
+   at: add_child (scene/main/node.cpp:1721)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:58)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+ERROR: Parent node is busy setting up children, `add_child()` failed. Consider using `add_child.call_deferred(child)` instead.
+   at: add_child (scene/main/node.cpp:1721)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:58)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "ExperienceMemory" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/run_goals.gd:112)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+ERROR: Failed to load script "res://scripts/qa/run_goals.gd" with error "Parse error".
+   at: load (modules/gdscript/gdscript_resource_format.cpp:46)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+WARNING: QA bootstrap: cannot instantiate res://scripts/qa/run_goals.gd
+   at: push_warning (core/variant/variant_utility.cpp:1033)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:51)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+ERROR: Parent node is busy setting up children, `add_child()` failed. Consider using `add_child.call_deferred(child)` instead.
+   at: add_child (scene/main/node.cpp:1721)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:58)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+ERROR: Parent node is busy setting up children, `add_child()` failed. Consider using `add_child.call_deferred(child)` instead.
+   at: add_child (scene/main/node.cpp:1721)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:58)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "ExperienceMemory" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:75)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "RunGoals" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:76)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "RunGoals" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:79)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "RunGoals" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:93)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "RunGoals" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:94)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "RunGoals" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:102)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "RunGoals" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:103)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "RunGoals" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:156)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "RunGoals" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:157)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "RunGoals" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:159)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "RunGoals" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:161)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "ExperienceMemory" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:170)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "RunGoals" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:187)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "RunGoals" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:188)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "RunGoals" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:191)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "RunGoals" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:193)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "ExperienceMemory" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:203)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "RunGoals" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:236)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "ExperienceMemory" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:424)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "ExperienceMemory" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:435)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "ExperienceMemory" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:448)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "ExperienceMemory" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:452)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "ExperienceMemory" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:460)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "ExperienceMemory" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:467)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "ExperienceMemory" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:498)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "ExperienceMemory" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:510)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "ExperienceMemory" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:515)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "ExperienceMemory" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:525)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "ExperienceMemory" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:535)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "ExperienceMemory" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:539)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "ExperienceMemory" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:549)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "AgentActions" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:561)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "AgentActions" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:566)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "AgentInput" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:573)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "AgentActions" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:604)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "AgentInput" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:612)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "AgentActions" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:614)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "AgentActions" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:744)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "ExperienceMemory" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:850)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "RunGoals" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:857)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "RunGoals" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:859)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "ExperienceMemory" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:862)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "RunGoals" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:941)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "AgentActions" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:943)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "AgentInput" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:950)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "AgentInput" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:953)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "RunGoals" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:958)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "AgentActions" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:959)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "RunGoals" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:966)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "AgentActions" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:974)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "AgentInput" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:977)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "RunGoals" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:982)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "AgentActions" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:990)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "AgentInput" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:993)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "AgentActions" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:1007)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "AgentActions" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:1010)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "AgentActions" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:1017)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "ExperienceMemory" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:1085)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "RunGoals" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:1109)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "RunGoals" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:1112)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "RunGoals" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:1171)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "ExperienceMemory" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:1189)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "ExperienceMemory" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:1197)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "ExperienceMemory" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:1205)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "ExperienceMemory" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:1215)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "ExperienceMemory" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:1223)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "ExperienceMemory" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:1231)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "RunGoals" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:1281)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Cannot infer the type of "goals" variable because the value doesn't have a set type.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:1281)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "RunGoals" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:1285)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "DeckAnalyzer" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:1296)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Cannot infer the type of "analysis" variable because the value doesn't have a set type.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:1296)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "ExperienceMemory" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:1297)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "AgentActions" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:1349)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "AgentInput" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:1361)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+SCRIPT ERROR: Parse Error: Identifier "AgentInput" not declared in the current scope.
+   at: GDScript::reload (res://scripts/qa/ai_player.gd:1363)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+ERROR: Failed to load script "res://scripts/qa/ai_player.gd" with error "Parse error".
+   at: load (modules/gdscript/gdscript_resource_format.cpp:46)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:49)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+WARNING: QA bootstrap: cannot instantiate res://scripts/qa/ai_player.gd
+   at: push_warning (core/variant/variant_utility.cpp:1033)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:51)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+ERROR: Parent node is busy setting up children, `add_child()` failed. Consider using `add_child.call_deferred(child)` instead.
+   at: add_child (scene/main/node.cpp:1721)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:58)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+ERROR: Parent node is busy setting up children, `add_child()` failed. Consider using `add_child.call_deferred(child)` instead.
+   at: add_child (scene/main/node.cpp:1721)
+   GDScript backtrace (most recent call first):
+       [0] ensure_qa_nodes (res://scripts/qa/debug_runner.gd:58)
+       [1] _ready (res://scripts/core/game_state.gd:38)
+QA bootstrap: --qa-auto-run present → mounted 10 QA nodes
+CardPool: 加载 mvp=17 + zhuji=15 + jindan=13 = 总 45 张卡
+========================================
+  蜃都 — 项目启动
+========================================
+
+--- 五行系统自测 ---
+  ✓ 相生判定正确
+  ✓ 相克判定正确
+  ✓ 伤害计算正确
+
+--- 卡池自测 ---
+SCRIPT ERROR: Trying to assign value of type 'Object' to a variable of type 'Dictionary'.
+   at: _test_card_pool (res://scripts/main.gd:63)
+   GDScript backtrace (most recent call first):
+       [0] _test_card_pool (res://scripts/main.gd:63)
+       [1] _ready (res://scripts/main.gd:15)
+========================================
+  所有自测通过 ✓
+========================================
+主菜单：菜单加载完成，自动存档: 存在
+主菜单：headless 模式自动开始游戏 (跳过 start_button click)
+Save: 存档 auto_save 已加载（2026-08-13T18:21:59）
+主菜单：加载自动存档成功
+地图场景：生成地图 liqi
+地图场景：加载完成，当前境界 炼气期

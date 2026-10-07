@@ -32,7 +32,7 @@ func run_all_tests() -> void:
 
 func test_load_battle_baseline() -> void:
 	print("\n--- 测试 load_goal_scene('battle_baseline') ---")
-	var goals: Array[Goal] = RunGoals.load_goal_scene("battle_baseline")
+	var goals: Array[Goal] = Qa.run_goals.load_goal_scene("battle_baseline")
 	assert(goals.size() == 3, "battle_baseline 应有 3 个 goal，实际 %d" % goals.size())
 	assert(goals[0].type == Goal.TYPE_SURVIVE_N_BATTLES, "[0].type 错：%s" % goals[0].type)
 	assert(goals[0].value == 3, "[0].value 错：%d" % goals[0].value)
@@ -45,7 +45,7 @@ func test_load_battle_baseline() -> void:
 
 func test_load_empty_scene() -> void:
 	print("\n--- 测试 load_goal_scene('empty') 边界 ---")
-	var goals: Array[Goal] = RunGoals.load_goal_scene("empty")
+	var goals: Array[Goal] = Qa.run_goals.load_goal_scene("empty")
 	assert(goals.is_empty(), "empty 应返回空数组，实际 %d 个" % goals.size())
 	print("  ✓ empty 场景返回空数组")
 
@@ -57,7 +57,7 @@ func test_load_all_10_scenes() -> void:
 		"single_goal_max_runtime", "empty"
 	]
 	for scene_name in scene_names:
-		var goals: Array[Goal] = RunGoals.load_goal_scene(scene_name)
+		var goals: Array[Goal] = Qa.run_goals.load_goal_scene(scene_name)
 		assert(goals.size() >= 0, "%s 加载结果非法" % scene_name)
 		for g in goals:
 			assert(g.type in Goal.VALID_TYPES, "%s: type '%s' 不合法" % [scene_name, g.type])
@@ -66,13 +66,13 @@ func test_load_all_10_scenes() -> void:
 
 func test_load_nonexistent_scene() -> void:
 	print("\n--- 测试 load_goal_scene('not_exist') 返回 [] ---")
-	var goals: Array[Goal] = RunGoals.load_goal_scene("not_exist_scene")
+	var goals: Array[Goal] = Qa.run_goals.load_goal_scene("not_exist_scene")
 	assert(goals.is_empty(), "不存在场景应返回空，实际 %d 个" % goals.size())
 	print("  ✓ 不存在场景返回空数组（push_warning 已记录）")
 
 func test_load_nonexistent_path() -> void:
 	print("\n--- 测试 load_goal_scene(scene, 'fake/path.json') 返回 [] ---")
-	var goals: Array[Goal] = RunGoals.load_goal_scene("battle_baseline", "res://scripts/qa/does_not_exist.json")
+	var goals: Array[Goal] = Qa.run_goals.load_goal_scene("battle_baseline", "res://scripts/qa/does_not_exist.json")
 	assert(goals.is_empty(), "不存在 path 应返回空，实际 %d" % goals.size())
 	print("  ✓ 不存在路径返回空数组")
 
@@ -84,7 +84,7 @@ func test_invalid_json_structure() -> void:
 	bad_file.store_string("not valid json {{{")
 	bad_file.close()
 
-	var goals: Array[Goal] = RunGoals.load_goal_scene("battle_baseline", bad_path)
+	var goals: Array[Goal] = Qa.run_goals.load_goal_scene("battle_baseline", bad_path)
 	assert(goals.is_empty(), "malformed JSON 应返回空，实际 %d" % goals.size())
 
 	# cleanup
@@ -95,7 +95,7 @@ func test_invalid_json_structure() -> void:
 
 func test_goal_from_dict_basics() -> void:
 	print("\n--- 测试 _goal_from_dict 转换合法 dict ---")
-	var g: Goal = RunGoals._goal_from_dict({
+	var g: Goal = Qa.run_goals._goal_from_dict({
 		"type": Goal.TYPE_SURVIVE_N_BATTLES,
 		"value": 5,
 		"priority": Goal.TYPE_PRIORITY_HIGH
@@ -108,13 +108,13 @@ func test_goal_from_dict_basics() -> void:
 
 func test_goal_from_dict_missing_type() -> void:
 	print("\n--- 测试 _goal_from_dict 缺 type 返回 null ---")
-	var g: Variant = RunGoals._goal_from_dict({"value": 5, "priority": "high"})
+	var g: Variant = Qa.run_goals._goal_from_dict({"value": 5, "priority": "high"})
 	assert(g == null, "缺 type 应返回 null，实际 %s" % str(g))
 	print("  ✓ 缺 type 返回 null")
 
 func test_goal_from_dict_default_value_priority() -> void:
 	print("\n--- 测试 _goal_from_dict 缺 value/priority 用默认 ---")
-	var g: Goal = RunGoals._goal_from_dict({"type": Goal.TYPE_COMPLETE_RUN})
+	var g: Goal = Qa.run_goals._goal_from_dict({"type": Goal.TYPE_COMPLETE_RUN})
 	assert(g != null, "应返回非 null")
 	assert(g.value == 0, "value 默认应为 0，实际 %d" % g.value)
 	assert(g.priority == "normal", "priority 默认应为 normal，实际 %s" % g.priority)
@@ -126,7 +126,7 @@ func test_json_matches_goal_templates() -> void:
 	print("\n--- 测试 JSON 库与 GoalTemplates 一致（防漂移）---")
 	var tpl := GoalTemplates.new()
 	# 抽取 json 中 battle_baseline 的关键字段，和 GoalTemplates 对齐
-	var json_battle: Array[Goal] = RunGoals.load_goal_scene("battle_baseline")
+	var json_battle: Array[Goal] = Qa.run_goals.load_goal_scene("battle_baseline")
 	var tpl_battle: Array[Goal] = tpl.battle_baseline()
 	assert(json_battle.size() == tpl_battle.size(), "battle_baseline 数量不一致：JSON=%d TPL=%d" % [json_battle.size(), tpl_battle.size()])
 	for i in range(json_battle.size()):

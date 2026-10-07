@@ -59,15 +59,15 @@ func _make_profile_record(timestamp: String, completion_rate: float, completed_g
 	}
 
 func _add_profile(rec: Dictionary) -> void:
-	ExperienceMemory._records.append(rec)
+	Qa.experience_memory._records.append(rec)
 	_added_records.append(rec)
 
 func _cleanup() -> void:
 	# 从 _records 末尾移除我们 add 的（保持顺序假设：add 是 append）
 	for rec in _added_records:
-		var idx := ExperienceMemory._records.find(rec)
+		var idx = Qa.experience_memory._records.find(rec)
 		if idx >= 0:
-			ExperienceMemory._records.remove_at(idx)
+			Qa.experience_memory._records.remove_at(idx)
 	_added_records.clear()
 
 # ===== Tests =====
@@ -76,7 +76,7 @@ func test_empty_records_returns_no_data() -> void:
 	print("\n--- 测试：当只剩余我们 add 的 mock 时，先 clear ——")
 	# 注意：production EM 有 11+ 条 strategy_profile，所以 "空 records" 假设不成立
 	# 改为测试 last_n=0 边界
-	var result := ExperienceMemory.summarize_long_term(0)
+	var result = Qa.experience_memory.summarize_long_term(0)
 	assert(result["runs_analyzed"] == 0, "last_n=0 应 runs_analyzed=0，实际 %d" % result["runs_analyzed"])
 	assert(result["trend"] == "no_data", "空 trend 应 no_data，实际 %s" % result["trend"])
 	print("  ✓ last_n=0 边界: runs_analyzed=0")
@@ -86,7 +86,7 @@ func test_single_profile() -> void:
 	var ts := "2026-07-05T20:00:00"
 	var rec := _make_profile_record(ts, 0.8, 4, 5, 2, 2, 0, {"survive_n_battles": 2, "max_runtime_seconds": 2})
 	_add_profile(rec)
-	var result := ExperienceMemory.summarize_long_term(50)  # 大 window 确保只 add 这条新 mock
+	var result = Qa.experience_memory.summarize_long_term(50)  # 大 window 确保只 add 这条新 mock
 	_cleanup()
 	# 单条时 runs_analyzed=1 (如果没其他 mock 污染)
 	# 但 production EM 有历史 profile，所以 runs_analyzed >= 1
@@ -103,7 +103,7 @@ func test_three_profiles_aggregate_avg() -> void:
 	_add_profile(_make_profile_record(ts1, 0.5, 5, 10, 5, 0, 0))
 	_add_profile(_make_profile_record(ts2, 0.7, 7, 10, 5, 2, 0))
 	_add_profile(_make_profile_record(ts3, 1.0, 10, 10, 5, 5, 0))
-	var result := ExperienceMemory.summarize_long_term(3)  # 只看最近 3 条
+	var result = Qa.experience_memory.summarize_long_term(3)  # 只看最近 3 条
 	_cleanup()
 	assert(result["runs_analyzed"] == 3, "window=3 应 3 条 runs_analyzed，实际 %d" % result["runs_analyzed"])
 	# ts3 / ts2 / ts1 是最新 3 条（按倒序）
@@ -121,7 +121,7 @@ func test_five_profiles_trend_improving() -> void:
 	_add_profile(_make_profile_record("2026-07-05T22:00:02", 0.3, 3, 10))
 	_add_profile(_make_profile_record("2026-07-05T22:00:03", 0.9, 9, 10))
 	_add_profile(_make_profile_record("2026-07-05T22:00:04", 0.9, 9, 10))
-	var result := ExperienceMemory.summarize_long_term(5)
+	var result = Qa.experience_memory.summarize_long_term(5)
 	_cleanup()
 	assert(result["runs_analyzed"] == 5, "应 5 条，实际 %d" % result["runs_analyzed"])
 	assert(result["trend"] == "improving", "trend 应 improving，实际 %s" % result["trend"])
@@ -135,7 +135,7 @@ func test_five_profiles_trend_regressing() -> void:
 	_add_profile(_make_profile_record("2026-07-05T23:00:02", 0.9, 9, 10))
 	_add_profile(_make_profile_record("2026-07-05T23:00:03", 0.2, 2, 10))
 	_add_profile(_make_profile_record("2026-07-05T23:00:04", 0.3, 3, 10))
-	var result := ExperienceMemory.summarize_long_term(5)
+	var result = Qa.experience_memory.summarize_long_term(5)
 	_cleanup()
 	assert(result["runs_analyzed"] == 5, "应 5 条，实际 %d" % result["runs_analyzed"])
 	assert(result["trend"] == "regressing", "trend 应 regressing，实际 %s" % result["trend"])
@@ -148,7 +148,7 @@ func test_five_profiles_trend_stable() -> void:
 	_add_profile(_make_profile_record("2026-07-06T00:00:02", 0.7, 7, 10))
 	_add_profile(_make_profile_record("2026-07-06T00:00:03", 0.7, 7, 10))
 	_add_profile(_make_profile_record("2026-07-06T00:00:04", 0.7, 7, 10))
-	var result := ExperienceMemory.summarize_long_term(5)
+	var result = Qa.experience_memory.summarize_long_term(5)
 	_cleanup()
 	assert(result["runs_analyzed"] == 5, "应 5 条，实际 %d" % result["runs_analyzed"])
 	assert(result["trend"] == "stable", "trend 应 stable，实际 %s" % result["trend"])
@@ -159,7 +159,7 @@ func test_priority_distribution_aggregation() -> void:
 	_add_profile(_make_profile_record("2026-07-06T01:00:00", 1.0, 5, 5, 2, 1, 0))
 	_add_profile(_make_profile_record("2026-07-06T01:00:01", 1.0, 5, 5, 1, 2, 0))
 	_add_profile(_make_profile_record("2026-07-06T01:00:02", 1.0, 5, 5, 0, 1, 1))
-	var result := ExperienceMemory.summarize_long_term(3)
+	var result = Qa.experience_memory.summarize_long_term(3)
 	_cleanup()
 	# recent 3 条的 priority 累加：high=2+1+0=3, normal=1+2+1=4, low=0+0+1=1
 	var pd: Dictionary = result["priority_distribution"]
@@ -172,7 +172,7 @@ func test_type_distribution_aggregation() -> void:
 	print("\n--- 测试：type_distribution 跨多 profile 累加 ---")
 	_add_profile(_make_profile_record("2026-07-06T02:00:00", 1.0, 3, 3, 1, 1, 0, {"survive_n_battles": 2, "max_runtime_seconds": 1}))
 	_add_profile(_make_profile_record("2026-07-06T02:00:01", 1.0, 3, 3, 1, 1, 0, {"survive_n_battles": 1, "collect_n_cards": 2}))
-	var result := ExperienceMemory.summarize_long_term(2)
+	var result = Qa.experience_memory.summarize_long_term(2)
 	_cleanup()
 	var td: Dictionary = result["type_distribution"]
 	# survive_n_battles: 2+1=3, max_runtime_seconds: 1+0=1, collect_n_cards: 0+2=2
@@ -186,7 +186,7 @@ func test_window_size_truncation() -> void:
 	# 加 8 条 profile，window=3 应只取最近 3 条
 	for i in range(8):
 		_add_profile(_make_profile_record("2026-07-06T03:00:%02d" % i, float(i) / 8.0, i, 10))
-	var result := ExperienceMemory.summarize_long_term(3)
+	var result = Qa.experience_memory.summarize_long_term(3)
 	_cleanup()
 	assert(result["runs_analyzed"] == 3, "window=3 应 3 条，实际 %d" % result["runs_analyzed"])
 	# 最近 3 条时间戳是 07, 06, 05 → rate = 0.875, 0.75, 0.625

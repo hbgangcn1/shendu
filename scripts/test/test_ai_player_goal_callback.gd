@@ -27,10 +27,10 @@ func run_all_tests() -> void:
 	player._run_id = "test_ai_player_callback"
 
 	# 关闭 RunGoals 默认 callback，避免污染 production memory
-	RunGoals.disconnect_default_callback()
-	RunGoals.set_run_id("test_ai_player_callback")
-	ExperienceMemory.set_run_id("test_ai_player_callback")
-	RunGoals.clear_goals()
+	Qa.run_goals.disconnect_default_callback()
+	Qa.run_goals.set_run_id("test_ai_player_callback")
+	Qa.experience_memory.set_run_id("test_ai_player_callback")
+	Qa.run_goals.clear_goals()
 
 	_run_for_goal(player, "survive_n_battles", 3)
 	_run_for_goal(player, "max_runtime_seconds", 120)
@@ -50,8 +50,8 @@ func run_all_tests() -> void:
 	test_elapsed_sec_in_evidence()
 
 	# cleanup
-	RunGoals.reconnect_default_callback()
-	RunGoals.clear_goals()
+	Qa.run_goals.reconnect_default_callback()
+	Qa.run_goals.clear_goals()
 	player.queue_free()
 	print("=== AIPlayer Goal Callback 测试完成 ===\n")
 
@@ -70,7 +70,7 @@ func _run_for_goal(player, type_name: String, value: int) -> void:
 
 func _get_latest_record_of_type(type_name: String) -> Dictionary:
 	# ExperienceMemory.get_last_by_type 返回最新
-	return ExperienceMemory.get_last_by_type(type_name)
+	return Qa.experience_memory.get_last_by_type(type_name)
 
 # ===== 各 type 路由测试 =====
 
@@ -96,7 +96,7 @@ func test_strategy_record() -> void:
 		"latest strategy_profile 应是 complete_run，实际 %s" % str(rec_max.get("evidence", {}).get("goal_type", "")))
 
 	# 验证 max_runtime_seconds 写过的 strategy_profile record 还在
-	var all_strategies := ExperienceMemory.get_records_by_type("strategy_profile")
+	var all_strategies = Qa.experience_memory.get_records_by_type("strategy_profile")
 	assert(all_strategies.size() >= 2, "应有 2+ 条 strategy_profile 记录（max_runtime + complete_run），实际 %d" % all_strategies.size())
 	var has_max := false
 	for r in all_strategies:
@@ -127,7 +127,7 @@ func test_fallback_record() -> void:
 	print("\n--- 测试未匹配类型走 fallback (goal) ---")
 	# trigger_n_chains + reach_realm_n 没在 match 里，应走 fallback
 	# 注意: 跨多次 test_runner run 累积，本 run 应至少 +2
-	var all_goal := ExperienceMemory.get_records_by_type("goal")
+	var all_goal = Qa.experience_memory.get_records_by_type("goal")
 	assert(all_goal.size() >= 2, "fallback 记录应 >= 2，实际 %d" % all_goal.size())
 	var has_trigger: bool = false
 	var has_realm: bool = false

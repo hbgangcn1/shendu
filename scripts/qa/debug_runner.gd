@@ -11,20 +11,25 @@ extends SceneTree
 # get_node_or_null("/root/AgentSocket") 类查找保持可用）。
 const AGENT_FLAG := "--qa-auto-run"
 
-# 下表逐字照搬移除前的 production autoload 顺序，保证 _ready 执行顺序不变。
+# 挂载顺序：RunGoals / ExperienceMemory / AgentInput / AgentActions 必须在
+# AIPlayer 及其他消费者之前挂载 —— AIPlayer._ready() 内直接调用
+# Qa.run_goals / Qa.experience_memory (set_run_id, get_goals, goal_completed),
+# 而 add_child 会同步触发被挂节点的 _ready，此时 bind_all 尚未跑完，
+# 因此被依赖的 4 个节点必须先挂载，且每次 add_child 后增量 bind 一次，
+# 保证消费者 _ready 里 Qa.* 已可用；循环结束后再全量 bind_all 一次兜底。
 const QA_SINGLETONS: Array = [
 	["ViewportCapture", "res://scripts/qa_capture.gd"],
 	["SceneWalker", "res://scripts/scene_walker.gd"],
 	["AgentSocket", "res://scripts/agent_socket.gd"],
 	["AgentInspector", "res://scripts/agent_inspector.gd"],
+	["RunGoals", "res://scripts/qa/run_goals.gd"],
+	["ExperienceMemory", "res://scripts/qa/experience_memory.gd"],
 	["AgentInput", "res://scripts/qa/agent_input.gd"],
 	["AgentActions", "res://scripts/qa/agent_actions.gd"],
-	["RunGoals", "res://scripts/qa/run_goals.gd"],
 	["RewardEvaluator", "res://scripts/qa/reward_evaluator.gd"],
 	["DeckAnalyzer", "res://scripts/qa/deck_analyzer.gd"],
 	["AIPlayer", "res://scripts/qa/ai_player.gd"],
 	["VisualChecker", "res://scripts/qa/visual_checker_stub.gd"],
-	["ExperienceMemory", "res://scripts/qa/experience_memory.gd"],
 ]
 
 static func is_qa_mode() -> bool:
@@ -57,6 +62,10 @@ static func ensure_qa_nodes(tree: SceneTree) -> int:
 		node.name = node_name
 		root.add_child(node)
 		added += 1
+		# 增量绑定：add_child 已同步触发该节点的 _ready，后续挂载的消费者
+		# (如 AIPlayer._ready) 在 _ready 内即可用 Qa.run_goals 等先行节点。
+		Qa.bind_all(tree)
+	Qa.bind_all(tree)
 	print("QA bootstrap: --qa-auto-run present → mounted %d QA nodes" % added)
 	return added
 

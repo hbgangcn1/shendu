@@ -152,13 +152,13 @@ func test_scenes_contain_real_type_priority(tpl: GoalTemplates) -> void:
 ## P1.1 Phase 2 Step 7 (H7, 2026-07-05 20:20):
 ## test_runner 跑测时主动对比 GoalTemplates vs goal_library.json，让 drift 早暴露
 func test_load_goal_scene_matches_templates(tpl: GoalTemplates) -> void:
-	print("\n--- 测试 RunGoals.load_goal_scene() 与 GoalTemplates 一致（drift 早暴露）---")
+	print("\n--- 测试 Qa.run_goals.load_goal_scene() 与 GoalTemplates 一致（drift 早暴露）---")
 	var names: Array[String] = tpl.all_scene_names()
 	var mismatches: Array[String] = []
 
 	for scene_name in names:
 		var tpl_goals: Array[Goal] = tpl.call(scene_name)
-		var json_goals: Array[Goal] = RunGoals.load_goal_scene(scene_name)
+		var json_goals: Array[Goal] = Qa.run_goals.load_goal_scene(scene_name)
 
 		if tpl_goals.size() != json_goals.size():
 			mismatches.append("%s: goal count %d (templates) != %d (json)" % [scene_name, tpl_goals.size(), json_goals.size()])

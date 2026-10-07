@@ -26,7 +26,7 @@ func run_all_tests() -> void:
 	print("=== compute_goal_pct 测试完成 ===\n")
 
 func _pct(g: Goal, stats: Dictionary) -> float:
-	return AIPlayer.compute_goal_pct(g, stats)
+	return Qa.ai_player.compute_goal_pct(g, stats)
 
 # ===== 9 种 Goal type =====
 

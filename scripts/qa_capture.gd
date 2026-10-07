@@ -84,6 +84,7 @@ func _capture() -> void:
 	#   但 _capture() 设计目的就是为了拿真实 viewport（不然 ai_player_client 截图发给 minimax 没意义）。
 	#   修复：非 headless 模式下，先 await process_frame 让 viewport 渲染，然后强制 get_image()，失败才写 placeholder + warning
 	var img: Image = null
+	var is_black := false
 	if _is_headless_mode():
 		# headless 模式：尝试真实捕获 viewport texture
 		# 2026-08-08 architectural reality: Godot 4.7 --headless 强制 dummy renderer，
@@ -118,6 +119,7 @@ func _capture() -> void:
 		var h := int(vp_rect.size.y)
 		img = Image.create(w, h, false, Image.FORMAT_RGBA8)
 		img.fill(Color.BLACK)
+		is_black = true
 		print("ViewportCapture: headless → fallback black fill (%dx%d)" % [w, h])
 
 	# 确保输出目录存在
@@ -132,5 +134,9 @@ func _capture() -> void:
 	if err == OK:
 		var abs_path := ProjectSettings.globalize_path(path)
 		print("ViewportCapture: saved %s (%dx%d) -> %s" % [path, img.get_width(), img.get_height(), abs_path])
+		if is_black:
+			var mf := FileAccess.open(path + ".black", FileAccess.WRITE)
+			if mf != null:
+				mf.close()
 	else:
 		push_error("ViewportCapture: save_png failed: %d" % err)

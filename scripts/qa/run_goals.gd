@@ -109,7 +109,7 @@ func _goal_from_dict(d: Dictionary) -> Goal:
 ## evidence 包含 type/value/priority/stats_at_completion
 ## confidence=0.7 (Goal 自动判定, 不是 LLM/AI 主观判断)
 func _default_goal_callback(goal: Goal, stats: Dictionary) -> void:
-	ExperienceMemory.record(
+	Qa.experience_memory.record(
 		"goal",
 		"run_goals",
 		goal.description,

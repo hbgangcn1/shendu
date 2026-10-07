@@ -72,11 +72,11 @@ func _ready() -> void:
 	_running = true
 	_start_time_ms = Time.get_ticks_msec()
 	_run_id = _generate_run_id()
-	ExperienceMemory.set_run_id(_run_id)
-	RunGoals.set_run_id(_run_id)
+	Qa.experience_memory.set_run_id(_run_id)
+	Qa.run_goals.set_run_id(_run_id)
 	# 默认 goals(如果 RunGoals 还没设置)
 	# P1.1 Phase 2 (2026-07-05 16:18): 改为按 deck 状态自动选 scene
-	if RunGoals.get_goals().is_empty():
+	if Qa.run_goals.get_goals().is_empty():
 		var current_deck: Array = []
 		if not GameState.deck.is_empty():
 			for idx in GameState.deck:
@@ -90,8 +90,8 @@ func _ready() -> void:
 			# Fallback: P1.1 Phase 1 的硬编码（防止 load_goal_scene 失败）
 			# 2026-07-24 Robert: 移除 max_runtime_seconds 时限 goal。
 			# 只保留游戏 driven goals（survive/collect）+ LLM 主动 quit。
-			RunGoals.add_goal("survive_n_battles", 3, "high")
-			RunGoals.add_goal("collect_n_cards", 15, "normal")
+			Qa.run_goals.add_goal("survive_n_battles", 3, "high")
+			Qa.run_goals.add_goal("collect_n_cards", 15, "normal")
 	# 2026-08-02 15:35：Robert 决定只接受 model 模式。Script 模式已彻底移除。
 	#   _parse_ai_player_mode() 现在总是返回 MODE_MODEL（见下方函数定义）。
 	#   以下的 if/else 是历史兼容：理论上 _ai_player_mode 永远是 MODE_MODEL，但保留死代码以防回归。
@@ -99,8 +99,8 @@ func _ready() -> void:
 	print("AIPlayer: 解析后的 mode = %s" % _ai_player_mode)
 	assert(_ai_player_mode == MODE_MODEL, "AIPlayer 只接受 model 模式，2026-08-02 Robert 决定")
 	# 连接 Goal 完成信号仍需保留（reflect prompt 需要）
-	if not RunGoals.goal_completed.is_connected(_on_ai_player_goal_completed):
-		RunGoals.goal_completed.connect(_on_ai_player_goal_completed)
+	if not Qa.run_goals.goal_completed.is_connected(_on_ai_player_goal_completed):
+		Qa.run_goals.goal_completed.connect(_on_ai_player_goal_completed)
 	# 2026-08-02 15:50：character_select watchdog。在 MODE_MODEL 下 AIPlayer 不调 _handle_*
 	#   所以 character_select 卡住的安全网永远不触发。这里加一个 watchdog：
 	#   在 character_select 停留超过 60s 时，自动 force-skip（设置 chenmo + 跳到 map.tscn），
@@ -153,12 +153,12 @@ func _observe_loop() -> void:
 		_loop_count += 1
 		var elapsed: int = Time.get_ticks_msec() - _start_time_ms
 		var elapsed_sec: int = int(float(elapsed) / 1000.0)
-		RunGoals.report("elapsed_seconds", elapsed_sec)
-		RunGoals.report("loop_count", _loop_count)
+		Qa.run_goals.report("elapsed_seconds", elapsed_sec)
+		Qa.run_goals.report("loop_count", _loop_count)
 		# 游戏自己触发通关/完成时退出（goal-driven）
-		if RunGoals.should_quit():
+		if Qa.run_goals.should_quit():
 			print("AIPlayer[model]: should_quit 返回 true, 退出")
-			print("AIPlayer[model]: 最终 stats: %s" % JSON.stringify(RunGoals.get_stats(), "  "))
+			print("AIPlayer[model]: 最终 stats: %s" % JSON.stringify(Qa.run_goals.get_stats(), "  "))
 			_save_deck_health_snapshot()
 			var tree := _get_tree_safe()
 			if tree != null:
@@ -167,7 +167,7 @@ func _observe_loop() -> void:
 		# 「真挂死」安全网：2h 仍没动 → 记录 lifecycle 退出（不应常态触发）
 		if elapsed > _max_runtime_ms:
 			print("AIPlayer[model]: 异常：2h 未退出 → 强制退出（可能是 LLM/agent hang）")
-			ExperienceMemory.record("lifecycle", _state_name(_state), "max_runtime_hang_protection", {"elapsed_ms": elapsed})
+			Qa.experience_memory.record("lifecycle", _state_name(_state), "max_runtime_hang_protection", {"elapsed_ms": elapsed})
 			_save_deck_health_snapshot()
 			var tree := _get_tree_safe()
 			if tree != null:
@@ -184,13 +184,13 @@ func _run_loop() -> void:
 		_loop_count += 1
 		var elapsed: int = Time.get_ticks_msec() - _start_time_ms
 		var elapsed_sec: int = int(float(elapsed) / 1000.0)
-		RunGoals.report("elapsed_seconds", elapsed_sec)
-		RunGoals.report("loop_count", _loop_count)
+		Qa.run_goals.report("elapsed_seconds", elapsed_sec)
+		Qa.run_goals.report("loop_count", _loop_count)
 
 		# 检查是否所有 goal 都完成（或 max_runtime_seconds 触发）
-		if RunGoals.should_quit():
+		if Qa.run_goals.should_quit():
 			print("AIPlayer: should_quit 返回 true, 退出")
-			print("AIPlayer: 最终 stats: %s" % JSON.stringify(RunGoals.get_stats(), "  "))
+			print("AIPlayer: 最终 stats: %s" % JSON.stringify(Qa.run_goals.get_stats(), "  "))
 			_save_deck_health_snapshot()
 			var tree := _get_tree_safe()
 			if tree != null:
@@ -200,7 +200,7 @@ func _run_loop() -> void:
 		# 软上限兜底（script mode 仍保留 2h 安全网，但 2026-07-24 不应常态触发）
 		if elapsed > _max_runtime_ms:
 			print("AIPlayer: 异常：2h 未退出 → 强制退出")
-			ExperienceMemory.record("lifecycle", _state_name(_state), "max_runtime_hang_protection", {"elapsed_ms": elapsed})
+			Qa.experience_memory.record("lifecycle", _state_name(_state), "max_runtime_hang_protection", {"elapsed_ms": elapsed})
 			_save_deck_health_snapshot()
 			var tree := _get_tree_safe()
 			if tree != null:
@@ -233,7 +233,7 @@ func _run_loop() -> void:
 				await _handle_settlement()
 			State.VICTORY:
 				await _handle_victory()
-				RunGoals.report("victory", true)
+				Qa.run_goals.report("victory", true)
 			State.IDLE:
 				await _wait_ms(500)
 		await _wait_ms(200)
@@ -421,7 +421,7 @@ func _force_skip_character_select() -> void:
 		var idx: int = GameState.add_to_collection(card)
 		GameState.add_to_deck(idx)
 	get_tree().change_scene_to_file("res://scenes/map.tscn")
-	ExperienceMemory.record("watchdog", "character_select", "force_skip_after_60s", {
+	Qa.experience_memory.record("watchdog", "character_select", "force_skip_after_60s", {
 		"elapsed_ms": Time.get_ticks_msec() - _watchdog_char_select_entered_at_ms,
 	})
 
@@ -432,7 +432,7 @@ func _force_skip_main_menu() -> void:
 		current._on_new_game_pressed()
 	else:
 		get_tree().change_scene_to_file("res://scenes/character_select.tscn")
-	ExperienceMemory.record("watchdog", "main_menu", "force_skip_after_30s", {
+	Qa.experience_memory.record("watchdog", "main_menu", "force_skip_after_30s", {
 		"elapsed_ms": Time.get_ticks_msec() - _watchdog_main_menu_entered_at_ms,
 	})
 
@@ -445,11 +445,11 @@ func _force_skip_map() -> void:
 	# 2026-08-03 噪音抑制 B：_force_skip_map 的 fallback 用 record_quiet（设计预期，不是 bug）
 	var current := get_tree().current_scene
 	if current == null or current.get("_realm_map") == null:
-		ExperienceMemory.record_quiet("watchdog", "map", "force_skip_failed", {"reason": "no_realm_map"})
+		Qa.experience_memory.record_quiet("watchdog", "map", "force_skip_failed", {"reason": "no_realm_map"})
 		return
 	var realm_map: Variant = current.get("_realm_map")
 	if realm_map == null:
-		ExperienceMemory.record_quiet("watchdog", "map", "force_skip_failed", {"reason": "realm_map_null"})
+		Qa.experience_memory.record_quiet("watchdog", "map", "force_skip_failed", {"reason": "realm_map_null"})
 		return
 	var target_node: Variant = null
 	for n in realm_map.nodes:
@@ -457,14 +457,14 @@ func _force_skip_map() -> void:
 			target_node = n
 			break
 	if target_node == null:
-		ExperienceMemory.record_quiet("watchdog", "map", "force_skip_failed", {"reason": "no_reachable_node"})
+		Qa.experience_memory.record_quiet("watchdog", "map", "force_skip_failed", {"reason": "no_reachable_node"})
 		return
 	GameState.current_node_id = target_node.id
 	if not GameState.visited_node_ids.has(target_node.id):
 		GameState.visited_node_ids.append(target_node.id)
 	target_node.is_visited = true
 	print("AIPlayer[watchdog]: force-select node %s (type=%s)" % [target_node.id, target_node.get_type_name()])
-	ExperienceMemory.record("watchdog", "map", "force_skip_after_60s", {
+	Qa.experience_memory.record("watchdog", "map", "force_skip_after_60s", {
 		"node_id": target_node.id,
 		"node_type": target_node.get_type_name(),
 		"elapsed_ms": Time.get_ticks_msec() - _watchdog_map_entered_at_ms,
@@ -495,7 +495,7 @@ func _force_skip_battle() -> void:
 	# 2026-08-03 噪音抑制 B：_force_skip_* 的 fallback 用 record_quiet（设计预期，不是 bug）
 	var current := get_tree().current_scene
 	if current == null:
-		ExperienceMemory.record_quiet("watchdog", "battle", "force_skip_failed", {"reason": "no_scene"})
+		Qa.experience_memory.record_quiet("watchdog", "battle", "force_skip_failed", {"reason": "no_scene"})
 		return
 	var bm: Variant = null
 	# 2026-08-02 20:25 fix：battle_manager 也可能不是 method（优先用 _get_battle_manager 风格的 helper 模式）
@@ -507,12 +507,12 @@ func _force_skip_battle() -> void:
 		bm = current.get("battle_manager")
 	if bm == null or not bm.has_method("player_lose"):
 		# fallback: 直接 change scene 回 map
-		ExperienceMemory.record_quiet("watchdog", "battle", "force_skip_failed", {"reason": "no_battle_manager"})
+		Qa.experience_memory.record_quiet("watchdog", "battle", "force_skip_failed", {"reason": "no_battle_manager"})
 		get_tree().change_scene_to_file("res://scenes/map.tscn")
 		return
 	print("AIPlayer[watchdog]: force-lose battle")
 	bm.player_lose()
-	ExperienceMemory.record("watchdog", "battle", "force_lose_after_120s", {
+	Qa.experience_memory.record("watchdog", "battle", "force_lose_after_120s", {
 		"elapsed_ms": Time.get_ticks_msec() - _watchdog_battle_entered_at_ms,
 	})
 
@@ -522,7 +522,7 @@ func _force_end_turn_battle() -> void:
 	# 跟 LLM 应该发的 action 一样，只是不等 LLM。优先选这个而不是直接 force-lose。
 	var current := get_tree().current_scene
 	if current == null:
-		ExperienceMemory.record_quiet("watchdog", "battle", "force_end_turn_failed", {"reason": "no_scene"})
+		Qa.experience_memory.record_quiet("watchdog", "battle", "force_end_turn_failed", {"reason": "no_scene"})
 		return
 	var bm: Variant = null
 	if current.has_method("battle_manager"):
@@ -532,11 +532,11 @@ func _force_end_turn_battle() -> void:
 	elif current.get("battle_manager") != null:
 		bm = current.get("battle_manager")
 	if bm == null or not bm.has_method("player_end_turn"):
-		ExperienceMemory.record_quiet("watchdog", "battle", "force_end_turn_failed", {"reason": "no_battle_manager_or_no_end_turn"})
+		Qa.experience_memory.record_quiet("watchdog", "battle", "force_end_turn_failed", {"reason": "no_battle_manager_or_no_end_turn"})
 		return
 	print("AIPlayer[watchdog]: force-end-turn battle")
 	bm.player_end_turn()
-	ExperienceMemory.record("watchdog", "battle", "force_end_turn_after_60s", {
+	Qa.experience_memory.record("watchdog", "battle", "force_end_turn_after_60s", {
 		"elapsed_ms": Time.get_ticks_msec() - _watchdog_battle_entered_at_ms,
 	})
 
@@ -546,7 +546,7 @@ func _force_skip_post_battle() -> void:
 	# reward 会给卡牌、event 会触发选项、rest 会回血 — 都丢掉了。但至少 scene 推进。
 	print("AIPlayer[watchdog]: force-skip post-battle 回 map")
 	get_tree().change_scene_to_file("res://scenes/map.tscn")
-	ExperienceMemory.record("watchdog", "post_battle", "force_skip_after_30s", {
+	Qa.experience_memory.record("watchdog", "post_battle", "force_skip_after_30s", {
 		"elapsed_ms": Time.get_ticks_msec() - _watchdog_post_battle_entered_at_ms,
 	})
 
@@ -558,19 +558,19 @@ func _handle_main_menu() -> void:
 		await _wait_ms(500)
 		return
 	# 优先用 NewGameButton(保证新游戏状态,清理旧存档)
-	if AgentActions.click_button_by_name("NewGameButton"):
+	if Qa.agent_actions.click_button_by_name("NewGameButton"):
 		print("AIPlayer: 触发新游戏按钮")
 		await _wait_ms(1500)
 		return
 	# Fallback 到 StartButton
-	if AgentActions.click_button_by_name("StartButton"):
+	if Qa.agent_actions.click_button_by_name("StartButton"):
 		print("AIPlayer: 触发开始/继续游戏按钮")
 		await _wait_ms(1500)
 		return
 	# 最后 fallback:模拟点击
 	var new_game_btn: Button = _find_button("NewGameButton", "新游戏")
 	if new_game_btn and new_game_btn.visible and not new_game_btn.disabled:
-		await AgentInput.click_control(new_game_btn)
+		await Qa.agent_input.click_control(new_game_btn)
 		await _wait_ms(1500)
 		return
 	print("AIPlayer: 未找到主菜单按钮")
@@ -601,7 +601,7 @@ func _handle_character_select() -> void:
 		return
 	
 	# 直接调用场景的确认方法(绕过点击)
-	if AgentActions.call_method("_confirm_selection"):
+	if Qa.agent_actions.call_method("_confirm_selection"):
 		print("AIPlayer: 调用 _confirm_selection")
 		_char_select_stuck_count = 0  # 成功调用，重置计数器
 		await _wait_ms(1500)
@@ -609,9 +609,9 @@ func _handle_character_select() -> void:
 	# fallback:先选陈默卡再确认
 	var card: Control = _find_control("ChenmoCard")
 	if card:
-		await AgentInput.click_control(card)
+		await Qa.agent_input.click_control(card)
 		await _wait_ms(300)
-	if AgentActions.click_button_by_name("ConfirmButton"):
+	if Qa.agent_actions.click_button_by_name("ConfirmButton"):
 		_char_select_stuck_count = 0  # 成功调用，重置计数器
 		await _wait_ms(1500)
 		return
@@ -741,7 +741,7 @@ func _handle_battle() -> void:
 	if battle_ui != null and is_instance_valid(battle_ui):
 		var end_turn_btn: Button = battle_ui.get_node_or_null("%EndTurnButton")
 		if end_turn_btn != null and is_instance_valid(end_turn_btn):
-			if AgentActions.click_button(end_turn_btn):
+			if Qa.agent_actions.click_button(end_turn_btn):
 				print("AIPlayer: 触发结束回合(通过 BattleUI 按钮)")
 				end_turn_clicked = true
 				_turns_in_battle += 1
@@ -847,19 +847,19 @@ func _on_battle_ended(result: int) -> void:
 	if player != null and player.max_hp > 0:
 		hp_percent = float(player.current_hp) / float(player.max_hp)
 
-	ExperienceMemory.record_battle_result(won, _turns_in_battle, hp_percent, {
+	Qa.experience_memory.record_battle_result(won, _turns_in_battle, hp_percent, {
 		"cards_played": _cards_played_this_battle,
 		"damage_dealt": _total_damage_dealt,
 		"start_hp": _battle_start_hp,
 		"end_hp": player.current_hp if player != null else 0,
 	})
 	if won:
-		RunGoals.increment("battles_won")
+		Qa.run_goals.increment("battles_won")
 	else:
-		RunGoals.report("defeat", true)
+		Qa.run_goals.report("defeat", true)
 
 	if won and _cards_played_this_battle > 0:
-		ExperienceMemory.record_trick("battle", "低费攻击牌优先出牌策略有效", {
+		Qa.experience_memory.record_trick("battle", "低费攻击牌优先出牌策略有效", {
 			"cards_played": _cards_played_this_battle,
 			"damage_dealt": _total_damage_dealt,
 		})
@@ -938,32 +938,32 @@ func _handle_reward() -> void:
 		return
 	# 等待翻牌动画完成(约 2.5 秒)
 	await _wait_ms(2500)
-	RunGoals.increment("cards_collected")
+	Qa.run_goals.increment("cards_collected")
 	# 优先直接触发跳过按钮(绕过点击)
-	if AgentActions.click_button_by_name("SkipButton"):
+	if Qa.agent_actions.click_button_by_name("SkipButton"):
 		print("AIPlayer: 触发跳过奖励")
 		await _wait_ms(2000)
 		return
 	# Fallback:模拟点击
 	var skip: Button = _find_button("SkipButton", "跳过")
 	if skip and is_instance_valid(skip) and skip.visible and not skip.disabled:
-		await AgentInput.click_control(skip)
+		await Qa.agent_input.click_control(skip)
 		await _wait_ms(2000)
 	else:
-		await AgentInput.click_at(Vector2(960, 600))
+		await Qa.agent_input.click_at(Vector2(960, 600))
 		await _wait_ms(2000)
 
 func _handle_shop() -> void:
 	print("AIPlayer: 处理商店")
-	RunGoals.increment("shops_visited")
-	if AgentActions.click_button_by_name("LeaveButton"):
+	Qa.run_goals.increment("shops_visited")
+	if Qa.agent_actions.click_button_by_name("LeaveButton"):
 		await _wait_ms(1500)
 		return
 	await _wait_ms(1000)
 
 func _handle_event() -> void:
 	print("AIPlayer: 处理事件")
-	RunGoals.increment("events_visited")
+	Qa.run_goals.increment("events_visited")
 	if not is_instance_valid(_current_scene):
 		await _wait_ms(500)
 		return
@@ -971,15 +971,15 @@ func _handle_event() -> void:
 	for child: Node in _current_scene.get_children():
 		var btn := _find_first_button(child)
 		if btn:
-			AgentActions.click_button(btn)
+			Qa.agent_actions.click_button(btn)
 			await _wait_ms(1500)
 			return
-	await AgentInput.click_at(Vector2(960, 700))
+	await Qa.agent_input.click_at(Vector2(960, 700))
 	await _wait_ms(1000)
 
 func _handle_rest() -> void:
 	print("AIPlayer: 处理休息")
-	RunGoals.increment("rests_visited")
+	Qa.run_goals.increment("rests_visited")
 	if not is_instance_valid(_current_scene):
 		await _wait_ms(500)
 		return
@@ -987,10 +987,10 @@ func _handle_rest() -> void:
 	for child: Node in _current_scene.get_children():
 		var btn := _find_first_button(child)
 		if btn:
-			AgentActions.click_button(btn)
+			Qa.agent_actions.click_button(btn)
 			await _wait_ms(1500)
 			return
-	await AgentInput.click_at(Vector2(960, 600))
+	await Qa.agent_input.click_at(Vector2(960, 600))
 	await _wait_ms(1000)
 
 func _find_first_button(node: Node) -> Button:
@@ -1004,17 +1004,17 @@ func _find_first_button(node: Node) -> Button:
 
 func _handle_settlement() -> void:
 	print("AIPlayer: 处理结算")
-	if AgentActions.click_button_by_name("ReplayButton"):
+	if Qa.agent_actions.click_button_by_name("ReplayButton"):
 		await _wait_ms(1500)
 		return
-	if AgentActions.click_button_by_name("QuitButton"):
+	if Qa.agent_actions.click_button_by_name("QuitButton"):
 		await _wait_ms(1500)
 		return
 	await _wait_ms(1000)
 
 func _handle_victory() -> void:
 	print("AIPlayer: 处理通关")
-	if AgentActions.click_button_by_name("BackButton"):
+	if Qa.agent_actions.click_button_by_name("BackButton"):
 		await _wait_ms(1500)
 		return
 	await _wait_ms(1000)
@@ -1082,7 +1082,7 @@ func _check_stuck() -> void:
 		var stuck_desc: String = "在同一状态停留过久 (%s, %dms, turn=%d)" % [
 			_state_name(_state), elapsed, _turns_in_battle
 		]
-		ExperienceMemory.record_stuck(_state_name(_state), stuck_desc, {
+		Qa.experience_memory.record_stuck(_state_name(_state), stuck_desc, {
 			"state": _state_name(_state),
 			"elapsed_ms": elapsed,
 			"scene": str(_current_scene.name) if _current_scene else "null",
@@ -1106,10 +1106,10 @@ func _check_stuck() -> void:
 ## 实时检查 Goal 进度（在主循环每 iteration 调一次）
 ## 每 5 秒 print 一次 进度 (避免 log spam)
 func _check_goal_progress() -> void:
-	var goals: Array = RunGoals.get_goals()
+	var goals: Array = Qa.run_goals.get_goals()
 	if goals.is_empty():
 		return
-	var stats: Dictionary = RunGoals.get_stats()
+	var stats: Dictionary = Qa.run_goals.get_stats()
 	var now_ms: int = Time.get_ticks_msec()
 	if now_ms - _last_goal_progress_print_ms < GOAL_PROGRESS_PRINT_INTERVAL_MS:
 		return
@@ -1168,7 +1168,7 @@ func _generate_run_id() -> String:
 
 func _goals_describe() -> String:
 	var parts: Array = []
-	for goal in RunGoals.get_goals():
+	for goal in Qa.run_goals.get_goals():
 		parts.append(goal.description)
 	return ", ".join(parts)
 
@@ -1186,7 +1186,7 @@ func _on_ai_player_goal_completed(goal: Goal, stats: Dictionary) -> void:
 	match goal.type:
 		Goal.TYPE_SURVIVE_N_BATTLES:
 			var efficiency: float = float(goal.value) / max(1.0, float(elapsed_sec))
-			ExperienceMemory.record(
+			Qa.experience_memory.record(
 				"trick", "ai_player",
 				"完成 %d 场战斗(elapsed=%ds, 效率 %.2f 场/秒)" % [goal.value, elapsed_sec, efficiency],
 				{"goal_type": goal.type, "goal_value": goal.value, "elapsed_sec": elapsed_sec,
@@ -1194,7 +1194,7 @@ func _on_ai_player_goal_completed(goal: Goal, stats: Dictionary) -> void:
 				0.7
 			)
 		Goal.TYPE_MAX_RUNTIME_SECONDS:
-			ExperienceMemory.record(
+			Qa.experience_memory.record(
 				"strategy_profile", "ai_player",
 				"达到运行上限 %ds（实际 elapsed=%ds）" % [goal.value, elapsed_sec],
 				{"goal_type": goal.type, "goal_value": goal.value,
@@ -1202,7 +1202,7 @@ func _on_ai_player_goal_completed(goal: Goal, stats: Dictionary) -> void:
 				0.6
 			)
 		Goal.TYPE_COLLECT_N_CARDS:
-			ExperienceMemory.record(
+			Qa.experience_memory.record(
 				"progress", "ai_player",
 				"卡组达到 %d 张(battles_won=%d)" % [goal.value, int(stats.get("battles_won", 0))],
 				{"goal_type": goal.type, "goal_value": goal.value,
@@ -1212,7 +1212,7 @@ func _on_ai_player_goal_completed(goal: Goal, stats: Dictionary) -> void:
 				0.65
 			)
 		Goal.TYPE_COMPLETE_RUN:
-			ExperienceMemory.record(
+			Qa.experience_memory.record(
 				"strategy_profile", "ai_player",
 				"通关(elapsed=%ds)" % elapsed_sec,
 				{"goal_type": goal.type, "victory": bool(stats.get("victory", false)),
@@ -1220,7 +1220,7 @@ func _on_ai_player_goal_completed(goal: Goal, stats: Dictionary) -> void:
 				0.75
 			)
 		Goal.TYPE_FIRST_LOSS:
-			ExperienceMemory.record(
+			Qa.experience_memory.record(
 				"loss", "ai_player",
 				"第一次失败(elapsed=%ds, battles_won=%d)" % [elapsed_sec, int(stats.get("battles_won", 0))],
 				{"goal_type": goal.type, "elapsed_sec": elapsed_sec,
@@ -1228,7 +1228,7 @@ func _on_ai_player_goal_completed(goal: Goal, stats: Dictionary) -> void:
 				0.7
 			)
 		_:
-			ExperienceMemory.record(
+			Qa.experience_memory.record(
 				"goal", "ai_player",
 				"%s 完成" % goal.description,
 				{"goal_type": goal.type, "elapsed_sec": elapsed_sec,
@@ -1278,11 +1278,11 @@ func _select_goal_scene_for_deck(deck: Array, realm: int) -> String:
 ## 返回加载的 goal 数量; 失败返回 0
 ## 不影响 _ready 现有行为 (只在显式调用时生效)
 func _load_goals_from_scene(scene_name: String) -> int:
-	var goals := RunGoals.load_goal_scene(scene_name)
+	var goals = Qa.run_goals.load_goal_scene(scene_name)
 	if goals.is_empty():
 		return 0
 	for goal in goals:
-		RunGoals.add_goal(goal.type, goal.value, goal.priority)
+		Qa.run_goals.add_goal(goal.type, goal.value, goal.priority)
 	return goals.size()
 
 func _save_deck_health_snapshot() -> void:
@@ -1293,8 +1293,8 @@ func _save_deck_health_snapshot() -> void:
 		var card: Dictionary = GameState.get_collection_card(idx)
 		if not card.is_empty():
 			deck.append(card)
-	var analysis := DeckAnalyzer.analyze(deck)
-	ExperienceMemory.record("deck_health_final", "settlement", "最终牌组健康度 %d/100" % analysis.health_score, {
+	var analysis = Qa.deck_analyzer.analyze(deck)
+	Qa.experience_memory.record("deck_health_final", "settlement", "最终牌组健康度 %d/100" % analysis.health_score, {
 		"health_score": analysis.health_score,
 		"avg_cost": analysis.avg_cost,
 		"defense_ratio": analysis.defense_ratio,
@@ -1346,7 +1346,7 @@ func _stuck_recovery() -> void:
 		if battle_ui != null and is_instance_valid(battle_ui):
 			var end_turn_btn: Button = battle_ui.get_node_or_null("%EndTurnButton")
 			if end_turn_btn != null and is_instance_valid(end_turn_btn):
-				if AgentActions.click_button(end_turn_btn):
+				if Qa.agent_actions.click_button(end_turn_btn):
 					end_turn_clicked = true
 		if not end_turn_clicked:
 			# Fallback 2：直接调用 battle_manager.player_end_turn()（如果还在选牌阶段）
@@ -1358,6 +1358,6 @@ func _stuck_recovery() -> void:
 				end_turn_clicked = true
 		if not end_turn_clicked:
 			# Fallback 3：屏幕中央
-			AgentInput.click_at(Vector2(960, 540))
+			Qa.agent_input.click_at(Vector2(960, 540))
 	else:
-		AgentInput.click_at(Vector2(960, 540))
+		Qa.agent_input.click_at(Vector2(960, 540))
