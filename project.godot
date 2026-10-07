@@ -22,18 +22,6 @@ GameState="*res://scripts/core/game_state.gd"
 WuXing="*res://scripts/core/wuxing_manager.gd"
 CardPool="*res://scripts/core/card_pool.gd"
 EventBus="*res://scripts/core/event_bus.gd"
-ViewportCapture="*res://scripts/qa_capture.gd"
-SceneWalker="*res://scripts/scene_walker.gd"
-AgentSocket="*res://scripts/agent_socket.gd"
-AgentInspector="*res://scripts/agent_inspector.gd"
-AgentInput="*res://scripts/qa/agent_input.gd"
-AgentActions="*res://scripts/qa/agent_actions.gd"
-RunGoals="*res://scripts/qa/run_goals.gd"
-RewardEvaluator="*res://scripts/qa/reward_evaluator.gd"
-DeckAnalyzer="*res://scripts/qa/deck_analyzer.gd"
-AIPlayer="*res://scripts/qa/ai_player.gd"
-VisualChecker="*res://scripts/qa/visual_checker_stub.gd"
-ExperienceMemory="*res://scripts/qa/experience_memory.gd"
 
 [debug]
 

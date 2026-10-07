@@ -46,7 +46,8 @@ const STUCK_TIMEOUT_SECONDS := 60  # 卡死检测超时（秒）
 var current_state: BattleStateEnum = BattleStateEnum.IDLE
 var turn_number: int = 0
 var selected_enemy_index: int = 0  # 选中的敌人索引
-var _stuck_timer: float = 0.0  # 卡死检测计时器
+var _stuck_timer: float = 0.0  # 卡死计时快照（仅诊断上报用，不再每帧累加）
+var _stuck_timer_node: Timer = null  # 卡死检测 Timer（代替 _process 轮询）
 var _stuck_diagnostic_emitted: bool = false  # 是否已发出卡死诊断信号
 
 # ==================== 战斗单位 ====================
@@ -73,23 +74,34 @@ var pending_damage_multiplier: float = 1.0  # 临时伤害倍率（相生加成�
 # ==================== 初始化 ====================
 
 func _ready() -> void:
-	pass
+	# 卡死检测 Timer：一进入 CARD_SELECTION 启动 60s one-shot，离开即停（无每帧开销）
+	_stuck_timer_node = Timer.new()
+	_stuck_timer_node.name = "StuckTimer"
+	_stuck_timer_node.one_shot = true
+	_stuck_timer_node.wait_time = STUCK_TIMEOUT_SECONDS
+	_stuck_timer_node.timeout.connect(_stuck_diagnostic)
+	add_child(_stuck_timer_node)
 
-func _process(delta: float) -> void:
-	# 卡死检测：在 CARD_SELECTION 状态下累计时间
-	if current_state == BattleStateEnum.CARD_SELECTION:
-		_stuck_timer += delta
-		if _stuck_timer >= STUCK_TIMEOUT_SECONDS and not _stuck_diagnostic_emitted:
-			_stuck_diagnostic()
-	else:
-		# 离开选牌阶段时重置计时器
-		if _stuck_timer > 0.0:
-			_stuck_timer = 0.0
-			_stuck_diagnostic_emitted = false
+## 启动/重置卡死计时（进入 CARD_SELECTION 时调用）
+func _start_stuck_timer() -> void:
+	_stuck_timer = 0.0
+	_stuck_diagnostic_emitted = false
+	if _stuck_timer_node:
+		_stuck_timer_node.start()
+
+## 停止并重置卡死计时（离开 CARD_SELECTION 时调用）
+func _stop_stuck_timer() -> void:
+	if _stuck_timer_node and not _stuck_timer_node.is_stopped():
+		_stuck_timer_node.stop()
+	_stuck_timer = 0.0
+	_stuck_diagnostic_emitted = false
 
 ## 卡死自动诊断
 func _stuck_diagnostic() -> void:
+	if _stuck_diagnostic_emitted:
+		return
 	_stuck_diagnostic_emitted = true
+	_stuck_timer = STUCK_TIMEOUT_SECONDS
 	
 	var state_data: Dictionary = {
 		"state": get_state_name(),
@@ -138,15 +150,31 @@ func _change_state(new_state: BattleStateEnum) -> void:
 	var old_state := current_state
 	current_state = new_state
 
+	# 卡死 Timer：进入 CARD_SELECTION 启动，离开即停（Timer one-shot 60s，无 _process 轮询）
+	if new_state == BattleStateEnum.CARD_SELECTION:
+		_start_stuck_timer()
+	elif _stuck_timer_node and not _stuck_timer_node.is_stopped():
+		_stop_stuck_timer()
+
 	match new_state:
+		BattleStateEnum.IDLE:
+			pass
 		BattleStateEnum.BATTLE_START:
 			_on_battle_start()
 		BattleStateEnum.PLAYER_TURN:
 			_on_player_turn_start()
+		BattleStateEnum.CARD_SELECTION:
+			_on_card_selection_start()
+		BattleStateEnum.RESOLUTION:
+			_on_resolution()
 		BattleStateEnum.ENEMY_TURN:
 			_on_enemy_turn_start()
 		BattleStateEnum.CLEANUP:
 			_on_cleanup()
+		BattleStateEnum.CHECK_END:
+			_on_cleanup()
+		BattleStateEnum.NEXT_TURN:
+			_on_next_turn()
 		BattleStateEnum.BATTLE_WIN:
 			end_battle(0)
 		BattleStateEnum.BATTLE_LOSE:
@@ -507,11 +535,11 @@ func _apply_generation_bonus(card: CardDataResource, bonus: Dictionary) -> void:
 
 # ==================== 暴击系统 ====================
 
-## 触发暴击：伤害×2 + 获得运气牌
+## 触发暴击：临时伤害倍率×2 + 获得运气牌（不修改 card 对象）
 func _trigger_crit(card: CardDataResource) -> void:
-	# 伤害翻倍
-	card.damage *= 2
-	print("BattleManager: 🔥 暴击！%s 伤害翻倍 → %d" % [card.name, card.damage])
+	# 伤害翻倍：使用临时倍率（与 _apply_generation_bonus 同模式），由结算统一应用
+	pending_damage_multiplier *= 2.0
+	print("BattleManager: 🔥 暴击！%s 临时倍率 → ×%.2f" % [card.name, pending_damage_multiplier])
 
 	# 生成运气牌加入手牌
 	var luck_card := _create_luck_card()

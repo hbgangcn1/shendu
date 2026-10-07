@@ -26,7 +26,7 @@ func _test_element_distribution() -> void:
 	var counts: Dictionary = {"metal": 0, "wood": 0, "water": 0, "fire": 0, "earth": 0}
 	var sample: Array = []
 	for card_id in CardPool._mvp_pool + CardPool._zhuji_pool + CardPool._jindan_pool:
-		var c = CardPool.get_card(card_id)
+		var c: Dictionary = CardPool.get_card(card_id)
 		if c:
 			var elem: int = c.element
 			if sample.size() < 5:
@@ -42,7 +42,7 @@ func _test_type_distribution() -> void:
 	# 类型：attack 18 / defense 11 / support 11 / special 5
 	var counts: Dictionary = {"attack": 0, "defense": 0, "support": 0, "special": 0}
 	for card_id in CardPool._mvp_pool + CardPool._zhuji_pool + CardPool._jindan_pool:
-		var c = CardPool.get_card(card_id)
+		var c: Dictionary = CardPool.get_card(card_id)
 		if c:
 			var k: int = c.card_kind
 			var k_str: String = ["attack", "defense", "special", "support"][k]
@@ -60,7 +60,7 @@ func _test_rarity_distribution() -> void:
 	# zhuji/jindan 池用旧 schema (common=1/rare=2/epic=3/legend=4)
 	var counts: Dictionary = {"common": 0, "rare": 0, "epic": 0, "legend": 0}
 	for card_id in CardPool._mvp_pool + CardPool._zhuji_pool + CardPool._jindan_pool:
-		var c = CardPool.get_card(card_id)
+		var c: Dictionary = CardPool.get_card(card_id)
 		if c:
 			var r: int = c.rarity
 			var r_str: String
@@ -77,13 +77,13 @@ func _test_rarity_distribution() -> void:
 
 func _test_zero_cost_card() -> void:
 	# EA 范围需 0 费卡（spec §3.1 理想初始卡组有 0×2）
-	var jin_jing = CardPool.get_card("MC-ME-003")
+	var jin_jing: Dictionary = CardPool.get_card("MC-ME-003")
 	assert(jin_jing != null, "MC-ME-003 金精聚应存在（0 费）")
 	assert(jin_jing.cost == 0, "金精聚费用应为 0")
 	print("  ✓ 0 费卡 MC-ME-003 金精聚（unlock starter_deck 0 费需求）")
 
 func _test_legend_card() -> void:
-	var ye_huo = CardPool.get_card("MC-FI-006")
+	var ye_huo: Dictionary = CardPool.get_card("MC-FI-006")
 	assert(ye_huo != null, "MC-FI-006 业火焚天应存在（legend）")
 	assert(ye_huo.cost == 4, "业火焚天费用应为 4（EA 范围 4 费覆盖）")
 	print("  ✓ 传说卡 MC-FI-006 业火焚天（unlock starter_deck 4 费需求）")

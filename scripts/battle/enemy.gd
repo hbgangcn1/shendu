@@ -249,13 +249,13 @@ func execute_intent(target: Actor) -> Dictionary:
 	if current_intent.is_empty():
 		return {"success": false, "reason": "无意图"}
 
-	var intent_type = current_intent.get("type", IntentType.ATTACK)
+	var intent_type: Variant = current_intent.get("type", IntentType.ATTACK)
 	var result: Dictionary = {"success": true, "type": intent_type}
 
 	match intent_type:
 		IntentType.ATTACK, IntentType.ATK_BUFF:
 			var damage: int = current_intent.get("damage", 5)
-			var atk_element = current_intent.get("element", element)
+			var atk_element: Variant = current_intent.get("element", element)
 			var actual := target.take_damage(damage, atk_element, false)
 			result["damage"] = actual
 			# 攻击+增益：给自己加攻击buff
@@ -265,7 +265,7 @@ func execute_intent(target: Actor) -> Dictionary:
 		IntentType.PIERCE:
 			var damage: int = current_intent.get("damage", 5)
 			var _pierce_rate: float = current_intent.get("pierce_rate", 0.5)
-			var atk_element = current_intent.get("element", element)
+			var atk_element: Variant = current_intent.get("element", element)
 			# 穿透：先计算伤害，格挡只吸收 (1-pierce_rate) 部分
 			var actual := target.take_damage(damage, atk_element, false)
 			result["damage"] = actual

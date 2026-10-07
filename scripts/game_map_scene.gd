@@ -5,8 +5,8 @@
 class_name GameMapScene
 extends Control
 
-const _MapNodeScript = preload("res://scripts/core/map_node.gd")
-const NodeType = _MapNodeScript.NodeType
+const _MapNodeScript: GDScript = preload("res://scripts/core/map_node.gd")
+const NodeType: Dictionary = _MapNodeScript.NodeType
 
 # ==================== 常量 ====================
 
@@ -65,15 +65,15 @@ const PATH_COLOR_LOCKED := Color(0.3, 0.3, 0.4, 0.5)    ## 暗灰
 
 var _rest_popup: PanelContainer = null
 var _event_popup: PanelContainer = null
-var _event_logic = null
-var _current_event = null
+var _event_logic: Variant = null
+var _current_event: Variant = null
 var _move_hint_tween: Tween = null
 
 # ==================== 状态 ====================
 
-var _realm_map = null
+var _realm_map: Variant = null
 var _node_ui_map: Dictionary = {}  ## id -> PanelContainer
-var _selected_node = null
+var _selected_node: Variant = null
 var _deck_view_open: bool = false  ## 牌组界面是否已打开
 
 # ==================== 生命周期 ====================
@@ -121,7 +121,7 @@ func _on_node_gui_input(event: InputEvent, node) -> void:
 		if mouse_event.pressed and mouse_event.button_index == MOUSE_BUTTON_LEFT:
 			if node.is_reachable and not GameState.visited_node_ids.has(node.id):
 				# 2026-08-09 P1 #3: click 弹跳反馈（scale 1.1 → 1.15 → 1.1）
-				var panel = _node_ui_map.get(node.id)
+				var panel: Variant = _node_ui_map.get(node.id)
 				if panel != null:
 					_play_click_bounce(panel)
 				_show_confirmation(node)
@@ -137,7 +137,7 @@ func _on_node_panel_hover_entered(panel: PanelContainer) -> void:
 		return
 	# scale 1.0 → 1.1（0.15s ease-out）
 	if _hover_tweens.has(panel):
-		var old_tween = _hover_tweens[panel]
+		var old_tween: Variant = _hover_tweens[panel]
 		if old_tween != null and old_tween.is_valid():
 			old_tween.kill()
 	var tween := create_tween()
@@ -150,7 +150,7 @@ func _on_node_panel_hover_exited(panel: PanelContainer) -> void:
 	if panel == null or not is_instance_valid(panel):
 		return
 	if _hover_tweens.has(panel):
-		var old_tween = _hover_tweens[panel]
+		var old_tween: Variant = _hover_tweens[panel]
 		if old_tween != null and old_tween.is_valid():
 			old_tween.kill()
 	var tween := create_tween()
@@ -211,13 +211,13 @@ func _generate_map() -> void:
 	var realm_ids: Array[String] = ["liqi", "zhuji", "jindan"]
 	var realm_index: int = mini(GameState.current_realm, realm_ids.size() - 1)
 	var realm_id: String = realm_ids[realm_index]
-	var MapGeneratorScript = load("res://scripts/core/map_generator.gd")
-	var generator = MapGeneratorScript.new(42)
+	var MapGeneratorScript: GDScript = load("res://scripts/core/map_generator.gd")
+	var generator: Variant = MapGeneratorScript.new(42)
 	_realm_map = generator.generate(realm_id, realm_index)
 
 	# 保存到 GameState 供战斗场景使用（boss检测、节点类型查询）
 	if GameState.game_map == null:
-		var GameMapScript = load("res://scripts/core/game_map.gd")
+		var GameMapScript: GDScript = load("res://scripts/core/game_map.gd")
 		GameState.game_map = GameMapScript.new()
 		GameState.game_map.initialize_all_realms(42)
 	# 同步当前层的 RealmMap（保留 boss_node 等生成结果）
@@ -365,7 +365,7 @@ func _update_reachable() -> void:
 
 func _update_node_visuals() -> void:
 	for node in _realm_map.nodes:
-		var panel = _node_ui_map.get(node.id)
+		var panel: Variant = _node_ui_map.get(node.id)
 		if panel == null:
 			continue
 
@@ -385,7 +385,7 @@ func _update_node_visuals() -> void:
 		var style := UITheme.panel_style.duplicate()
 		style.set_corner_radius_all(12)
 
-		var icon_rect = panel.get_child(0)
+		var icon_rect: Node = panel.get_child(0)
 		var modulate_color := Color(1, 1, 1, 1)
 		if is_visited:
 			style.bg_color = Color(base_color.r * 0.3, base_color.g * 0.3, base_color.b * 0.3)
@@ -438,8 +438,8 @@ func _maybe_show_onboarding() -> void:
 		return
 	if GameState.dao_xing > 0:
 		return  # 已玩过的玩家，不显示
-	var OnboardingOverlay = preload("res://scripts/ui/onboarding_overlay.gd")
-	var overlay = OnboardingOverlay.new()
+	var OnboardingOverlay: GDScript = preload("res://scripts/ui/onboarding_overlay.gd")
+	var overlay: Variant = OnboardingOverlay.new()
 	overlay.z_index = 200
 	add_child(overlay)
 
@@ -474,13 +474,13 @@ func _show_move_hint() -> void:
 	)
 
 	# 脉冲首个可达节点，引导玩家点击（scale 1.0→1.25→1.0，循环 2 次）
-	var first_node = null
+	var first_node: Variant = null
 	for node in _realm_map.nodes:
 		if node.is_reachable and not GameState.visited_node_ids.has(node.id):
 			first_node = node
 			break
 	if first_node != null:
-		var panel = _node_ui_map.get(first_node.id)
+		var panel: Variant = _node_ui_map.get(first_node.id)
 		if panel != null:
 			_pulse_first_node(panel)
 
@@ -593,7 +593,7 @@ func _show_event_ui() -> void:
 
 	# 初始化事件逻辑
 	if _event_logic == null:
-		var EventLogicScript = preload("res://scripts/core/event_logic.gd")
+		var EventLogicScript: GDScript = preload("res://scripts/core/event_logic.gd")
 		_event_logic = EventLogicScript.new(42)
 		# 加载事件数据
 		var events_file := FileAccess.open("res://data/events/events.json", FileAccess.READ)
@@ -659,7 +659,7 @@ func _show_event_ui() -> void:
 	vbox.add_child(HSeparator.new())
 
 	for i in range(_current_event.choices.size()):
-		var choice = _current_event.choices[i]
+		var choice: Variant = _current_event.choices[i]
 		var btn := Button.new()
 		btn.text = choice.text
 		btn.custom_minimum_size = Vector2(533, 48)

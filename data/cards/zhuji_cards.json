@@ -8,8 +8,8 @@
     "description": "火焰附体，斩击附带灼烧。",
     "cost": 2,
     "element": 3,
-    "card_type": 0,
-    "rarity": 1,
+    "card_type": "attack",
+    "rarity": "common",
     "effects": [
       {
         "trigger": "on_play",
@@ -39,8 +39,8 @@
     "description": "以土气凝结厚重护甲。",
     "cost": 2,
     "element": 4,
-    "card_type": 1,
-    "rarity": 1,
+    "card_type": "defense",
+    "rarity": "common",
     "effects": [
       {
         "trigger": "on_play",
@@ -69,8 +69,8 @@
     "description": "灵藤缠绕，连续抽击两次。",
     "cost": 2,
     "element": 1,
-    "card_type": 0,
-    "rarity": 1,
+    "card_type": "attack",
+    "rarity": "common",
     "effects": [
       {
         "trigger": "on_play",
@@ -102,8 +102,8 @@
     "description": "水气爆发，造成伤害并抽牌。",
     "cost": 2,
     "element": 2,
-    "card_type": 0,
-    "rarity": 1,
+    "card_type": "attack",
+    "rarity": "common",
     "effects": [
       {
         "trigger": "on_play",
@@ -143,8 +143,8 @@
     "description": "金气护体，格挡后获得反击。",
     "cost": 2,
     "element": 0,
-    "card_type": 1,
-    "rarity": 1,
+    "card_type": "defense",
+    "rarity": "common",
     "effects": [
       {
         "trigger": "on_play",
@@ -173,8 +173,8 @@
     "description": "五行之力循环不息，造成大量伤害。",
     "cost": 3,
     "element": 3,
-    "card_type": 0,
-    "rarity": 2,
+    "card_type": "attack",
+    "rarity": "rare",
     "effects": [
       {
         "trigger": "on_play",
@@ -205,8 +205,8 @@
     "description": "灵脉共鸣，回复大量生命并获得格挡。",
     "cost": 3,
     "element": 2,
-    "card_type": 3,
-    "rarity": 2,
+    "card_type": "special",
+    "rarity": "rare",
     "effects": [
       {
         "trigger": "on_play",
@@ -245,8 +245,8 @@
     "description": "金气贯穿，无视部分护盾。",
     "cost": 2,
     "element": 0,
-    "card_type": 0,
-    "rarity": 2,
+    "card_type": "attack",
+    "rarity": "rare",
     "effects": [
       {
         "trigger": "on_play",
@@ -277,8 +277,8 @@
     "description": "消耗全部蓄势层数，每层回复3HP。",
     "cost": 1,
     "element": 1,
-    "card_type": 3,
-    "rarity": 2,
+    "card_type": "special",
+    "rarity": "rare",
     "effects": [
       {
         "trigger": "on_play",
@@ -298,145 +298,190 @@
       "charge"
     ],
     "image_path": "res://assets/images/cards/card_char_wood_002.png"
+  },
+  {
+    "id": "MC-ME-004",
+    "card_name": "钢壁",
+    "name_prefix": "钢",
+    "name_core": "壁",
+    "name_suffix": "",
+    "description": "钢铁意志，坚不可摧。",
+    "cost": 2,
+    "element": 0,
+    "card_type": "defense",
+    "rarity": "common",
+    "effects": [
+      {
+        "trigger": "on_play",
+        "action": {
+          "type": "Block",
+          "target": "self",
+          "value": 8
+        },
+        "description": "获得8点格挡"
+      }
+    ],
+    "engraving_slot_count": 2,
+    "erosion_tolerance": 3,
+    "tags": [
+      "metal",
+      "defend"
+    ],
+    "image_path": "res://assets/images/cards/card_char_metal_004.png"
+  },
+  {
+    "id": "MC-FI-004",
+    "card_name": "烈焰护",
+    "name_prefix": "烈焰",
+    "name_core": "护",
+    "name_suffix": "",
+    "description": "火焰缠身，灼伤近敌。",
+    "cost": 1,
+    "element": 3,
+    "card_type": "defense",
+    "rarity": "common",
+    "effects": [
+      {
+        "trigger": "on_play",
+        "action": {
+          "type": "Block",
+          "target": "self",
+          "value": 5
+        },
+        "description": "获得5点格挡"
+      }
+    ],
+    "engraving_slot_count": 2,
+    "erosion_tolerance": 3,
+    "tags": [
+      "fire",
+      "defend"
+    ],
+    "image_path": "res://assets/images/cards/card_char_fire_004.png"
+  },
+  {
+    "id": "MC-WO-005",
+    "card_name": "灵藤刺",
+    "name_prefix": "灵藤",
+    "name_core": "刺",
+    "name_suffix": "",
+    "description": "藤蔓化刺，贯穿敌人。",
+    "cost": 1,
+    "element": 1,
+    "card_type": "attack",
+    "rarity": "common",
+    "effects": [
+      {
+        "trigger": "on_play",
+        "action": {
+          "type": "Damage",
+          "target": "enemy",
+          "value": 5,
+          "element": 1
+        },
+        "description": "对敌方造成5点木属性伤害"
+      }
+    ],
+    "engraving_slot_count": 2,
+    "erosion_tolerance": 3,
+    "tags": [
+      "wood",
+      "attack"
+    ],
+    "image_path": "res://assets/images/cards/card_char_wood_005.png"
+  },
+  {
+    "id": "MC-WA-005",
+    "card_name": "寒潮击",
+    "name_prefix": "寒潮",
+    "name_core": "击",
+    "name_suffix": "",
+    "description": "寒潮袭来，冻结敌势。",
+    "cost": 1,
+    "element": 2,
+    "card_type": "attack",
+    "rarity": "common",
+    "effects": [
+      {
+        "trigger": "on_play",
+        "action": {
+          "type": "Damage",
+          "target": "enemy",
+          "value": 6,
+          "element": 2
+        },
+        "description": "对敌方造成6点水属性伤害"
+      }
+    ],
+    "engraving_slot_count": 2,
+    "erosion_tolerance": 3,
+    "tags": [
+      "water",
+      "attack"
+    ],
+    "image_path": "res://assets/images/cards/card_char_water_005.png"
+  },
+  {
+    "id": "MC-ME-005",
+    "card_name": "金锋连斩",
+    "name_prefix": "金锋",
+    "name_core": "连斩",
+    "name_suffix": "",
+    "description": "金属性利刃连斩两击。",
+    "cost": 2,
+    "element": 0,
+    "card_type": "attack",
+    "rarity": "rare",
+    "effects": [
+      {
+        "trigger": "on_play",
+        "action": {
+          "type": "Damage",
+          "target": "enemy",
+          "value": 6,
+          "element": 0,
+          "hits": 2
+        },
+        "description": "对敌方造成6点金属性伤害两次（共12点）"
+      }
+    ],
+    "engraving_slot_count": 3,
+    "erosion_tolerance": 4,
+    "tags": [
+      "metal",
+      "attack"
+    ],
+    "image_path": "res://assets/images/cards/card_char_metal_005.png"
+  },
+  {
+    "id": "MC-FI-005",
+    "card_name": "炎爆",
+    "name_prefix": "炎",
+    "name_core": "爆",
+    "name_suffix": "",
+    "description": "炎之力量，一击爆裂。",
+    "cost": 3,
+    "element": 3,
+    "card_type": "attack",
+    "rarity": "rare",
+    "effects": [
+      {
+        "trigger": "on_play",
+        "action": {
+          "type": "Damage",
+          "target": "enemy",
+          "value": 14,
+          "element": 3
+        },
+        "description": "对敌方造成14点火属性伤害"
+      }
+    ],
+    "engraving_slot_count": 3,
+    "erosion_tolerance": 4,
+    "tags": [
+      "fire",
+      "attack"
+    ],
+    "image_path": "res://assets/images/cards/card_char_fire_005.png"
   }
-
-,
-	{
-		"id": "MC-ME-004",
-		"card_name": "钢壁",
-		"name_prefix": "钢",
-		"name_core": "壁",
-		"name_suffix": "",
-		"description": "钢铁意志，坚不可摧。",
-		"cost": 2,
-		"element": 0,
-		"card_type": 1,
-		"rarity": 1,
-		"effects": [
-			{
-				"trigger": "on_play",
-				"action": {"type": "Block", "target": "self", "value": 8},
-				"description": "获得8点格挡"
-			}
-		],
-		"engraving_slot_count": 2,
-		"erosion_tolerance": 3,
-		"tags": ["metal", "defend"],
-		"image_path": "res://assets/images/cards/card_char_metal_004.png"
-	},
-	{
-		"id": "MC-FI-004",
-		"card_name": "烈焰护",
-		"name_prefix": "烈焰",
-		"name_core": "护",
-		"name_suffix": "",
-		"description": "火焰缠身，灼伤近敌。",
-		"cost": 1,
-		"element": 3,
-		"card_type": 1,
-		"rarity": 1,
-		"effects": [
-			{
-				"trigger": "on_play",
-				"action": {"type": "Block", "target": "self", "value": 5},
-				"description": "获得5点格挡"
-			}
-		],
-		"engraving_slot_count": 2,
-		"erosion_tolerance": 3,
-		"tags": ["fire", "defend"],
-		"image_path": "res://assets/images/cards/card_char_fire_004.png"
-	},
-	{
-		"id": "MC-WO-005",
-		"card_name": "灵藤刺",
-		"name_prefix": "灵藤",
-		"name_core": "刺",
-		"name_suffix": "",
-		"description": "藤蔓化刺，贯穿敌人。",
-		"cost": 1,
-		"element": 1,
-		"card_type": 0,
-		"rarity": 1,
-		"effects": [
-			{
-				"trigger": "on_play",
-				"action": {"type": "Damage", "target": "enemy", "value": 5, "element": 1},
-				"description": "对敌方造成5点木属性伤害"
-			}
-		],
-		"engraving_slot_count": 2,
-		"erosion_tolerance": 3,
-		"tags": ["wood", "attack"],
-		"image_path": "res://assets/images/cards/card_char_wood_005.png"
-	},
-	{
-		"id": "MC-WA-005",
-		"card_name": "寒潮击",
-		"name_prefix": "寒潮",
-		"name_core": "击",
-		"name_suffix": "",
-		"description": "寒潮袭来，冻结敌势。",
-		"cost": 1,
-		"element": 2,
-		"card_type": 0,
-		"rarity": 1,
-		"effects": [
-			{
-				"trigger": "on_play",
-				"action": {"type": "Damage", "target": "enemy", "value": 6, "element": 2},
-				"description": "对敌方造成6点水属性伤害"
-			}
-		],
-		"engraving_slot_count": 2,
-		"erosion_tolerance": 3,
-		"tags": ["water", "attack"],
-		"image_path": "res://assets/images/cards/card_char_water_005.png"
-	},
-	{
-		"id": "MC-ME-005",
-		"card_name": "金锋连斩",
-		"name_prefix": "金锋",
-		"name_core": "连斩",
-		"name_suffix": "",
-		"description": "金属性利刃连斩两击。",
-		"cost": 2,
-		"element": 0,
-		"card_type": 0,
-		"rarity": 2,
-		"effects": [
-			{
-				"trigger": "on_play",
-				"action": {"type": "Damage", "target": "enemy", "value": 6, "element": 0, "hits": 2},
-				"description": "对敌方造成6点金属性伤害两次（共12点）"
-			}
-		],
-		"engraving_slot_count": 3,
-		"erosion_tolerance": 4,
-		"tags": ["metal", "attack"],
-		"image_path": "res://assets/images/cards/card_char_metal_005.png"
-	},
-	{
-		"id": "MC-FI-005",
-		"card_name": "炎爆",
-		"name_prefix": "炎",
-		"name_core": "爆",
-		"name_suffix": "",
-		"description": "炎之力量，一击爆裂。",
-		"cost": 3,
-		"element": 3,
-		"card_type": 0,
-		"rarity": 2,
-		"effects": [
-			{
-				"trigger": "on_play",
-				"action": {"type": "Damage", "target": "enemy", "value": 14, "element": 3},
-				"description": "对敌方造成14点火属性伤害"
-			}
-		],
-		"engraving_slot_count": 3,
-		"erosion_tolerance": 4,
-		"tags": ["fire", "attack"],
-		"image_path": "res://assets/images/cards/card_char_fire_005.png"
-	}
 ]

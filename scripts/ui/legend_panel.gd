@@ -9,8 +9,8 @@
 
 extends PanelContainer
 
-const MapNodeScript = preload("res://scripts/core/map_node.gd")
-const NodeType = MapNodeScript.NodeType
+const MapNodeScript: GDScript = preload("res://scripts/core/map_node.gd")
+const NodeType: Dictionary = MapNodeScript.NodeType
 
 const TYPE_LIST := [
 	NodeType.COMBAT,

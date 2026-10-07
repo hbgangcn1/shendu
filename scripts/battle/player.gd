@@ -184,19 +184,19 @@ func _ensure_card_resource(data) -> CardDataResource:
 		card.description = data.get("description", "")
 		card.cost = data.get("cost", 0)
 		# element：可能是 string 或 int
-		var elem_val = data.get("element", 0)
+		var elem_val: Variant = data.get("element", 0)
 		if elem_val is String:
 			card.set_element_from_string(elem_val)
 		else:
 			card.element = elem_val as WuXing.Element
 		# card_kind：可能是 string 或 int
-		var kind_val = data.get("card_kind", data.get("card_type", "attack"))
+		var kind_val: Variant = data.get("card_kind", data.get("card_type", "attack"))
 		if kind_val is String:
 			card.set_kind_from_string(kind_val)
 		else:
 			card.card_kind = kind_val
 		# rarity：可能是 string 或 int
-		var rar_val = data.get("rarity", "common")
+		var rar_val: Variant = data.get("rarity", "common")
 		if rar_val is String:
 			card.set_rarity_from_string(rar_val)
 		else:

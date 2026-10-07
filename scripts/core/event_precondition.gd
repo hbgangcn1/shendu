@@ -7,7 +7,7 @@
 class_name EventPrecondition
 extends RefCounted
 
-const EventEnums = preload("res://scripts/core/event_enums.gd")
+const EventEnums: GDScript = preload("res://scripts/core/event_enums.gd")
 
 var condition_type  # EventEnums.PreconditionType
 var parameters: Dictionary

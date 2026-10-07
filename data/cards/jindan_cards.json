@@ -8,8 +8,8 @@
     "description": "召唤天火，焚烧一切。",
     "cost": 3,
     "element": 3,
-    "card_type": 0,
-    "rarity": 2,
+    "card_type": "attack",
+    "rarity": "rare",
     "effects": [
       {
         "trigger": "on_play",
@@ -40,8 +40,8 @@
     "description": "木气汇聚，造成伤害并回复生命。",
     "cost": 3,
     "element": 1,
-    "card_type": 0,
-    "rarity": 2,
+    "card_type": "attack",
+    "rarity": "rare",
     "effects": [
       {
         "trigger": "on_play",
@@ -81,8 +81,8 @@
     "description": "金气护体，获得大量格挡。",
     "cost": 3,
     "element": 0,
-    "card_type": 1,
-    "rarity": 2,
+    "card_type": "defense",
+    "rarity": "rare",
     "effects": [
       {
         "trigger": "on_play",
@@ -112,8 +112,8 @@
     "description": "水气洪流，造成伤害并抽2张牌。",
     "cost": 3,
     "element": 2,
-    "card_type": 0,
-    "rarity": 2,
+    "card_type": "attack",
+    "rarity": "rare",
     "effects": [
       {
         "trigger": "on_play",
@@ -153,8 +153,8 @@
     "description": "土气滋养，回复大量生命并获得格挡。",
     "cost": 3,
     "element": 4,
-    "card_type": 3,
-    "rarity": 2,
+    "card_type": "special",
+    "rarity": "rare",
     "effects": [
       {
         "trigger": "on_play",
@@ -193,8 +193,8 @@
     "description": "金丹之力撕裂虚空，造成毁灭性伤害。",
     "cost": 4,
     "element": 0,
-    "card_type": 0,
-    "rarity": 3,
+    "card_type": "attack",
+    "rarity": "epic",
     "effects": [
       {
         "trigger": "on_play",
@@ -225,8 +225,8 @@
     "description": "浴火重生，回复全部生命并清除负面状态。",
     "cost": 4,
     "element": 3,
-    "card_type": 3,
-    "rarity": 3,
+    "card_type": "special",
+    "rarity": "epic",
     "effects": [
       {
         "trigger": "on_play",
@@ -246,165 +246,223 @@
       "ultimate"
     ],
     "image_path": "res://assets/images/cards/card_char_fire_002.png"
+  },
+  {
+    "id": "MC-EA-005",
+    "card_name": "磐石防",
+    "name_prefix": "磐石",
+    "name_core": "防",
+    "name_suffix": "",
+    "description": "磐石之躯，刀枪不入。",
+    "cost": 2,
+    "element": 4,
+    "card_type": "defense",
+    "rarity": "common",
+    "effects": [
+      {
+        "trigger": "on_play",
+        "action": {
+          "type": "Block",
+          "target": "self",
+          "value": 10
+        },
+        "description": "获得10点格挡"
+      }
+    ],
+    "engraving_slot_count": 2,
+    "erosion_tolerance": 3,
+    "tags": [
+      "earth",
+      "defend"
+    ],
+    "image_path": "res://assets/images/cards/card_char_earth_005.png"
+  },
+  {
+    "id": "MC-EA-006",
+    "card_name": "大地馈赠",
+    "name_prefix": "大地",
+    "name_core": "馈赠",
+    "name_suffix": "",
+    "description": "大地之母，恩泽众生。",
+    "cost": 1,
+    "element": 4,
+    "card_type": "support",
+    "rarity": "common",
+    "effects": [
+      {
+        "trigger": "on_play",
+        "action": {
+          "type": "Heal",
+          "target": "self",
+          "value": 2
+        },
+        "description": "回复2点生命"
+      },
+      {
+        "trigger": "on_play",
+        "action": {
+          "type": "Block",
+          "target": "self",
+          "value": 4
+        },
+        "description": "获得4点格挡"
+      }
+    ],
+    "engraving_slot_count": 2,
+    "erosion_tolerance": 3,
+    "tags": [
+      "earth",
+      "support"
+    ],
+    "image_path": "res://assets/images/cards/card_char_earth_006.png"
+  },
+  {
+    "id": "MC-EA-007",
+    "card_name": "大地恩赐",
+    "name_prefix": "大地",
+    "name_core": "恩赐",
+    "name_suffix": "",
+    "description": "大地之母，恩泽广布。",
+    "cost": 3,
+    "element": 4,
+    "card_type": "support",
+    "rarity": "rare",
+    "effects": [
+      {
+        "trigger": "on_play",
+        "action": {
+          "type": "Heal",
+          "target": "self",
+          "value": 8
+        },
+        "description": "回复8点生命"
+      },
+      {
+        "trigger": "on_play",
+        "action": {
+          "type": "Block",
+          "target": "self",
+          "value": 6
+        },
+        "description": "获得6点格挡"
+      }
+    ],
+    "engraving_slot_count": 3,
+    "erosion_tolerance": 4,
+    "tags": [
+      "earth",
+      "support"
+    ],
+    "image_path": "res://assets/images/cards/card_char_earth_007.png"
+  },
+  {
+    "id": "MC-WO-006",
+    "card_name": "万木朝宗",
+    "name_prefix": "万木",
+    "name_core": "朝宗",
+    "name_suffix": "",
+    "description": "万木归一，攻守兼备。",
+    "cost": 3,
+    "element": 1,
+    "card_type": "attack",
+    "rarity": "epic",
+    "effects": [
+      {
+        "trigger": "on_play",
+        "action": {
+          "type": "Damage",
+          "target": "enemy",
+          "value": 12,
+          "element": 1
+        },
+        "description": "对敌方造成12点木属性伤害"
+      },
+      {
+        "trigger": "on_play",
+        "action": {
+          "type": "Heal",
+          "target": "self",
+          "value": 3
+        },
+        "description": "回复3点生命"
+      }
+    ],
+    "engraving_slot_count": 4,
+    "erosion_tolerance": 5,
+    "tags": [
+      "wood",
+      "attack"
+    ],
+    "image_path": "res://assets/images/cards/card_char_wood_006.png"
+  },
+  {
+    "id": "MC-WA-006",
+    "card_name": "灵泉涌",
+    "name_prefix": "灵泉",
+    "name_core": "涌",
+    "name_suffix": "",
+    "description": "灵泉涌动，滋养万物。",
+    "cost": 2,
+    "element": 2,
+    "card_type": "special",
+    "rarity": "epic",
+    "effects": [
+      {
+        "trigger": "on_play",
+        "action": {
+          "type": "Draw",
+          "target": "self",
+          "value": 3
+        },
+        "description": "抽3张牌"
+      },
+      {
+        "trigger": "on_play",
+        "action": {
+          "type": "Heal",
+          "target": "self",
+          "value": 4
+        },
+        "description": "回复4点生命"
+      }
+    ],
+    "engraving_slot_count": 4,
+    "erosion_tolerance": 5,
+    "tags": [
+      "water",
+      "special"
+    ],
+    "image_path": "res://assets/images/cards/card_char_water_006.png"
+  },
+  {
+    "id": "MC-FI-006",
+    "card_name": "业火焚天",
+    "name_prefix": "业火",
+    "name_core": "焚天",
+    "name_suffix": "",
+    "description": "业火燎原，焚尽一切。",
+    "cost": 4,
+    "element": 3,
+    "card_type": "attack",
+    "rarity": "legend",
+    "effects": [
+      {
+        "trigger": "on_play",
+        "action": {
+          "type": "Damage",
+          "target": "enemy",
+          "value": 25,
+          "element": 3
+        },
+        "description": "对敌方造成25点火属性伤害"
+      }
+    ],
+    "engraving_slot_count": 4,
+    "erosion_tolerance": 5,
+    "tags": [
+      "fire",
+      "attack"
+    ],
+    "image_path": "res://assets/images/cards/card_char_fire_006.png"
   }
-
-,
-	{
-		"id": "MC-EA-005",
-		"card_name": "磐石防",
-		"name_prefix": "磐石",
-		"name_core": "防",
-		"name_suffix": "",
-		"description": "磐石之躯，刀枪不入。",
-		"cost": 2,
-		"element": 4,
-		"card_type": 1,
-		"rarity": 1,
-		"effects": [
-			{
-				"trigger": "on_play",
-				"action": {"type": "Block", "target": "self", "value": 10},
-				"description": "获得10点格挡"
-			}
-		],
-		"engraving_slot_count": 2,
-		"erosion_tolerance": 3,
-		"tags": ["earth", "defend"],
-		"image_path": "res://assets/images/cards/card_char_earth_005.png"
-	},
-	{
-		"id": "MC-EA-006",
-		"card_name": "大地馈赠",
-		"name_prefix": "大地",
-		"name_core": "馈赠",
-		"name_suffix": "",
-		"description": "大地之母，恩泽众生。",
-		"cost": 1,
-		"element": 4,
-		"card_type": 2,
-		"rarity": 1,
-		"effects": [
-			{
-				"trigger": "on_play",
-				"action": {"type": "Heal", "target": "self", "value": 2},
-				"description": "回复2点生命"
-			},
-			{
-				"trigger": "on_play",
-				"action": {"type": "Block", "target": "self", "value": 4},
-				"description": "获得4点格挡"
-			}
-		],
-		"engraving_slot_count": 2,
-		"erosion_tolerance": 3,
-		"tags": ["earth", "support"],
-		"image_path": "res://assets/images/cards/card_char_earth_006.png"
-	},
-	{
-		"id": "MC-EA-007",
-		"card_name": "大地恩赐",
-		"name_prefix": "大地",
-		"name_core": "恩赐",
-		"name_suffix": "",
-		"description": "大地之母，恩泽广布。",
-		"cost": 3,
-		"element": 4,
-		"card_type": 2,
-		"rarity": 2,
-		"effects": [
-			{
-				"trigger": "on_play",
-				"action": {"type": "Heal", "target": "self", "value": 8},
-				"description": "回复8点生命"
-			},
-			{
-				"trigger": "on_play",
-				"action": {"type": "Block", "target": "self", "value": 6},
-				"description": "获得6点格挡"
-			}
-		],
-		"engraving_slot_count": 3,
-		"erosion_tolerance": 4,
-		"tags": ["earth", "support"],
-		"image_path": "res://assets/images/cards/card_char_earth_007.png"
-	},
-	{
-		"id": "MC-WO-006",
-		"card_name": "万木朝宗",
-		"name_prefix": "万木",
-		"name_core": "朝宗",
-		"name_suffix": "",
-		"description": "万木归一，攻守兼备。",
-		"cost": 3,
-		"element": 1,
-		"card_type": 0,
-		"rarity": 3,
-		"effects": [
-			{
-				"trigger": "on_play",
-				"action": {"type": "Damage", "target": "enemy", "value": 12, "element": 1},
-				"description": "对敌方造成12点木属性伤害"
-			},
-			{
-				"trigger": "on_play",
-				"action": {"type": "Heal", "target": "self", "value": 3},
-				"description": "回复3点生命"
-			}
-		],
-		"engraving_slot_count": 4,
-		"erosion_tolerance": 5,
-		"tags": ["wood", "attack"],
-		"image_path": "res://assets/images/cards/card_char_wood_006.png"
-	},
-	{
-		"id": "MC-WA-006",
-		"card_name": "灵泉涌",
-		"name_prefix": "灵泉",
-		"name_core": "涌",
-		"name_suffix": "",
-		"description": "灵泉涌动，滋养万物。",
-		"cost": 2,
-		"element": 2,
-		"card_type": 3,
-		"rarity": 3,
-		"effects": [
-			{
-				"trigger": "on_play",
-				"action": {"type": "Draw", "target": "self", "value": 3},
-				"description": "抽3张牌"
-			},
-			{
-				"trigger": "on_play",
-				"action": {"type": "Heal", "target": "self", "value": 4},
-				"description": "回复4点生命"
-			}
-		],
-		"engraving_slot_count": 4,
-		"erosion_tolerance": 5,
-		"tags": ["water", "special"],
-		"image_path": "res://assets/images/cards/card_char_water_006.png"
-	},
-	{
-		"id": "MC-FI-006",
-		"card_name": "业火焚天",
-		"name_prefix": "业火",
-		"name_core": "焚天",
-		"name_suffix": "",
-		"description": "业火燎原，焚尽一切。",
-		"cost": 4,
-		"element": 3,
-		"card_type": 0,
-		"rarity": 4,
-		"effects": [
-			{
-				"trigger": "on_play",
-				"action": {"type": "Damage", "target": "enemy", "value": 25, "element": 3},
-				"description": "对敌方造成25点火属性伤害"
-			}
-		],
-		"engraving_slot_count": 4,
-		"erosion_tolerance": 5,
-		"tags": ["fire", "attack"],
-		"image_path": "res://assets/images/cards/card_char_fire_006.png"
-	}
 ]

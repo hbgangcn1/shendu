@@ -60,18 +60,18 @@ func _test_card_pool() -> void:
 	var pool_size: int = CardPool.get_pool_size()
 	assert(pool_size == 45, "总卡池应为 45 张（EA 范围），实际为 %d" % pool_size)
 
-	var fire_bolt = CardPool.get_card("MC-FI-001")
+	var fire_bolt: Dictionary = CardPool.get_card("MC-FI-001")
 	assert(fire_bolt != null, "MC-FI-001 烈焰弹应存在")
 	assert(fire_bolt.damage == 10, "烈焰弹伤害应为 10")
 	assert(fire_bolt.element == WuXing.Element.FIRE, "烈焰弹应为火属性")
 
 	# 验证补的 0 费卡
-	var jin_jing = CardPool.get_card("MC-ME-003")
+	var jin_jing: Dictionary = CardPool.get_card("MC-ME-003")
 	assert(jin_jing != null, "MC-ME-003 金精聚应存在（0 费 support）")
 	assert(jin_jing.cost == 0, "金精聚费用应为 0")
 
 	# 验证补的传说卡（card_pool.gd 已做 rarity 偏移 -1，jindan 4 → spec 3）
-	var ye_huo = CardPool.get_card("MC-FI-006")
+	var ye_huo: Dictionary = CardPool.get_card("MC-FI-006")
 	assert(ye_huo != null, "MC-FI-006 业火焚天应存在（legend）")
 	assert(ye_huo.rarity == 3, "业火焚天应为传说（spec rarity=3）")
 

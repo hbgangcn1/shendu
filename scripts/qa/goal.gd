@@ -143,7 +143,7 @@ func check(stats: Dictionary) -> bool:
 		TYPE_REACH_REALM_N:
 			return int(stats.get("realm", 0)) >= value
 		TYPE_VISIT_NODE_TYPES:
-			var visited = stats.get("node_types_visited", [])
+			var visited: Variant = stats.get("node_types_visited", [])
 			return visited.size() >= value
 		TYPE_MAX_RUNTIME_SECONDS:
 			return int(stats.get("elapsed_seconds", 0)) >= value

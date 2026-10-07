@@ -8,7 +8,7 @@
 class_name ShopLogic
 extends Node
 
-const ShopEnums = preload("res://scripts/core/shop_enums.gd")
+const ShopEnums: GDScript = preload("res://scripts/core/shop_enums.gd")
 
 signal purchase_completed(item: ShopItem)
 signal purchase_failed(reason: String)

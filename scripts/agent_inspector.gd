@@ -116,7 +116,7 @@ func _write_state() -> void:
 	var gs := get_node_or_null("/root/GameState")
 	if gs:
 		state["game_state_keys"] = []
-		var props = gs.get_property_list()
+		var props: Array = gs.get_property_list()
 		# 2026-07-29 fix: verbose print 风暴 — 每秒 40+ 行 property list 会让 stdout buffer 满
 		# → Godot 进程死掉 → AI Player session 启动后立即退出
 		# 改成：只在 _ready 写一次 property 列表，运行时只写 state 不写 detail
@@ -126,13 +126,13 @@ func _write_state() -> void:
 				print("  prop: ", prop.name, " usage=", prop.usage, " type=", prop.type, " has_script_var=", bool(prop.usage & PROPERTY_USAGE_SCRIPT_VARIABLE))
 				if prop.usage & PROPERTY_USAGE_SCRIPT_VARIABLE:
 					var prop_name: String = prop.name
-					var val = gs.get(prop_name)
+					var val: Variant = gs.get(prop_name)
 					print("    -> val=", val, " type=", typeof(val), " is_null=", val == null, " is_object=", val is Object)
 			_verbose_printed = true
 		for prop in props:
 			if prop.usage & PROPERTY_USAGE_SCRIPT_VARIABLE:
 				var prop_name: String = prop.name
-				var val = gs.get(prop_name)
+				var val: Variant = gs.get(prop_name)
 				if val != null and not (val is Object and not (val is Array) and not (val is Dictionary)):
 					state["game_state_keys"].append(prop_name)
 					state[prop_name] = val
@@ -168,19 +168,19 @@ func _write_state() -> void:
 ##   current_node_id, visited_node_ids （从 GameState 来）
 ##   selected_node_id （如果玩家已点击未确认）
 func _write_map_state(state: Dictionary, current_scene: Node) -> void:
-	var realm_map = current_scene.get("_realm_map")
+	var realm_map: Variant = current_scene.get("_realm_map")
 	if realm_map == null:
 		return
-	var nodes = realm_map.get("nodes")
+	var nodes: Variant = realm_map.get("nodes")
 	if nodes == null or nodes.size() == 0:
 		return
 	# 2026-07-31 (D1 v2): 用 panel.position 代替 node.x/node.y
 	# 原代码读 node.x/y 但这些字段是 0.0（_init 没设），实际位置在 _node_ui_map[id].position
 	# 取 panel.position + 节点中心 (NODE_SIZE/2) 才是真正的 viewport 坐标
-	var node_ui_map = current_scene.get("_node_ui_map")
+	var node_ui_map: Variant = current_scene.get("_node_ui_map")
 	if node_ui_map == null:
 		node_ui_map = {}
-	const MAP_NODE_SIZE = 88.0
+	const MAP_NODE_SIZE: float = 88.0
 	# 2026-08-10 fix (card 6209bc47): 原 get_type_name() fallback 是 '未知' — LLM 看到误读为 '?'，不知道是 bug 还是实际未知节点类型。
 	# 修复：直接读 MapNode.NODE_TYPE_NAMES const（MapNode extends RefCounted，const 可通过常量路径访问），
 	# fallback 用本地图副本保证总是返回有效字符串，同时加 type_id 数字字段让 LLM 看到 raw int。
@@ -202,7 +202,7 @@ func _write_map_state(state: Dictionary, current_scene: Node) -> void:
 		var actual_x: float = 0.0
 		var actual_y: float = 0.0
 		if node.id in node_ui_map:
-			var panel = node_ui_map[node.id]
+			var panel: Variant = node_ui_map[node.id]
 			if panel and "position" in panel:
 				actual_x = panel.position.x + MAP_NODE_SIZE / 2.0
 				actual_y = panel.position.y + MAP_NODE_SIZE / 2.0
@@ -226,7 +226,7 @@ func _write_map_state(state: Dictionary, current_scene: Node) -> void:
 	state["map_nodes"] = all_nodes
 	state["reachable_nodes"] = reachable
 	# 当前选中（如果玩家点了未确认）— 让 LLM 知道下一步是不是 confirm
-	var selected = current_scene.get("_selected_node")
+	var selected: Variant = current_scene.get("_selected_node")
 	if selected and "id" in selected:
 		state["selected_node_id"] = selected.id
 		state["selected_node_type"] = selected.get_type_name() if selected.has_method("get_type_name") else ""
@@ -236,11 +236,11 @@ func _write_map_state(state: Dictionary, current_scene: Node) -> void:
 func _write_character_select_state(state: Dictionary, current_scene: Node) -> void:
 	# CharacterSelect 场景的 available_characters 列表通常在场景节点上或 GameState
 	# 尝试从 _characters 节点 / _char_data 列表取
-	var chars_node = current_scene.get_node_or_null("CharacterList")
+	var chars_node: Node = current_scene.get_node_or_null("CharacterList")
 	if chars_node:
 		state["character_select_count"] = chars_node.get_child_count()
 	# 当前选中（玩家高亮）
-	var focused = current_scene.get("_focused_index")
+	var focused: Variant = current_scene.get("_focused_index")
 	if focused != null:
 		state["character_focused_index"] = int(focused)
 
@@ -253,7 +253,7 @@ func _write_reward_state(state: Dictionary, current_scene: Node) -> void:
 	if gs == null:
 		return
 	# 2026-08-10 fix: 之前 gs.get("last_reward") 不会读 meta — get() 只读脚本属性，meta 必须用 get_meta()
-	var reward = gs.get_meta("last_reward", null) if gs.has_meta("last_reward") else null
+	var reward: Variant = gs.get_meta("last_reward", null) if gs.has_meta("last_reward") else null
 	if reward == null:
 		state["reward"] = null
 		return
@@ -267,7 +267,7 @@ func _write_reward_state(state: Dictionary, current_scene: Node) -> void:
 		"card_choices": [],
 	}
 	for i in range(card_choices.size()):
-		var c = card_choices[i]
+		var c: Variant = card_choices[i]
 		if c == null:
 			continue
 		var card_info: Dictionary = {
@@ -290,11 +290,11 @@ func _write_reward_state(state: Dictionary, current_scene: Node) -> void:
 	state["reward"] = reward_dict
 
 func _write_battle_state(state: Dictionary, current_scene: Node) -> void:
-	var bm = current_scene.get_node_or_null("BattleManager")
+	var bm: Node = current_scene.get_node_or_null("BattleManager")
 	if bm == null:
 		return
 	# Player 状态
-	var player = bm.get("player")
+	var player: Variant = bm.get("player")
 	if player:
 		state["hp"] = player.current_hp
 		state["max_hp"] = player.max_hp
@@ -303,7 +303,7 @@ func _write_battle_state(state: Dictionary, current_scene: Node) -> void:
 		state["block"] = player.current_block if "current_block" in player else 0
 		# 手牌数量：优先读 BattleUI.hand_count（single source of truth，避免 race）
 		# 修复数据漂移 bug 2026-07-15: state JSON hand=1 vs 截图 3 张
-		var ui = current_scene.get_node_or_null("BattleUI")
+		var ui: Node = current_scene.get_node_or_null("BattleUI")
 		if ui and "hand_count" in ui:
 			state["hand_count"] = int(ui.hand_count)
 		else:
@@ -321,7 +321,7 @@ func _write_battle_state(state: Dictionary, current_scene: Node) -> void:
 		var hand_cards: Array = []
 		if player.hand:
 			for i in range(player.hand.size()):
-				var c = player.hand[i]
+				var c: Variant = player.hand[i]
 				if c == null:
 					continue
 				var card_info: Dictionary = {
@@ -347,15 +347,15 @@ func _write_battle_state(state: Dictionary, current_scene: Node) -> void:
 	# 2026-08-10 fix (card 90780893): 原代码只看 enemies[0].is_alive — 第 1 个敌人 HP=0 但 enemies[1] 还活着时
 	# state.enemy 缺失（key 不写），AI Player 看到 stale state.enemy={} 或 missing key 反复 query 死敌。
 	# 修复：遍历所有 enemies 找第一个 alive 的作为主 enemy，找不到时记录 alive_count=0 + dead_count 让 LLM 知道战况。
-	var enemies = bm.get("enemies")
+	var enemies: Variant = bm.get("enemies")
 	if enemies and enemies.size() > 0:
-		var primary_enemy = null
+		var primary_enemy: Variant = null
 		var primary_idx: int = -1
 		var alive_count: int = 0
 		var dead_count: int = 0
 		var all_enemies: Array = []
 		for i in range(enemies.size()):
-			var e = enemies[i]
+			var e: Variant = enemies[i]
 			if e == null:
 				continue
 			var is_alive_e: bool = bool(e.is_alive) if "is_alive" in e else false
@@ -391,7 +391,7 @@ func _write_battle_state(state: Dictionary, current_scene: Node) -> void:
 			for i in range(enemies.size()):
 				if i == primary_idx:
 					continue
-				var e = enemies[i]
+				var e: Variant = enemies[i]
 				if e and (bool(e.is_alive) if "is_alive" in e else false):
 					extra.append({
 						"index": i,
@@ -403,7 +403,7 @@ func _write_battle_state(state: Dictionary, current_scene: Node) -> void:
 			if not extra.is_empty():
 				state["enemy"]["extra_enemies"] = extra
 	# 相生链
-	var chain = bm.get("generation_chain")
+	var chain: Variant = bm.get("generation_chain")
 	if chain and chain.size() > 0:
 		state["generation_chain"] = []
 		for elem in chain:

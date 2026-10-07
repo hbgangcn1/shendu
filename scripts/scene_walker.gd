@@ -46,11 +46,11 @@ func _visit_next() -> void:
 		await get_tree().create_timer(1.0).timeout
 		get_tree().quit()
 		return
-	var path = SCENES_TO_VISIT[_index]
+	var path: String = SCENES_TO_VISIT[_index]
 	print("SceneWalker: switching to %s" % path)
 	get_tree().change_scene_to_file.call_deferred(path)
 	await get_tree().create_timer(WAIT_SECONDS).timeout
-	var scene_name = path.get_file().get_basename()
+	var scene_name: String = path.get_file().get_basename()
 	_capture(scene_name)
 	_visit_next()
 

@@ -47,7 +47,7 @@ func _test_all_cards_in_cardpool() -> void:
 		var deck: Array = GameState.get_character_data().get("starter_deck", [])
 		for card in deck:
 			var card_id: String = card.get("id", "")
-			var pool_card = CardPool.get_card(card_id)
+			var pool_card: Dictionary = CardPool.get_card(card_id)
 			assert(pool_card != null, "[%s] starter_deck 卡牌 %s 不在 CardPool 中" % [cid, card_id])
 	print("  ✓ 所有 starter_deck 卡牌在 CardPool 中存在")
 

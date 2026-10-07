@@ -431,7 +431,7 @@ func _on_add_to_deck(collection_index: int) -> void:
 
 func _on_remove_from_deck(deck_index: int) -> void:
 	var ci: int = GameState.deck[deck_index]
-	var card = GameState.collection[ci]
+	var card: Variant = GameState.collection[ci]
 	var card_name: String = card.get("name", card.get("card_name", "未知"))
 	# 二次确认弹窗
 	var dialog := ConfirmationDialog.new()

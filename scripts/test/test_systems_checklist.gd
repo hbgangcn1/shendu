@@ -5,7 +5,7 @@
 
 extends Node
 
-const ShopEnums = preload("res://scripts/core/shop_enums.gd")
+const ShopEnums: GDScript = preload("res://scripts/core/shop_enums.gd")
 
 var passed := 0
 var failed := 0
@@ -225,7 +225,7 @@ func test_cvs03_min_price() -> void:
 
 func test_cvs05_insufficient_stones() -> void:
 	print("\n--- CVS-05: 灵石不足拒绝 ---")
-	var shop_logic = ShopLogic.new()
+	var shop_logic: Variant = ShopLogic.new()
 	var item := ShopItem.new()
 	item.type = ShopEnums.ShopItemType.CARD
 	item.final_price = 15
@@ -235,7 +235,7 @@ func test_cvs05_insufficient_stones() -> void:
 
 func test_cvs07_deduct_stones() -> void:
 	print("\n--- CVS-07: 扣灵石 ---")
-	var shop_logic = ShopLogic.new()
+	var shop_logic: Variant = ShopLogic.new()
 	var player_state := {"spirit_stones": 50, "deck": [], "deck_size": 0}
 	var item := ShopItem.new()
 	item.type = ShopEnums.ShopItemType.CARD
@@ -248,7 +248,7 @@ func test_cvs07_deduct_stones() -> void:
 
 func test_cvs08_mark_sold_out() -> void:
 	print("\n--- CVS-08: 标记售出 ---")
-	var shop_logic = ShopLogic.new()
+	var shop_logic: Variant = ShopLogic.new()
 	var player_state := {"spirit_stones": 50, "deck": [], "deck_size": 0}
 	var item := ShopItem.new()
 	item.type = ShopEnums.ShopItemType.CARD
@@ -260,7 +260,7 @@ func test_cvs08_mark_sold_out() -> void:
 
 func test_cvs09_card_added_to_deck() -> void:
 	print("\n--- CVS-09: 卡牌入卡组 ---")
-	var shop_logic = ShopLogic.new()
+	var shop_logic: Variant = ShopLogic.new()
 	var player_state := {"spirit_stones": 50, "deck": [], "deck_size": 0}
 	var item := ShopItem.new()
 	item.type = ShopEnums.ShopItemType.CARD

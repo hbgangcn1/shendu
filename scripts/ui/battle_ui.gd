@@ -375,7 +375,7 @@ func _create_enemy_ui(enemy: Actor) -> Control:
 		var intent_desc: String = enemy.get_intent_description()
 		var intent_detail: String = enemy.get_intent_detail()
 		var intent_icon := "👁 "
-		var intent_type_tmp = enemy.current_intent.get("type", -1)
+		var intent_type_tmp: Variant = enemy.current_intent.get("type", -1)
 		match intent_type_tmp:
 			Enemy.IntentType.ATTACK, Enemy.IntentType.PIERCE, Enemy.IntentType.ATK_BUFF:
 				intent_icon = "⚔️ "
@@ -490,10 +490,10 @@ func _create_tutorial_overlay() -> void:
 	var arrow_img := Image.create_empty(32, 32, false, Image.FORMAT_RGBA8)
 	for x in range(32):
 		for y in range(32):
-			var cx = 16.0
-			var cy = 16.0
-			var dx = x - cx
-			var dy = y - cy
+			var cx: float = 16.0
+			var cy: float = 16.0
+			var dx: Variant = x - cx
+			var dy: Variant = y - cy
 			# 向下的三角形
 			if abs(dx) * 2 < (16 - dy) and dy < 16:
 				arrow_img.set_pixel(x, y, UITheme.GOLD)
@@ -543,7 +543,7 @@ func _show_tutorial_step() -> void:
 func _get_tutorial_step_data(step: TutorialStep) -> Dictionary:
 	match step:
 		TutorialStep.WELCOME:
-			var hand_node = get_node_or_null("MainHBox/GameArea/BottomPanel/BottomVBox/HandContainer")
+			var hand_node: Node = get_node_or_null("MainHBox/GameArea/BottomPanel/BottomVBox/HandContainer")
 			return {
 				"text": "[color=#FFD700]欢迎来到蜃都战斗！[/color]\n\n点击手牌中的 [color=#4CAF50]卡牌[/color] 来选择它。",
 				"target_node": hand_node,
@@ -553,7 +553,7 @@ func _get_tutorial_step_data(step: TutorialStep) -> Dictionary:
 				"arrow_rotation": -PI / 2,
 			}
 		TutorialStep.SELECT_ENEMY:
-			var enemy_node = get_node_or_null("MainHBox/GameArea/EnemyArea/EnemyContainer")
+			var enemy_node: Node = get_node_or_null("MainHBox/GameArea/EnemyArea/EnemyContainer")
 			return {
 				"text": "很好！现在点击敌人 [color=#EF5350]选择目标[/color]。\n敌人头上会显示 [color=#FFAA44]意图[/color]（攻击/防御/治疗等）。",
 				"target_node": enemy_node,
@@ -570,7 +570,7 @@ func _get_tutorial_step_data(step: TutorialStep) -> Dictionary:
 				"arrow_pos": Vector2(),
 			}
 		TutorialStep.END_TURN:
-			var btn = get_node_or_null("MainHBox/GameArea/BottomPanel/BottomVBox/EndTurnButton")
+			var btn: Node = get_node_or_null("MainHBox/GameArea/BottomPanel/BottomVBox/EndTurnButton")
 			return {
 				"text": "打完牌后，点击 [color=#FFD700]结束回合[/color] 按钮。\n敌人将按 [color=#FFAA44]意图[/color] 行动。\n\n下回合灵力会 [color=#42A5F5]回满[/color] 并 [color=#4CAF50]抽新牌[/color]。",
 				"target_node": btn,
@@ -580,7 +580,7 @@ func _get_tutorial_step_data(step: TutorialStep) -> Dictionary:
 				"arrow_rotation": -PI / 2,
 			}
 		TutorialStep.ENERGY:
-			var energy_label = get_node_or_null("MainHBox/GameArea/BottomPanel/BottomVBox/PlayerInfoRow/PlayerEnergyLabel")
+			var energy_label: Node = get_node_or_null("MainHBox/GameArea/BottomPanel/BottomVBox/PlayerInfoRow/PlayerEnergyLabel")
 			return {
 				"text": "[color=#42A5F5]灵力[/color] 每回合恢复到上限（默认 10）。\n出牌消耗灵力，规划好每回合的花费。\n\n[color=#D4A04C]过载[/color]：单回合花费 > 8 会增加 [color=#CC88FF]魔念[/color]。",
 				"target_node": energy_label,

@@ -26,7 +26,7 @@ func test_card_pool_loading() -> void:
 func test_get_card() -> void:
 	print("\n--- 测试获取卡牌 ---")
 	# 测试存在的卡牌（新 ID 格式）
-	var fire_bolt = CardPool.get_card("MC-FI-001")
+	var fire_bolt: Dictionary = CardPool.get_card("MC-FI-001")
 	assert(fire_bolt != null, "MC-FI-001 应存在")
 	assert(fire_bolt.name == "烈焰弹", "MC-FI-001 名称应为 烈焰弹")
 	assert(fire_bolt.damage == 10, "MC-FI-001 伤害应为 10")
@@ -34,13 +34,13 @@ func test_get_card() -> void:
 	assert(fire_bolt.cost == 3, "MC-FI-001 费用应为 3")
 	
 	# 测试不存在的卡牌
-	var not_exist = CardPool.get_card("not_exist")
+	var not_exist: Variant = CardPool.get_card("not_exist")
 	assert(not_exist == null, "不存在的卡牌应返回 null")
 	print("  ✓ 获取卡牌正确")
 
 func test_get_mvp_pool() -> void:
 	print("\n--- 测试获取 MVP 卡池（活跃池，炼气期 17 张） ---")
-	var pool = CardPool.get_mvp_pool()
+	var pool: Array = CardPool.get_mvp_pool()
 	var mvp_size: int = CardPool._mvp_pool.size()
 	assert(pool.size() == mvp_size, "MVP 活跃池应为 %d 张，实际为 %d" % [mvp_size, pool.size()])
 
@@ -53,7 +53,7 @@ func test_get_mvp_pool() -> void:
 
 func test_card_data_structure() -> void:
 	print("\n--- 测试卡牌数据结构 ---")
-	var card = CardPool.get_card("MC-ME-001")
+	var card: Dictionary = CardPool.get_card("MC-ME-001")
 	assert(card != null, "MC-ME-001 应存在")
 	
 	# 检查基础属性

@@ -23,7 +23,7 @@ var _has_auto_save: bool = false
 
 func _ready() -> void:
 	# 初始化存档系统（动态加载避免 class_name 注册顺序问题）
-	var SaveSystemScript = load("res://scripts/core/save_system.gd")
+	var SaveSystemScript: GDScript = load("res://scripts/core/save_system.gd")
 	_save_system = SaveSystemScript.new()
 	add_child(_save_system)
 	_has_auto_save = _save_system.has_auto_save()

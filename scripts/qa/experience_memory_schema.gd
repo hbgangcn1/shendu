@@ -137,7 +137,7 @@ static func validate_all_records(records: Array) -> Dictionary:
 	var all_errors: Array[Dictionary] = []
 
 	for i in range(records.size()):
-		var rec = records[i]
+		var rec: Variant = records[i]
 		var errs: Array[String] = validate_record(rec)
 		if errs.is_empty():
 			valid_count += 1

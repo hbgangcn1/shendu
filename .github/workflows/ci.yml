@@ -7,7 +7,7 @@ on:
     branches: [main]
 
 env:
-  GODOT_VERSION: 4.6
+  GODOT_VERSION: 4.7
   EXPORT_NAME: shendu
 
 jobs:
@@ -38,7 +38,7 @@ jobs:
     name: Unit Tests
     runs-on: ubuntu-latest
     container:
-      image: barichello/godot-ci:4.4
+      image: barichello/godot-ci:4.7
     steps:
       - uses: actions/checkout@v4
       
@@ -50,7 +50,7 @@ jobs:
       
       - name: Run Tests
         run: |
-          godot --headless --path . -s scripts/main.gd
+          godot --headless --path . -s scripts/test_runner.gd
         timeout-minutes: 5
 
   build-windows:
@@ -58,7 +58,7 @@ jobs:
     needs: [lint, test]
     runs-on: ubuntu-latest
     container:
-      image: barichello/godot-ci:4.4
+      image: barichello/godot-ci:4.7
     steps:
       - uses: actions/checkout@v4
         with:

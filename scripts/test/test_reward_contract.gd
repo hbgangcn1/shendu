@@ -5,8 +5,8 @@
 
 extends Node
 
-const BattleReward = preload("res://scripts/core/reward_data.gd")
-const CardData = preload("res://scripts/core/card_data.gd")
+const BattleReward: GDScript = preload("res://scripts/core/reward_data.gd")
+const CardData: GDScript = preload("res://scripts/core/card_data.gd")
 
 func run_all_tests() -> void:
 	print("\n========== 奖励契约验证测试（12-reward-system-spec.md） ==========")
@@ -14,13 +14,13 @@ func run_all_tests() -> void:
 	# ===== §1.3 灵石/道行数值验证 =====
 	print("\n--- §1.3 灵石/道行 ---")
 	for i in range(100):
-		var r_normal = BattleReward.generate(false, false, 0)
+		var r_normal: Variant = BattleReward.generate(false, false, 0)
 		assert(r_normal.dao_xing == 2, "普通怪道行应为 2，实际 %d" % r_normal.dao_xing)
 		assert(r_normal.spirit_stones >= 5 and r_normal.spirit_stones <= 11, "普通怪灵石 5~11，实际 %d" % r_normal.spirit_stones)
-		var r_elite = BattleReward.generate(true, false, 0)
+		var r_elite: Variant = BattleReward.generate(true, false, 0)
 		assert(r_elite.dao_xing == 5, "精英道行应为 5，实际 %d" % r_elite.dao_xing)
 		assert(r_elite.spirit_stones >= 13 and r_elite.spirit_stones <= 23, "精英灵石 13~23，实际 %d" % r_elite.spirit_stones)
-		var r_boss = BattleReward.generate(false, true, 0)
+		var r_boss: Variant = BattleReward.generate(false, true, 0)
 		assert(r_boss.dao_xing == 10, "Boss 道行应为 10，实际 %d" % r_boss.dao_xing)
 		assert(r_boss.spirit_stones >= 25 and r_boss.spirit_stones <= 45, "Boss 灵石 25~45，实际 %d" % r_boss.spirit_stones)
 	print("  ✓ 普通怪: 5~11 灵石 +2 道行")
@@ -46,7 +46,7 @@ func run_all_tests() -> void:
 			candidates = BattleReward._downgrade_rarity(all_cards, rarity)
 		if candidates.is_empty():
 			candidates = all_cards
-		var selected = candidates[randi() % candidates.size()]
+		var selected: Variant = candidates[randi() % candidates.size()]
 		counts[CardData.RARITY_INT_TO_STRING[selected.rarity]] += 1
 
 	var total: int = 0
@@ -66,7 +66,7 @@ func run_all_tests() -> void:
 	# 边界条件：MVP 池只有 1 张 rare（fire_burst），无 epic/legend
 	# 所以滚到 epic/legend 时应该降级到 common/rare
 	for i in range(100):
-		var reward = BattleReward.generate(false, false, 0)  # MVP 池
+		var reward: Variant = BattleReward.generate(false, false, 0)  # MVP 池
 		assert(reward.card_choices.size() == 3, "三选一必须 3 张")
 		for c in reward.card_choices:
 			assert(c != null, "候选卡不能为 null（降级兜底应保证 3 张都有结果）")
@@ -76,12 +76,12 @@ func run_all_tests() -> void:
 	print("\n--- §4.1 元素加权 ---")
 	# 模拟玩家牌组全是火：理论上火卡出率 +20%
 	# 设置 GameState.deck 全火
-	var original_deck = GameState.deck.duplicate()
-	var original_collection = GameState.collection.duplicate()
+	var original_deck: Array = GameState.deck.duplicate()
+	var original_collection: Array = GameState.collection.duplicate()
 	GameState.collection.clear()
 	GameState.deck.clear()
 	# 加 5 张火卡
-	var fi_burst = CardPool.get_card("MC-FI-002")
+	var fi_burst: Dictionary = CardPool.get_card("MC-FI-002")
 	if fi_burst:
 		for i in range(5):
 			var idx: int = GameState.add_to_collection(fi_burst.to_dict())
@@ -90,7 +90,7 @@ func run_all_tests() -> void:
 	var fire_count: int = 0
 	var total_count: int = 0
 	for i in range(500):
-		var reward = BattleReward.generate(false, false, 0)
+		var reward: Variant = BattleReward.generate(false, false, 0)
 		for c in reward.card_choices:
 			total_count += 1
 			if c.element == 3:  # FIRE

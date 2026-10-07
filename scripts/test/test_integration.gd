@@ -5,19 +5,19 @@
 
 extends Node
 
-const MapNodeScript = preload("res://scripts/core/map_node.gd")
-const MapGeneratorScript = preload("res://scripts/core/map_generator.gd")
-const ConnectivityValidatorScript = preload("res://scripts/core/connectivity_validator.gd")
-const ShopItemScript = preload("res://scripts/core/shop_item.gd")
-const ShopInventoryScript = preload("res://scripts/core/shop_inventory.gd")
-const EventDefinitionScript = preload("res://scripts/core/event_definition.gd")
-const EventChoiceScript = preload("res://scripts/core/event_choice.gd")
-const EventOutcomeScript = preload("res://scripts/core/event_outcome.gd")
-const EventPreconditionScript = preload("res://scripts/core/event_precondition.gd")
-const DaoXingManagerScript = preload("res://scripts/core/progression_data.gd")
-const CardDataResourceScript = preload("res://scripts/core/card_data.gd")
-const BattleRewardScript = preload("res://scripts/core/reward_data.gd")
-const ShopEnumsScript = preload("res://scripts/core/shop_enums.gd")
+const MapNodeScript: GDScript = preload("res://scripts/core/map_node.gd")
+const MapGeneratorScript: GDScript = preload("res://scripts/core/map_generator.gd")
+const ConnectivityValidatorScript: GDScript = preload("res://scripts/core/connectivity_validator.gd")
+const ShopItemScript: GDScript = preload("res://scripts/core/shop_item.gd")
+const ShopInventoryScript: GDScript = preload("res://scripts/core/shop_inventory.gd")
+const EventDefinitionScript: GDScript = preload("res://scripts/core/event_definition.gd")
+const EventChoiceScript: GDScript = preload("res://scripts/core/event_choice.gd")
+const EventOutcomeScript: GDScript = preload("res://scripts/core/event_outcome.gd")
+const EventPreconditionScript: GDScript = preload("res://scripts/core/event_precondition.gd")
+const DaoXingManagerScript: GDScript = preload("res://scripts/core/progression_data.gd")
+const CardDataResourceScript: GDScript = preload("res://scripts/core/card_data.gd")
+const BattleRewardScript: GDScript = preload("res://scripts/core/reward_data.gd")
+const ShopEnumsScript: GDScript = preload("res://scripts/core/shop_enums.gd")
 
 var passed := 0
 var failed := 0
@@ -69,7 +69,7 @@ func test_full_combat_loop() -> void:
 
 		# 打出第一张牌
 		if player.hand.size() > 0:
-			var card = player.hand[0]
+			var card: Variant = player.hand[0]
 			if card.cost <= player.current_energy:
 				player.play_card(0)
 				_assert(player.hand.size() < 5 or player.hand.size() == 5, "出牌后手牌减少")
@@ -270,7 +270,7 @@ func test_map_generation() -> void:
 
 func test_shop_system() -> void:
 	print("\n--- 测试商店系统 ---")
-	var shop_logic = ShopLogic.new()
+	var shop_logic: Variant = ShopLogic.new()
 
 	# 价格计算
 	var price := ShopInventory.calculate_base_price(ShopEnumsScript.ShopItemType.CARD, "common")
@@ -305,7 +305,7 @@ func test_shop_system() -> void:
 
 func test_event_system() -> void:
 	print("\n--- 测试事件系统 ---")
-	var event_logic = EventLogic.new(42)
+	var event_logic: Variant = EventLogic.new(42)
 
 	# 加载测试事件
 	var test_events := [
@@ -344,17 +344,17 @@ func test_event_system() -> void:
 
 func test_reward_system() -> void:
 	print("\n--- 测试奖励系统 ---")
-	var reward = BattleRewardScript.generate(false, false, 0)
+	var reward: Variant = BattleRewardScript.generate(false, false, 0)
 	_assert(reward.spirit_stones > 0, "有灵石奖励")
 	_assert(reward.dao_xing > 0, "有道行奖励")
 	_assert(reward.card_choices.size() == 3, "三选一")
 
 	# 精英奖励
-	var elite_reward = BattleRewardScript.generate(true, false, 0)
+	var elite_reward: Variant = BattleRewardScript.generate(true, false, 0)
 	_assert(elite_reward.spirit_stones > reward.spirit_stones, "精英灵石更多")
 
 	# Boss奖励
-	var boss_reward = BattleRewardScript.generate(false, true, 0)
+	var boss_reward: Variant = BattleRewardScript.generate(false, true, 0)
 	_assert(boss_reward.dao_xing == 10, "Boss道行=10")
 
 	# 突破选择

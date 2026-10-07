@@ -33,8 +33,8 @@ const MODE_MODEL := "model"    # LLM-driven（必走）
 var _ai_player_mode: String = MODE_MODEL  # 默认就是 LLM，不再 fallback script
 
 # MapNode.NodeType 枚举（用于判断节点类型）
-const _MapNodeScript = preload("res://scripts/core/map_node.gd")
-const NodeType = _MapNodeScript.NodeType
+const _MapNodeScript: GDScript = preload("res://scripts/core/map_node.gd")
+const NodeType: Dictionary = _MapNodeScript.NodeType
 
 var _state: State = State.IDLE
 var _running: bool = false
@@ -80,7 +80,7 @@ func _ready() -> void:
 		var current_deck: Array = []
 		if not GameState.deck.is_empty():
 			for idx in GameState.deck:
-				var card = GameState.get_collection_card(idx)
+				var card: Dictionary = GameState.get_collection_card(idx)
 				if not card.is_empty():
 					current_deck.append(card)
 		var current_realm: int = GameState.current_realm if GameState.has_method("get_current_realm") else 1
@@ -277,7 +277,7 @@ func _detect_state() -> void:
 
 	# 连接战斗结束信号
 	if _state == State.BATTLE and _current_scene.has_method("_start_battle"):
-		var bm = _current_scene.battle_manager
+		var bm: Variant = _current_scene.battle_manager
 		if bm != null and not bm.battle_ended.is_connected(_on_battle_ended):
 			bm.battle_ended.connect(_on_battle_ended)
 
@@ -447,11 +447,11 @@ func _force_skip_map() -> void:
 	if current == null or current.get("_realm_map") == null:
 		ExperienceMemory.record_quiet("watchdog", "map", "force_skip_failed", {"reason": "no_realm_map"})
 		return
-	var realm_map = current.get("_realm_map")
+	var realm_map: Variant = current.get("_realm_map")
 	if realm_map == null:
 		ExperienceMemory.record_quiet("watchdog", "map", "force_skip_failed", {"reason": "realm_map_null"})
 		return
-	var target_node = null
+	var target_node: Variant = null
 	for n in realm_map.nodes:
 		if n.is_reachable and not GameState.visited_node_ids.has(n.id):
 			target_node = n
@@ -470,7 +470,7 @@ func _force_skip_map() -> void:
 		"elapsed_ms": Time.get_ticks_msec() - _watchdog_map_entered_at_ms,
 	})
 	# 根据 node type 切 scene（参考 game_map_scene.gd 的 _on_confirm_go line 108-）
-	var MapNodeScript = load("res://scripts/core/map_node.gd")
+	var MapNodeScript: GDScript = load("res://scripts/core/map_node.gd")
 	match target_node.type:
 		MapNodeScript.NodeType.COMBAT, MapNodeScript.NodeType.ELITE, MapNodeScript.NodeType.BOSS:
 			get_tree().change_scene_to_file("res://scenes/battle.tscn")
@@ -497,7 +497,7 @@ func _force_skip_battle() -> void:
 	if current == null:
 		ExperienceMemory.record_quiet("watchdog", "battle", "force_skip_failed", {"reason": "no_scene"})
 		return
-	var bm = null
+	var bm: Variant = null
 	# 2026-08-02 20:25 fix：battle_manager 也可能不是 method（优先用 _get_battle_manager 风格的 helper 模式）
 	if current.has_method("battle_manager"):
 		bm = current.battle_manager
@@ -524,7 +524,7 @@ func _force_end_turn_battle() -> void:
 	if current == null:
 		ExperienceMemory.record_quiet("watchdog", "battle", "force_end_turn_failed", {"reason": "no_scene"})
 		return
-	var bm = null
+	var bm: Variant = null
 	if current.has_method("battle_manager"):
 		bm = current.battle_manager
 	elif current.has_node("BattleManager"):
@@ -627,8 +627,8 @@ func _handle_map() -> void:
 	var scene := _current_scene
 	# 通过调用 _show_confirmation 选中第一个 reachable 节点
 	if scene.has_method("_show_confirmation") and scene.get("_realm_map") != null:
-		var realm_map = scene._realm_map
-		var reachable_node = null
+		var realm_map: Variant = scene._realm_map
+		var reachable_node: Variant = null
 		for n in realm_map.nodes:
 			if n.is_reachable and not GameState.visited_node_ids.has(n.id):
 				reachable_node = n
@@ -638,7 +638,7 @@ func _handle_map() -> void:
 			scene._show_confirmation(reachable_node)
 			await _wait_ms(500)
 			# 触发确认前往
-			var node_type = reachable_node.type
+			var node_type: Variant = reachable_node.type
 			scene._on_confirm_go()
 			await _wait_ms(1500)
 			# 处理 REST/EVENT 节点弹窗：弹窗不换场景，需手动关闭以触发 _update_reachable()
@@ -656,7 +656,7 @@ func _handle_map() -> void:
 ## 处理休息节点弹窗：点击第一个按钮（吐纳）关闭弹窗
 func _handle_rest_popup(scene: Node) -> void:
 	print("AIPlayer: 处理休息节点弹窗")
-	var rest_popup = scene.get_node_or_null("_rest_popup")
+	var rest_popup: Node = scene.get_node_or_null("_rest_popup")
 	if rest_popup == null or not is_instance_valid(rest_popup):
 		print("AIPlayer: 未找到 _rest_popup")
 		return
@@ -674,7 +674,7 @@ func _handle_rest_popup(scene: Node) -> void:
 ## 处理事件节点弹窗：点击第一个选择按钮关闭弹窗
 func _handle_event_popup(scene: Node) -> void:
 	print("AIPlayer: 处理事件节点弹窗")
-	var event_popup = scene.get_node_or_null("_event_popup")
+	var event_popup: Node = scene.get_node_or_null("_event_popup")
 	if event_popup == null or not is_instance_valid(event_popup):
 		print("AIPlayer: 未找到 _event_popup")
 		return
@@ -774,7 +774,7 @@ func _play_best_cards(bm: Node, player: Node) -> bool:
 
 		var chosen: Dictionary = playable[0]
 		var card_index: int = chosen.index
-		var card_data = chosen.card
+		var card_data: Variant = chosen.card
 
 		print("AIPlayer: 打出卡牌 #%d %s(费用 %d,伤害 %d)" % [
 			card_index,
@@ -815,9 +815,9 @@ func _play_best_cards(bm: Node, player: Node) -> bool:
 ## 获取可出牌并按优先级排序
 func _get_playable_cards_sorted(_bm: Node, player: Node) -> Array[Dictionary]:  # _bm 备用
 	var result: Array[Dictionary] = []
-	var hand = player.hand
+	var hand: Array = player.hand
 	for i in range(hand.size()):
-		var card = hand[i]
+		var card: Variant = hand[i]
 		var cost: int = _get_card_cost(card)
 		if cost <= player.current_energy:
 			result.append({
@@ -867,7 +867,7 @@ func _on_battle_ended(result: int) -> void:
 	_turns_in_battle = 0
 
 func _get_battle_manager() -> Node:
-	var scene = _current_scene
+	var scene: Node = _current_scene
 	if scene == null:
 		return null
 	if scene.has_method("_start_battle") and scene.get("battle_manager") != null:
@@ -882,7 +882,7 @@ func _get_player_from_battle_manager(bm: Node) -> Node:
 	return null
 
 func _get_player_hp() -> int:
-	var player = _get_player_from_battle_manager(_get_battle_manager())
+	var player: Variant = _get_player_from_battle_manager(_get_battle_manager())
 	if player != null:
 		return player.current_hp
 	return 0
@@ -920,13 +920,13 @@ func _get_card_kind(card) -> int:
 func _find_card_ui_by_index(index: int) -> Control:
 	if _current_scene == null:
 		return null
-	var battle_ui_node = _current_scene.get_node_or_null("BattleUI")
+	var battle_ui_node: Node = _current_scene.get_node_or_null("BattleUI")
 	if battle_ui_node == null:
 		return null
-	var hand_container = battle_ui_node.get_node_or_null("%HandContainer")
+	var hand_container: Node = battle_ui_node.get_node_or_null("%HandContainer")
 	if hand_container == null:
 		return null
-	var children = hand_container.get_children()
+	var children: Array = hand_container.get_children()
 	if index >= 0 and index < children.size():
 		return children[index] as Control
 	return null
@@ -1290,7 +1290,7 @@ func _save_deck_health_snapshot() -> void:
 		return
 	var deck: Array = []
 	for idx in GameState.deck:
-		var card = GameState.get_collection_card(idx)
+		var card: Dictionary = GameState.get_collection_card(idx)
 		if not card.is_empty():
 			deck.append(card)
 	var analysis := DeckAnalyzer.analyze(deck)

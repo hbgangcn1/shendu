@@ -32,6 +32,11 @@ var first_battle_done: bool = false  # 首战完成标记（用于onboarding）
 
 signal state_changed()
 
+const DEBUG_RUNNER := preload("res://scripts/qa/debug_runner.gd")
+
+func _ready() -> void:
+	DEBUG_RUNNER.ensure_qa_nodes(get_tree())
+
 func reset_run() -> void:
 	hp = 80
 	max_hp = 80
@@ -364,21 +369,24 @@ func _build_decision_hints(by_type: Dictionary, unvisited_reachable: int, total:
 	return " | ".join(hints)
 
 ## 将 layout 写到 user://ai-player-map-layout.json（ai_player_client.py 读这个）
-## 还同时写一份 workspace 镜像让 Phase E consume / agent 能访问
+## 还同时写一份 portable 镜像（user data dir 下，供 Phase E consume / agent 能访问）。
 ##
-## 2026-08-06 fix: 原来用 `res://../.openclaw/workspace/...` 是 Godot 4 不允许的 path —
-## Godot 资源路径不能 `..` 跳出项目根，ProjectSettings.globalize_path 返 project 父目录
-## 写进去是无关路径，workspace 镜像实际不出现。改用 absolute path 固定到
-## `C:\Users\hbgan\.openclaw\workspace\shendu\ai-player-map-layout.json`。
+## 2026-10-07 fix: 原硬编码 Windows 绝对路径改为 OS.get_user_data_dir() 派生。
 ##
-## user:// 写主源（标准 Godot 用法），workspace absolute 写镜像（供 Phase E / agent 读）。
+## user:// 写主源（标准 Godot 用法），portable absolute 写镜像（供 Phase E / agent 读）。
+func _get_map_layout_mirror_path() -> String:
+	var base_dir: String = OS.get_user_data_dir()
+	if OS.has_feature("editor"):
+		pass  # 编辑器与导出包共用同一派生规则，保持 portable
+	return base_dir.path_join("shendu-mirror/ai-player-map-layout.json")
+
 func save_map_layout_to_disk(layout: Dictionary) -> String:
 	if layout.is_empty():
 		return ""
 	var json_str: String = JSON.stringify(layout, "  ")
 	var user_path: String = "user://ai-player-map-layout.json"
-	# 2026-08-06: 用 absolute path 代替 `res://../...`（Godot 4 不允许 `..` 跳出项目根）
-	var abs_workspace: String = "C:/Users/hbgan/.openclaw/workspace/shendu/ai-player-map-layout.json"
+	# Portable 镜像路径（OS.get_user_data_dir() 派生，替代硬编码 Windows 绝对路径）
+	var abs_workspace: String = _get_map_layout_mirror_path()
 	# user:// 写主源
 	var user_file := FileAccess.open(user_path, FileAccess.WRITE)
 	if user_file != null:

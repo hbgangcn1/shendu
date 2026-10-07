@@ -52,7 +52,7 @@ func _on_node_added(node: Node) -> void:
 func _connect_battle_signals(scene: Node) -> void:
 	if not scene.has_method("_start_battle"):
 		return
-	var bm = scene.get("battle_manager")
+	var bm: Variant = scene.get("battle_manager")
 	if bm == null:
 		return
 	if bm.has_signal("turn_started") and not bm.turn_started.is_connected(_on_battle_turn_started):

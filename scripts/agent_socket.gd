@@ -46,7 +46,7 @@ func _process(_delta: float) -> void:
 	_clear_file()
 	if content.strip_edges().is_empty():
 		return
-	var json = JSON.parse_string(content)
+	var json: Variant = JSON.parse_string(content)
 	if json == null or not (json is Dictionary):
 		push_error("AgentSocket: invalid JSON: %s" % content)
 		return
@@ -137,7 +137,7 @@ func _read_state_file() -> Dictionary:
 		return {}
 	var content := f.get_as_text()
 	f.close()
-	var parsed = JSON.parse_string(content)
+	var parsed: Variant = JSON.parse_string(content)
 	if parsed == null or not (parsed is Dictionary):
 		return {}
 	return parsed
@@ -159,7 +159,7 @@ func _do_select_node(node_id: String) -> void:
 		push_warning("AgentSocket: no current scene for select_node")
 		return
 	# map scene 有 _realm_map
-	var realm_map = scene.get("_realm_map")
+	var realm_map: Variant = scene.get("_realm_map")
 	if realm_map == null:
 		push_warning("AgentSocket: scene has no _realm_map, fall back to click")
 		# fallback: click by coords
@@ -217,7 +217,7 @@ func _do_play_card(index: int) -> void:
 		push_warning("AgentSocket: play_card no current scene")
 		return
 	# 2026-08-08: main_battle scene 用 get_node_or_null("BattleManager")，跟 agent_inspector.gd:148 一致
-	var bm = scene.get_node_or_null("BattleManager")
+	var bm: Node = scene.get_node_or_null("BattleManager")
 	if bm == null:
 		push_warning("AgentSocket: play_card scene has no BattleManager child")
 		return
@@ -236,7 +236,7 @@ func _do_end_turn() -> void:
 	if scene == null:
 		push_warning("AgentSocket: end_turn no current scene")
 		return
-	var bm = scene.get_node_or_null("BattleManager")
+	var bm: Node = scene.get_node_or_null("BattleManager")
 	if bm == null or not bm.has_method("player_end_turn"):
 		push_warning("AgentSocket: BattleManager has no player_end_turn method")
 		return

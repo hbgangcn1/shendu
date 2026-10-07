@@ -108,7 +108,7 @@ func test_goal_from_dict_basics() -> void:
 
 func test_goal_from_dict_missing_type() -> void:
 	print("\n--- 测试 _goal_from_dict 缺 type 返回 null ---")
-	var g = RunGoals._goal_from_dict({"value": 5, "priority": "high"})
+	var g: Variant = RunGoals._goal_from_dict({"value": 5, "priority": "high"})
 	assert(g == null, "缺 type 应返回 null，实际 %s" % str(g))
 	print("  ✓ 缺 type 返回 null")
 

@@ -7,7 +7,7 @@
 class_name EventDefinition
 extends RefCounted
 
-const EventEnums = preload("res://scripts/core/event_enums.gd")
+const EventEnums: GDScript = preload("res://scripts/core/event_enums.gd")
 
 var id: String
 var name: String

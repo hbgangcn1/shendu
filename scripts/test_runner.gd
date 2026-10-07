@@ -71,7 +71,7 @@ func _ready() -> void:
 		print("")
 		print("║  最慢 3 个 suite:                   ║")
 		for i in range(min(3, sorted_suites.size())):
-			var suite_name = sorted_suites[i]
+			var suite_name: Variant = sorted_suites[i]
 			var ms: int = int(_suite_durations[suite_name])
 			print("║    %.2fs  %s" % [float(ms) / 1000.0, suite_name])
 
@@ -109,12 +109,12 @@ func _ready() -> void:
 func _run_test_suite(suite_name: String, script_path: String) -> void:
 	print("━━━ %s ━━━" % suite_name)
 
-	var script = load(script_path)
+	var script: Variant = load(script_path)
 	if script == null:
 		_record_fail(suite_name, "无法加载脚本: %s" % script_path)
 		return
 
-	var instance = script.new()
+	var instance: Variant = script.new()
 	if instance == null or not instance is Node:
 		_record_fail(suite_name, "无法实例化脚本")
 		if instance: instance.free()

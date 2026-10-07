@@ -7,7 +7,7 @@
 
 extends Control
 
-const BattleReward = preload("res://scripts/core/reward_data.gd")
+const BattleReward: GDScript = preload("res://scripts/core/reward_data.gd")
 const CardScene := preload("res://scenes/card.tscn")
 
 # ==================== 节点引用 ====================
@@ -102,7 +102,7 @@ func _ready() -> void:
 
 func _create_card_choices() -> void:
 	for i in range(reward.card_choices.size()):
-		var card_data = reward.card_choices[i]
+		var card_data: Variant = reward.card_choices[i]
 		var entry := _create_card_button(card_data, i)
 		card_container.add_child(entry.panel)
 		card_buttons.append(entry)
@@ -257,7 +257,7 @@ func _on_card_pressed(index: int) -> void:
 
 	# 选中的卡牌加入卡牌池和牌库
 	if index >= 0 and index < reward.card_choices.size():
-		var card = reward.card_choices[index]
+		var card: Variant = reward.card_choices[index]
 		# 将 CardDataResource 转为 Dictionary 存入卡牌池
 		var card_dict: Dictionary = {
 			"id": card.id,

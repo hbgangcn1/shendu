@@ -80,7 +80,7 @@ var is_boss: bool = false
 
 ## 生成战斗奖励（按 spec §1.3）
 static func generate(elite: bool = false, boss: bool = false, realm: int = 0):
-	var reward = load("res://scripts/core/reward_data.gd").new()
+	var reward: GDScript = load("res://scripts/core/reward_data.gd").new()
 	reward.is_elite = elite
 	reward.is_boss = boss
 
@@ -153,7 +153,7 @@ static func _generate_card_choices(count: int, elite: bool, boss: bool, realm: i
 		if filtered.is_empty():
 			# 全部重复：仍允许重复
 			filtered = candidates
-		var selected = filtered[randi() % filtered.size()]
+		var selected: Variant = filtered[randi() % filtered.size()]
 		choices.append(selected)
 		used_ids[selected.id] = true
 
@@ -214,7 +214,7 @@ static func _count_deck_elements() -> Dictionary:
 	if GameState.deck.is_empty():
 		return counts
 	for ci in GameState.deck:
-		var card = GameState.collection[ci] if ci < GameState.collection.size() else null
+		var card: Variant = GameState.collection[ci] if ci < GameState.collection.size() else null
 		if card == null:
 			continue
 		var elem_str: String = CardData.ELEMENT_INT_TO_STRING[card.get("element", 0)]
@@ -256,7 +256,7 @@ static func _filter_by_element(candidates: Array, dominant: String) -> Array:
 static func apply_breakthrough(choice: BreakthroughChoice, player_state: Dictionary) -> void:
 	var data: Dictionary = BREAKTHROUGH_DATA.get(choice, {})
 	var effect: String = data.get("effect", "")
-	var value = data.get("value", 0)
+	var value: Variant = data.get("value", 0)
 
 	match effect:
 		"attack_bonus":

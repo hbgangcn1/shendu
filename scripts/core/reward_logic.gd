@@ -7,7 +7,7 @@
 
 extends Node
 
-const BattleReward = preload("res://scripts/core/reward_data.gd")
+const BattleReward: GDScript = preload("res://scripts/core/reward_data.gd")
 
 signal reward_completed(reward: BattleReward)
 signal card_selected(card_data: Dictionary)

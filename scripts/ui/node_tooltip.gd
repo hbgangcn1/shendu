@@ -10,8 +10,8 @@
 
 extends Node
 
-const MapNodeScript = preload("res://scripts/core/map_node.gd")
-const NodeType = MapNodeScript.NodeType
+const MapNodeScript: GDScript = preload("res://scripts/core/map_node.gd")
+const NodeType: Dictionary = MapNodeScript.NodeType
 
 # ==================== 节点类型 → tooltip 数据 ====================
 ## icon 用 Unicode emoji / 符号 — 无需额外素材，立即可用

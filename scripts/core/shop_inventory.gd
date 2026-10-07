@@ -7,7 +7,7 @@
 class_name ShopInventory
 extends RefCounted
 
-const ShopEnums = preload("res://scripts/core/shop_enums.gd")
+const ShopEnums: GDScript = preload("res://scripts/core/shop_enums.gd")
 
 var items: Array = []                ## ShopItem[]
 var max_slots: int = 6

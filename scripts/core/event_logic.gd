@@ -8,11 +8,11 @@
 class_name EventLogic
 extends Node
 
-const EventEnums = preload("res://scripts/core/event_enums.gd")
-const EventDefinitionScript = preload("res://scripts/core/event_definition.gd")
-const EventChoiceScript = preload("res://scripts/core/event_choice.gd")
-const EventOutcomeScript = preload("res://scripts/core/event_outcome.gd")
-const EventPreconditionScript = preload("res://scripts/core/event_precondition.gd")
+const EventEnums: GDScript = preload("res://scripts/core/event_enums.gd")
+const EventDefinitionScript: GDScript = preload("res://scripts/core/event_definition.gd")
+const EventChoiceScript: GDScript = preload("res://scripts/core/event_choice.gd")
+const EventOutcomeScript: GDScript = preload("res://scripts/core/event_outcome.gd")
+const EventPreconditionScript: GDScript = preload("res://scripts/core/event_precondition.gd")
 
 signal event_triggered(event: EventDefinition)
 signal event_choice_made(choice_index: int, event_id: String)

@@ -227,7 +227,7 @@ func _confirm_selection() -> void:
 		_failsafe_timer.stop()
 	
 	# 切换场景
-	var err = get_tree().change_scene_to_file("res://scenes/map.tscn")
+	var err: Error = get_tree().change_scene_to_file("res://scenes/map.tscn")
 	if err != OK:
 		push_error("角色选择：change_scene_to_file 失败，error code = %d" % err)
 		# 2026-08-01 fix(ed75d23a): 如果 change_scene_to_file 失败，尝试 call_deferred

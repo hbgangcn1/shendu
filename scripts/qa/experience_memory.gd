@@ -14,7 +14,9 @@ const MEMORY_FILE := "user://qa-logs/experience-memory.json"
 # 2026-07-14: 同时写一份镜像到 workspace 路径，让 shendu-loop Phase E 能读到
 # （Phase E 是 Node.js 工具，跑在 workspace 上下文，读 user:// 路径需要装 Godot SDK 不可行）
 # 双写策略：user:// 是权威源（Godot 启动时读），workspace 是镜像（agent 读）
-const WORKSPACE_MIRROR_FILE := "C:/Users/hbgan/.openclaw/workspace/shendu/qa-logs/experience-memory.json"
+## 2026-10-07 fix: 原硬编码 Windows 绝对路径改为 OS.get_user_data_dir() 派生（portable）。
+func _get_workspace_mirror_file() -> String:
+	return OS.get_user_data_dir().path_join("shendu-mirror/qa-logs/experience-memory.json")
 
 ## 经验记录字段（使用 Dictionary）：
 ## id, type, scene, run_id, description, evidence, confidence, uses, timestamp
@@ -257,7 +259,7 @@ func _save_memory() -> void:
 
 # 2026-07-14: 镜像到 workspace 路径（sute-SilentCommand 友好）
 func _mirror_to_workspace(data: Dictionary) -> void:
-	var abs_path := WORKSPACE_MIRROR_FILE
+	var abs_path := _get_workspace_mirror_file()
 	var abs_dir := abs_path.get_base_dir()
 	if not DirAccess.dir_exists_absolute(abs_dir):
 		DirAccess.make_dir_recursive_absolute(abs_dir)

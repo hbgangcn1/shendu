@@ -43,7 +43,7 @@ func _generate_items() -> void:
 		var roll := randf()
 		if roll < 0.4:
 			# 卡牌
-			var card = mvp_cards[randi() % mvp_cards.size()]
+			var card: Variant = mvp_cards[randi() % mvp_cards.size()]
 			_shop_items.append({
 				"name": card.name,
 				"price": randi_range(8, 20),
@@ -104,7 +104,7 @@ func _render_items() -> void:
 		var desc: String = item.get("description", "")
 		var can_afford: bool = GameState.spirit_stones >= price
 
-		var card_data_ref = item.get("card_data", null)
+		var card_data_ref: Variant = item.get("card_data", null)
 		var elem_name := ""
 		if card_data_ref:
 			elem_name = "[%s] " % WuXing.get_element_name(card_data_ref.element)
@@ -173,7 +173,7 @@ func _on_buy_item(index: int) -> void:
 			GameState.hp += effect_value
 			print("商店：最大HP +%d → %d/%d" % [effect_value, GameState.hp, GameState.max_hp])
 		"card":
-			var card_data = item.get("card_data", null)
+			var card_data: Variant = item.get("card_data", null)
 			if card_data:
 				# 将 CardDataResource 转为 Dictionary
 				var card_dict: Dictionary = {

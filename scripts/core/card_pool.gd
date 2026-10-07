@@ -61,26 +61,13 @@ func _load_cards(path: String, target_pool: Array) -> void:
 
 		var kind_str = dict.get("type", dict.get("card_type", "attack"))
 		if typeof(kind_str) in [TYPE_INT, TYPE_FLOAT]:
-			# zhuji/jindan 旧 schema: 0=attack, 1=defense, 2=support, 3=special
-			# spec 新 schema (card_data KIND_INT_TO_STRING): 0=attack, 1=defense, 2=special, 3=support
-			# 旧 schema 中 2/3 顺序与新 schema 相反，需交换
-			var kind_int: int = int(kind_str)
-			if kind_int == 2:
-				card.card_kind = 3  # 旧 support → 新 support(=3)
-			elif kind_int == 3:
-				card.card_kind = 2  # 旧 special → 新 special(=2)
-			else:
-				card.card_kind = kind_int
+			card.card_kind = int(kind_str)
 		else:
 			card.set_kind_from_string(str(kind_str))
 
 		var rar_str = dict.get("rarity", "common")
-		# JSON 数字默认解析为 float，需 int() 转换
-		# zhuji/jindan 旧 schema: 1=common, 2=rare, 3=epic, 4=legend
-		# spec 新 schema (card_data RARITY_INT_TO_STRING): 0=common, 1=rare, 2=epic, 3=legend
-		# 需 -1 偏移对齐
 		if typeof(rar_str) in [TYPE_INT, TYPE_FLOAT]:
-			card.rarity = int(rar_str) - 1
+			card.rarity = int(rar_str)
 		else:
 			card.set_rarity_from_string(str(rar_str))
 

@@ -7,7 +7,7 @@
 class_name EventOutcome
 extends RefCounted
 
-const EventEnums = preload("res://scripts/core/event_enums.gd")
+const EventEnums: GDScript = preload("res://scripts/core/event_enums.gd")
 
 var resource_type  # EventEnums.ResourceType
 var value: int

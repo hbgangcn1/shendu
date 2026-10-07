@@ -7,7 +7,7 @@
 
 extends Node2D
 
-const BattleReward = preload("res://scripts/core/reward_data.gd")
+const BattleReward: GDScript = preload("res://scripts/core/reward_data.gd")
 
 var _save_system: SaveSystem = null
 
@@ -132,7 +132,7 @@ func _create_normal_enemy() -> Enemy:
 		Enemy.create_neon_spider,
 		Enemy.create_data_jellyfish,
 	]
-	var factory = pool[randi() % pool.size()]
+	var factory: Variant = pool[randi() % pool.size()]
 	return factory.call()
 
 func _create_elite() -> Enemy:
@@ -141,7 +141,7 @@ func _create_elite() -> Enemy:
 		Enemy.create_elite_thorn_vine,
 		Enemy.create_elite_phantom_fire,
 	]
-	var factory = pool[randi() % pool.size()]
+	var factory: Variant = pool[randi() % pool.size()]
 	return factory.call()
 
 func _create_boss() -> Enemy:
@@ -230,7 +230,7 @@ func _on_battle_ended(result: int) -> void:
 		# 生成奖励
 		var node_type: int = _get_node_type()
 		var is_elite: bool = (node_type == 1)
-		var reward = BattleReward.generate(is_elite, is_boss_fight, GameState.current_realm)
+		var reward: Variant = BattleReward.generate(is_elite, is_boss_fight, GameState.current_realm)
 
 		# 存储奖励到GameState供奖励场景读取
 		GameState.set_meta("last_reward", reward)
